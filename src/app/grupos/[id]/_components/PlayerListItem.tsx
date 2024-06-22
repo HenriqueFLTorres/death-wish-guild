@@ -1,13 +1,17 @@
 import { Sword } from "lucide-react"
 import Image from "next/image"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { memo } from "react"
 
-function PlayerListItem() {
+function PlayerListItemComponent() {
   return (
-    <li className="relative flex w-full items-center gap-2 overflow-hidden rounded-full border-2 border-black/10 bg-black/20 px-2 py-1">
-      <Avatar className="relative z-10 h-6 w-6">
-        <AvatarImage alt="" size={24} src="/avatar/variant-1.png" />
-      </Avatar>
+    <li className="relative flex h-8 w-full items-center gap-2 overflow-hidden rounded-full border-2 border-black/10 bg-black/20 px-2 py-1">
+      <Image
+        alt=""
+        className="relative z-10 h-6 w-6 rounded-full object-cover"
+        height={24}
+        src="/avatar/variant-1.png"
+        width={24}
+      />
 
       <Image
         alt=""
@@ -30,5 +34,7 @@ function PlayerListItem() {
     </li>
   )
 }
+
+const PlayerListItem = memo(PlayerListItemComponent)
 
 export { PlayerListItem }

@@ -11,6 +11,9 @@
     "format:fix": "prettier --write  \"./**/*.{cjs,mjs,ts,tsx,js,html,json,md}\""
   },
   "dependencies": {
+    "@dnd-kit/core": "5.0.3",
+    "@dnd-kit/sortable": "6.0.1",
+    "@dnd-kit/utilities": "^3.2.2",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
