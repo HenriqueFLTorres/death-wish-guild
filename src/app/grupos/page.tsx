@@ -1,5 +1,5 @@
 function Grupos() {
-  return <p>Select a event</p>
+  return <p>Select an event</p>
 }
 
 export default Grupos

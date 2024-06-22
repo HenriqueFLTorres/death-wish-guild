@@ -2,23 +2,21 @@
 
 import {
   DndContext,
-  type DragEndEvent,
+  DragEndEvent,
   DragOverEvent,
-  DragStartEvent,
-  MeasuringStrategy,
-  MouseSensor,
-  TouchSensor,
-  type UniqueIdentifier,
+  KeyboardSensor,
+  PointerSensor,
+  closestCorners,
+  defaultAnnouncements,
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import { arrayMove } from "@dnd-kit/sortable"
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { Clock, Users } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
-import { useRef, useState } from "react"
-import { GroupCard, SortableItem } from "./_components/GroupCard"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react"
+import { GroupCard } from "./_components/GroupCard"
 
 const CURRENT_EVENT = {
   id: 1,
@@ -28,82 +26,27 @@ const CURRENT_EVENT = {
   date: 1719014941283,
 }
 
-const MEASURING_CONFIGURATION = {
-  droppable: {
-    strategy: MeasuringStrategy.Always,
-  },
+const MAX_GROUP_SIZE = 3
+
+type Items = {
+  [key in string]: string[]
 }
 
-export type Items = Record<UniqueIdentifier, UniqueIdentifier[]>
-
 function EventPage() {
-  const [items, setItems] = useState<Items>(() => ({
-    A: createRange(5, (index) => `A${index + 1}`),
-    B: createRange(3, (index) => `B${index + 1}`),
-    C: createRange(2, (index) => `C${index + 1}`),
-    D: createRange(5, (index) => `D${index + 1}`),
-  }))
-  const [containers, setContainers] = useState(
-    Object.keys(items) as UniqueIdentifier[]
+  const [items, setItems] = useState<Items>({
+    root: ["1", "2", "3"],
+    container1: ["4", "5", "6"],
+    container2: ["7", "8", "9"],
+    container3: [],
+  })
+  const [backupItems, setBackupItems] = useState<Items>(items)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   )
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
-  // const lastOverId = useRef<UniqueIdentifier | null>(null)
-  const recentlyMovedToNewContainer = useRef(false)
-
-  // const collisionDetectionStrategy: CollisionDetection = useCallback(
-  //   (args) => {
-  //     if (activeId != null && activeId in items) {
-  //       return closestCenter({
-  //         ...args,
-  //         droppableContainers: args.droppableContainers.filter(
-  //           (container) => container.id in items
-  //         ),
-  //       })
-  //     }
-
-  //     const pointerIntersections = pointerWithin(args)
-  //     const intersections =
-  //       pointerIntersections.length > 0
-  //         ? pointerIntersections
-  //         : rectIntersection(args)
-  //     let overId = getFirstCollision(intersections, "id")
-
-  //     if (overId != null) {
-  //       if (overId in items) {
-  //         const containerItems = items[overId]
-
-  //         if (containerItems.length > 0) {
-  //           overId = closestCenter({
-  //             ...args,
-  //             droppableContainers: args.droppableContainers.filter(
-  //               (container) =>
-  //                 container.id !== overId &&
-  //                 containerItems.includes(container.id)
-  //             ),
-  //           })[0]?.id
-  //         }
-  //       }
-
-  //       lastOverId.current = overId
-
-  //       return [{ id: overId }]
-  //     }
-
-  //     if (recentlyMovedToNewContainer.current) lastOverId.current = activeId
-
-  //     return lastOverId.current == null ? [] : [{ id: lastOverId.current }]
-  //   },
-  //   [activeId, items]
-  // )
-
-  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
-  const findContainer = (id: UniqueIdentifier) => {
-    if (id in items) {
-      return id
-    }
-
-    return Object.keys(items).find((key) => items[key].includes(id))
-  }
 
   const now = new Date()
 
@@ -111,11 +54,12 @@ function EventPage() {
 
   return (
     <DndContext
-      measuring={MEASURING_CONFIGURATION}
+      announcements={defaultAnnouncements}
+      collisionDetection={closestCorners}
       sensors={sensors}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
-      onDragStart={onDragStart}
+      onDragStart={handleDragStart}
     >
       <section className="relative flex w-full flex-col items-center overflow-hidden rounded-xl px-4 py-3">
         <Image
@@ -129,6 +73,10 @@ function EventPage() {
           <header className="flex w-full flex-col gap-2 text-left">
             <div className="flex justify-between">
               <h1 className="text-3xl font-semibold drop-shadow-md">{name}</h1>
+
+              <button type="button" onClick={() => console.log(items)}>
+                showAll items
+              </button>
 
               <div className="flex items-center gap-2">
                 <div className="grid h-5 w-5 place-items-center rounded-sm border border-primary bg-primary-600">
@@ -164,151 +112,122 @@ function EventPage() {
           </header>
 
           <ul className="mx-auto grid w-max grid-cols-3 place-items-center gap-3">
-            {containers.map((containerId) => (
-              <GroupCard
-                containerId={containerId}
-                containerItems={items[containerId]}
-                key={containerId}
-              />
+            {Object.entries(items).map(([key, items]) => (
+              <GroupCard containerId={key} containerItems={items} key={key} />
             ))}
           </ul>
         </div>
 
-        <div className="fixed bottom-12 flex gap-3 rounded border border-black/30 bg-black/60 px-4 py-2 backdrop-blur-md">
+        {/* <div className="fixed bottom-12 flex gap-3 rounded border border-black/30 bg-black/60 px-4 py-2 backdrop-blur-md">
           <SortableItem id={6} />
           <SortableItem id={7} />
           <SortableItem id={8} />
           <Badge>+44</Badge>
-        </div>
+        </div> */}
       </section>
     </DndContext>
   )
 
-  function onDragStart(event: DragStartEvent) {
-    const { active } = event
+  function findContainer(id: string | undefined | null) {
+    if (id == null) return null
 
-    if (activeId !== active.id) {
-      setActiveId(active.id)
+    if (id in items) {
+      return id
     }
+
+    return Object.keys(items).find((key) => items[key].includes(id))
+  }
+
+  function handleDragStart() {
+    setBackupItems(items)
   }
 
   function handleDragOver(event: DragOverEvent) {
     const { active, over } = event
-    const overId = over?.id
 
-    if (overId == null || active.id in items) {
-      return
-    }
+    if (over?.id == null || over == null) return
 
-    const overContainer = findContainer(overId)
+    // Find the containers
     const activeContainer = findContainer(active.id)
+    const overContainer = findContainer(over.id)
 
-    if (overContainer == null || activeContainer == null) {
+    if (
+      activeContainer == null ||
+      overContainer == null ||
+      activeContainer === overContainer
+    ) {
       return
     }
 
-    if (activeContainer !== overContainer) {
-      setItems((items) => {
-        const activeItems = items[activeContainer]
-        const overItems = items[overContainer]
-        const overIndex = overItems.indexOf(overId)
-        const activeIndex = activeItems.indexOf(active.id)
+    setItems((prev) => {
+      const activeItems = prev[activeContainer]
+      const overItems = prev[overContainer]
 
-        let newIndex: number
+      // Find the indexes for the items
+      const activeIndex = activeItems.indexOf(active.id)
+      const overIndex = overItems.indexOf(over.id)
 
-        if (overId in items) {
-          newIndex = overItems.length + 1
-        } else {
-          const isBelowOverItem =
-            over &&
-            active.rect.current.translated &&
-            active.rect.current.translated.top >
-              over.rect.top + over.rect.height
+      let newIndex: number
+      if (over.id in prev) {
+        // We're at the root droppable of a container
+        newIndex = overItems.length + 1
+      } else {
+        const isBelowLastItem =
+          active.rect.current.translated != null &&
+          active.rect.current.translated.top > over.rect.top + over.rect.height
 
-          const modifier = isBelowOverItem === true ? 1 : 0
+        const modifier = isBelowLastItem ? 1 : 0
 
-          newIndex =
-            overIndex >= 0 ? overIndex + modifier : overItems.length + 1
-        }
+        newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1
+      }
 
-        recentlyMovedToNewContainer.current = true
-
-        return {
-          ...items,
-          [activeContainer]: items[activeContainer].filter(
-            (item) => item !== active.id
-          ),
-          [overContainer]: [
-            ...items[overContainer].slice(0, newIndex),
-            items[activeContainer][activeIndex],
-            ...items[overContainer].slice(
-              newIndex,
-              items[overContainer].length
-            ),
-          ],
-        }
-      })
-    }
+      return {
+        ...prev,
+        [activeContainer]: [
+          ...prev[activeContainer].filter((item) => item !== active.id),
+        ],
+        [overContainer]: [
+          ...prev[overContainer].slice(0, newIndex),
+          items[activeContainer][activeIndex],
+          ...prev[overContainer].slice(newIndex, prev[overContainer].length),
+        ],
+      }
+    })
   }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
 
-    if (active.id in items && over?.id != null)
-      setContainers((containers) => {
-        const activeIndex = containers.indexOf(active.id)
-        const overIndex = containers.indexOf(over.id)
-
-        console.log(containers[overIndex].length)
-
-        return arrayMove(containers, activeIndex, overIndex)
-      })
+    if (over == null) return
 
     const activeContainer = findContainer(active.id)
+    const overContainer = findContainer(over.id)
 
-    if (activeContainer == null) {
-      setActiveId(null)
+    if (
+      activeContainer == null ||
+      overContainer == null ||
+      activeContainer !== overContainer
+    ) {
       return
     }
 
-    const overId = over?.id
+    const overGroupSize = over?.data.current?.sortable.items.length
+    if (overGroupSize >= MAX_GROUP_SIZE) return setItems(backupItems)
 
-    if (overId == null) {
-      setActiveId(null)
-      return
+    const activeIndex = items[activeContainer].indexOf(active.id)
+    const overIndex = items[overContainer].indexOf(over.id)
+
+    if (activeIndex !== overIndex) {
+      setItems((items) => ({
+        ...items,
+        [overContainer]: arrayMove(
+          items[overContainer],
+          activeIndex,
+          overIndex
+        ),
+      }))
     }
-
-    const overContainer = findContainer(overId)
-
-    if (overContainer != null) {
-      const activeIndex = items[activeContainer].indexOf(active.id)
-      const overIndex = items[overContainer].indexOf(overId)
-
-      if (activeIndex !== overIndex)
-        console.log("asdfasdfas", items[overContainer].length > 5)
-      setItems((items) =>
-        items[overContainer].length > 5
-          ? items
-          : {
-              ...items,
-              [overContainer]: arrayMove(
-                items[overContainer],
-                activeIndex,
-                overIndex
-              ),
-            }
-      )
-    }
-
-    setActiveId(null)
   }
 }
 
 export default EventPage
-
-function createRange<T = number>(
-  length: number,
-  initializer: (index: number) => T
-): T[] {
-  return [...new Array(length)].map((_, index) => initializer(index))
-}
