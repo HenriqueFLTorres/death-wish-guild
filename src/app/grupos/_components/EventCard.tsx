@@ -1,21 +1,25 @@
+"use client"
+
 import { Moon } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 moment.locale("fr")
 
 interface EventCardProps {
-  isActive: boolean
-  onSelect: () => void
-
   name: string
   type: string
   category: string
   date: number
+  id: number
 }
 
 function EventCard(props: EventCardProps) {
-  const { isActive, onSelect, date } = props
+  const { date, id } = props
+
+  const pathname = usePathname()
 
   const weekday = moment(date).format("dddd")
   const formattedDate = moment(date).format("LL")
@@ -23,13 +27,12 @@ function EventCard(props: EventCardProps) {
   return (
     <li
       className="text-primary-foreground group relative flex w-80 flex-col rounded-br-2xl rounded-tl-2xl border border-b-0 border-t-2 border-secondary data-[active='true']:border-primary data-[active='true']:bg-primary"
-      data-active={isActive ? "true" : "false"}
+      data-active={pathname === `/grupos/${id}`}
     >
-      <button
+      <Link
         aria-label="select event"
         className="relative flex overflow-hidden rounded-br-2xl rounded-tl-2xl bg-gradient-to-b from-neutral-900 to-neutral-800 group-data-[active='true']:from-primary-700 group-data-[active='true']:to-primary-500 group-data-[active='true']:drop-shadow-[0_0_6px_#7B53A7]"
-        type="button"
-        onClick={onSelect}
+        href={`/grupos/${id}`}
       >
         <div className="z-10 flex w-full flex-col p-2 text-left shadow">
           <small className="text-xs font-light text-primary-200">
@@ -71,7 +74,7 @@ function EventCard(props: EventCardProps) {
           src={"/event-preview/chernobog.png"}
           width={197}
         />
-      </button>
+      </Link>
     </li>
   )
 }

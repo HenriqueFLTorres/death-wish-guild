@@ -2,15 +2,15 @@ import {
   Backpack,
   Crown,
   LayoutDashboard,
+  type LucideIcon,
   Scale,
   ScrollText,
   Users,
-  type LucideIcon,
 } from "lucide-react"
 
+import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
 
 type NavegationLink = {
   icon: LucideIcon
@@ -22,32 +22,32 @@ const links: NavegationLink[] = [
   {
     icon: LayoutDashboard,
     label: "Dashboard",
-    path: "dashboard",
+    path: "/dashboard",
   },
   {
     icon: Users,
     label: "Grupos",
-    path: "grupos",
+    path: "/grupos",
   },
   {
     icon: Crown,
     label: "Ranking",
-    path: "ranking",
+    path: "/ranking",
   },
   {
     icon: Backpack,
     label: "Gerenciar Items",
-    path: "gerenciar-items",
+    path: "/gerenciar-items",
   },
   {
     icon: Scale,
     label: "Leilão",
-    path: "leilão",
+    path: "/leilão",
   },
   {
     icon: ScrollText,
     label: "Log de Eventos",
-    path: "log-de-eventos",
+    path: "/log-de-eventos",
   },
 ]
 

@@ -38,7 +38,7 @@ const AvatarImage = forwardRef<
   <AvatarImageBase ref={ref} src={src} asChild>
     <Image
       alt={alt ?? ""}
-      className={cn("aspect-square h-full w-full", className)}
+      className={cn("aspect-square h-full w-full object-cover", className)}
       height={size}
       src={src ?? ""}
       width={size}
