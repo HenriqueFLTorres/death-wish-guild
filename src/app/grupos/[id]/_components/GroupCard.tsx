@@ -1,3 +1,4 @@
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import type { UniqueIdentifier } from "@dnd-kit/core"
 import {
   SortableContext,
@@ -8,7 +9,6 @@ import { CSS } from "@dnd-kit/utilities"
 import type { CSSProperties } from "react"
 import { Items } from "../page"
 import { PlayerListItem } from "./PlayerListItem"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
 
 interface SortableItemProps {
   id: UniqueIdentifier
@@ -53,7 +53,7 @@ interface GroupCardProps {
 function GroupCard(props: GroupCardProps) {
   const { hasMe = false, containerItems, containerId, REFERENCE_ITEMS } = props
 
-  const membersInGroup = 6
+  const membersInGroup = REFERENCE_ITEMS[containerId].filter(Boolean).length + 1
 
   return (
     <li
