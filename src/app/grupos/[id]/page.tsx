@@ -6,7 +6,7 @@ import {
   DragOverEvent,
   KeyboardSensor,
   PointerSensor,
-  closestCorners,
+  closestCenter,
   defaultAnnouncements,
   useSensor,
   useSensors,
@@ -64,7 +64,7 @@ function EventPage() {
   return (
     <DndContext
       announcements={defaultAnnouncements}
-      collisionDetection={closestCorners}
+      collisionDetection={closestCenter}
       sensors={sensors}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
