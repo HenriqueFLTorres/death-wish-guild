@@ -49,11 +49,12 @@ interface TLEvent {
   type: "GUILD" | "PVP" | "PVE" | "DOMINION_EVENT" | "OTHER"
 }
 
-interface EventFromDB {
-  start_time: Date
+export interface EventFromDB {
+  start_time: string
   name: string
   location: string
   type: string
+  id?: string
 }
 
 function CreateEvent() {
@@ -102,7 +103,7 @@ function CreateEvent() {
     const { startTime, startDate, ...restEvent } = values
     const summedStartTime = moment(startDate).add(startTime).toDate()
 
-    mutate({ start_time: summedStartTime, ...restEvent })
+    mutate({ start_time: summedStartTime.toDateString(), ...restEvent })
   }
 
   return (

@@ -12,19 +12,15 @@ import {
   useSensors,
 } from "@dnd-kit/core"
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
+import { useQuery } from "@tanstack/react-query"
 import { Clock, Users } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
 import { useState } from "react"
+import { getEventTypeImagePath } from "../_components/EventCard"
 import { GroupCard } from "./_components/GroupCard"
-
-const CURRENT_EVENT = {
-  id: 1,
-  name: "Chernobog | Normal",
-  type: "Guild Raid - Boss",
-  category: "guild",
-  date: 1719014941283,
-}
+import { EVENTS } from "@/lib/QueryKeys"
+import { createClient } from "@/lib/supabase/client"
 
 const MAX_GROUP_SIZE = 5
 
@@ -32,7 +28,33 @@ export type Items = {
   [key in string]: (string | null)[]
 }
 
-function EventPage() {
+interface EventPageProps {
+  params: { id: string }
+}
+
+function EventPage(props: EventPageProps) {
+  const { params } = props
+
+  const id = params.id
+
+  const supabase = createClient()
+
+  const { data: event, isLoading } = useQuery({
+    queryKey: [EVENTS.GET_EVENT, id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select()
+        .match({ id })
+        .single()
+
+      if (error != null) throw new Error(`Failed to fetch event: ${error}`)
+
+      return data
+    },
+    enabled: Number.isInteger(Number(id)),
+  })
+
   const [items, setItems] = useState<Items>({
     root: ["1", "2", "3", "4", "5"],
     container1: ["6", "7", "8", "9", "10"],
@@ -57,9 +79,9 @@ function EventPage() {
     })
   )
 
-  const now = new Date()
+  if (isLoading || event == null) return null
 
-  const { name } = CURRENT_EVENT
+  const { name, start_time, type } = event
 
   return (
     <DndContext
@@ -89,8 +111,8 @@ function EventPage() {
                 </div>
 
                 <p className="font-semibold drop-shadow">
-                  {moment(now).add(2, "hour").format("LT")} -{" "}
-                  {moment(now).add(2, "hour").fromNow()}
+                  {moment(start_time).format("LT")} -{" "}
+                  {moment(start_time).fromNow()}
                 </p>
               </div>
             </div>
@@ -98,12 +120,12 @@ function EventPage() {
             <div className="flex justify-between">
               <p className="flex items-center gap-2 font-medium drop-shadow">
                 <Image
-                  alt="guild icon"
+                  alt=""
                   height={14}
-                  src={"/event-indicator/guild.png"}
+                  src={getEventTypeImagePath(type)}
                   width={14}
                 />
-                Guilda
+                {type}
               </p>
 
               <div className="flex items-center gap-2">

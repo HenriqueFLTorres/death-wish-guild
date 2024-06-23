@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { CreateEvent } from "./CreateEvent"
+import { CreateEvent, EventFromDB } from "./CreateEvent"
 import { EventCard } from "./EventCard"
 import { EVENTS } from "@/lib/QueryKeys"
 import { createClient } from "@/lib/supabase/client"
@@ -20,11 +20,15 @@ function Events() {
     },
   })
 
+  const eventsSortedByDate: EventFromDB[] = events.sort(
+    (a, b) => Number(new Date(b.start_time)) - Number(new Date(a.start_time))
+  )
+
   return (
     <section className="relative z-10 flex flex-col justify-between gap-4">
       <ol className="flex flex-col gap-4">
-        {events?.map((event) => (
-          <EventCard key={event.start_time} {...event} />
+        {eventsSortedByDate?.map((event) => (
+          <EventCard key={event.start_time.toString()} {...event} />
         ))}
       </ol>
 

@@ -11,7 +11,7 @@ import { PlayerListItem } from "./PlayerListItem"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 
 interface SortableItemProps {
-  id: UniqueIdentifier
+  id: UniqueIdentifier | null
   isPlaceholder?: boolean
 }
 
@@ -19,7 +19,7 @@ function SortableItem(props: SortableItemProps) {
   const { id, isPlaceholder = false } = props
 
   const { attributes, listeners, setNodeRef, transform, transition, isOver } =
-    useSortable({ id, disabled: isPlaceholder })
+    useSortable({ id: id ?? "", disabled: isPlaceholder })
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -82,7 +82,7 @@ function GroupCard(props: GroupCardProps) {
 
       <SortableContext
         id={containerId}
-        items={containerItems}
+        items={containerItems as UniqueIdentifier[]}
         strategy={verticalListSortingStrategy}
       >
         <ol className="flex flex-col gap-1">

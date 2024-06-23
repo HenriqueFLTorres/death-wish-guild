@@ -1,25 +1,20 @@
 "use client"
 
-import { Moon } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import type { EventFromDB } from "./CreateEvent"
 
-moment.locale("fr")
-
-interface EventCardProps {
-  name: string
-  location: string
-  type: string
-  start_time: number
-  id: number
-}
-
-function EventCard(props: EventCardProps) {
+function EventCard(props: EventFromDB) {
   const { start_time, name, type, location, id } = props
 
   const pathname = usePathname()
+
+  const isNight = moment(start_time).isAfter(
+    moment().startOf("day").add(18, "hours")
+  )
 
   const weekday = moment(start_time).format("dddd")
   const formattedDate = moment(start_time).format("LL")
@@ -47,9 +42,9 @@ function EventCard(props: EventCardProps) {
 
           <p className="flex items-center gap-1 text-xs">
             <Image
-              alt="guild icon"
+              alt=""
               height={14}
-              src={"/event-indicator/guild.png"}
+              src={getEventTypeImagePath(type)}
               width={14}
             />
             {type}
@@ -62,7 +57,11 @@ function EventCard(props: EventCardProps) {
 
             <div className="flex items-center gap-2">
               <div className="grid h-5 w-5 place-items-center rounded-sm border border-primary bg-primary-600">
-                <Moon className="fill-white" size={12} />
+                {isNight ? (
+                  <Moon className="fill-white" size={12} />
+                ) : (
+                  <Sun className="fill-white" size={12} />
+                )}
               </div>
               <p className="font-semibold">{moment(start_time).format("LT")}</p>
             </div>
@@ -81,4 +80,15 @@ function EventCard(props: EventCardProps) {
   )
 }
 
-export { EventCard }
+export { EventCard, getEventTypeImagePath }
+
+function getEventTypeImagePath(type: string) {
+  switch (type) {
+    case "PVE":
+      return "/event-indicator/peace.png"
+    case "PVP":
+      return "/event-indicator/battle.png"
+    default:
+      return "/event-indicator/guild.png"
+  }
+}

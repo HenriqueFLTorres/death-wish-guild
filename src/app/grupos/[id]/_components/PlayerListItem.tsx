@@ -3,8 +3,9 @@ import { Sword } from "lucide-react"
 import Image from "next/image"
 import { type HTMLAttributes, forwardRef, memo } from "react"
 
-interface PlayerListItemProps extends HTMLAttributes<HTMLDivElement> {
-  id: UniqueIdentifier
+interface PlayerListItemProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "id"> {
+  id: UniqueIdentifier | null
   isPlaceholder: boolean
 }
 
@@ -16,7 +17,7 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
       return (
         <div
           className="flex h-8 w-full rounded-full opacity-0"
-          id={id}
+          id={id ?? undefined}
           ref={ref}
           aria-hidden
         />
