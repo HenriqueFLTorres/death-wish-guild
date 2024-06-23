@@ -11,6 +11,8 @@ const buttonVariants = cva(
       variant: {
         default: "border-primary primary-button",
         secondary: "border-secondary secondary-button",
+        outline: "border-secondary hover:bg-pink-400",
+        ghost: "border-none",
       },
       size: {
         default: "h-10 px-3 py-2",

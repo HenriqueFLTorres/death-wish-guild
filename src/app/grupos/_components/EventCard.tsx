@@ -26,14 +26,16 @@ function EventCard(props: EventCardProps) {
 
   return (
     <li
-      className="text-primary-foreground group relative flex w-80 flex-col rounded-br-2xl rounded-tl-2xl border border-b-0 border-t-2 border-secondary data-[active='true']:border-primary data-[active='true']:bg-primary"
+      className="text-primary-foreground group relative flex w-80 flex-col rounded-br-2xl rounded-tl-2xl border border-b-0 border-t-2 border-secondary transition-colors hover:border-primary data-[active='true']:border-primary"
       data-active={pathname === `/grupos/${id}`}
     >
       <Link
         aria-label="select event"
-        className="relative flex overflow-hidden rounded-br-2xl rounded-tl-2xl bg-gradient-to-b from-neutral-900 to-neutral-800 group-data-[active='true']:from-primary-700 group-data-[active='true']:to-primary-500 group-data-[active='true']:drop-shadow-[0_0_6px_#7B53A7]"
+        className="group relative flex overflow-hidden rounded-br-2xl rounded-tl-2xl bg-gradient-to-b from-neutral-900 to-neutral-800 group-data-[active='true']:from-primary-700 group-data-[active='true']:to-primary-500 group-data-[active='true']:drop-shadow-[0_0_6px_#7B53A7]"
         href={`/grupos/${id}`}
       >
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-700 to-primary-500 opacity-0 transition-opacity group-hover:opacity-40" />
+
         <div className="z-10 flex w-full flex-col p-2 text-left shadow">
           <small className="text-xs font-light text-primary-200">
             Guild Raid - Boss

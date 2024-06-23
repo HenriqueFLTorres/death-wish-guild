@@ -1,5 +1,11 @@
+import { CreateEvent } from "./_components/CreateEvent"
+
 function Grupos() {
-  return <p>Select an event</p>
+  return (
+    <div className="relative z-50">
+      <CreateEvent />
+    </div>
+  )
 }
 
 export default Grupos

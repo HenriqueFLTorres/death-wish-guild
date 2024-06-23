@@ -83,13 +83,6 @@ function EventPage() {
             <div className="flex justify-between">
               <h1 className="text-3xl font-semibold drop-shadow-md">{name}</h1>
 
-              <button
-                type="button"
-                onClick={() => console.log(items, referenceItems)}
-              >
-                showAll items
-              </button>
-
               <div className="flex items-center gap-2">
                 <div className="grid h-5 w-5 place-items-center rounded-sm border border-primary bg-primary-600">
                   <Clock size={12} />
