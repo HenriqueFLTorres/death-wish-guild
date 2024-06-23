@@ -15,7 +15,7 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
     if (isPlaceholder)
       return (
         <div
-          className="flex h-8 w-full rounded-full bg-pink-400/10"
+          className="flex h-8 w-full rounded-full opacity-0"
           id={id}
           ref={ref}
           aria-hidden

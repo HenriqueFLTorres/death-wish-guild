@@ -6,6 +6,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import type { CSSProperties } from "react"
+import { Items } from "../page"
 import { PlayerListItem } from "./PlayerListItem"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 
@@ -44,12 +45,13 @@ function SortableItem(props: SortableItemProps) {
 
 interface GroupCardProps {
   hasMe?: boolean
-  containerItems: UniqueIdentifier[]
+  containerItems: (string | null)[]
   containerId: UniqueIdentifier
+  REFERENCE_ITEMS: Items
 }
 
 function GroupCard(props: GroupCardProps) {
-  const { hasMe = false, containerItems, containerId } = props
+  const { hasMe = false, containerItems, containerId, REFERENCE_ITEMS } = props
 
   const membersInGroup = 6
 
@@ -84,9 +86,13 @@ function GroupCard(props: GroupCardProps) {
         strategy={verticalListSortingStrategy}
       >
         <ol className="flex flex-col gap-1">
-          {containerItems.map((value) => (
-            <SortableItem id={value} key={value} />
-          ))}
+          {containerItems.map((value) =>
+            REFERENCE_ITEMS[containerId].includes(value) ? (
+              <SortableItem id={value} key={value} />
+            ) : (
+              <SortableItem id={value} key={value} isPlaceholder />
+            )
+          )}
         </ol>
       </SortableContext>
     </li>

@@ -26,20 +26,29 @@ const CURRENT_EVENT = {
   date: 1719014941283,
 }
 
-const MAX_GROUP_SIZE = 3
+const MAX_GROUP_SIZE = 5
 
-type Items = {
-  [key in string]: string[]
+export type Items = {
+  [key in string]: (string | null)[]
 }
 
 function EventPage() {
   const [items, setItems] = useState<Items>({
-    root: ["1", "2", "3"],
-    container1: ["4", "5", "6"],
-    container2: ["7", "8", "9"],
-    container3: [],
+    root: ["1", "2", "3", "4", "5"],
+    container1: ["6", "7", "8", "9", "10"],
+    container2: ["11", "12", "13", "14", "15"],
+    container3: ["16", "17", "18", "19", "20"],
   })
-  const [backupItems, setBackupItems] = useState<Items>(items)
+  const [referenceItems, setRefereceItems] = useState<Items>({
+    root: ["1", "2", "3", "4", "5"],
+    container1: ["6", "7", "8", null, null],
+    container2: ["11", "12", "13", null, null],
+    container3: [null, null, null, null, null],
+  })
+  const [backupItems, setBackupItems] = useState<{
+    items: Items
+    referenceItems: Items
+  }>({ items, referenceItems })
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -74,7 +83,10 @@ function EventPage() {
             <div className="flex justify-between">
               <h1 className="text-3xl font-semibold drop-shadow-md">{name}</h1>
 
-              <button type="button" onClick={() => console.log(items)}>
+              <button
+                type="button"
+                onClick={() => console.log(items, referenceItems)}
+              >
                 showAll items
               </button>
 
@@ -113,7 +125,12 @@ function EventPage() {
 
           <ul className="mx-auto grid w-max grid-cols-3 place-items-center gap-3">
             {Object.entries(items).map(([key, items]) => (
-              <GroupCard containerId={key} containerItems={items} key={key} />
+              <GroupCard
+                containerId={key}
+                containerItems={items}
+                key={key}
+                REFERENCE_ITEMS={referenceItems}
+              />
             ))}
           </ul>
         </div>
@@ -135,11 +152,11 @@ function EventPage() {
       return id
     }
 
-    return Object.keys(items).find((key) => items[key].includes(id))
+    return Object.keys(referenceItems).find((key) => items[key].includes(id))
   }
 
   function handleDragStart() {
-    setBackupItems(items)
+    setBackupItems({ items, referenceItems })
   }
 
   function handleDragOver(event: DragOverEvent) {
@@ -159,14 +176,14 @@ function EventPage() {
       return
     }
 
+    const activeItems = items[activeContainer]
+    const overItems = items[overContainer]
+
+    // Find the indexes for the items
+    const activeIndex = activeItems.indexOf(active.id)
+    const overIndex = overItems.indexOf(over.id)
+
     setItems((prev) => {
-      const activeItems = prev[activeContainer]
-      const overItems = prev[overContainer]
-
-      // Find the indexes for the items
-      const activeIndex = activeItems.indexOf(active.id)
-      const overIndex = overItems.indexOf(over.id)
-
       let newIndex: number
       if (over.id in prev) {
         // We're at the root droppable of a container
@@ -181,16 +198,35 @@ function EventPage() {
         newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1
       }
 
+      const newActiveContainer = structuredClone(prev[activeContainer])
+      newActiveContainer[activeIndex] = over.id
+
+      const newOverContainer = [
+        ...prev[overContainer].slice(0, newIndex),
+        items[activeContainer][activeIndex],
+        ...prev[overContainer].slice(newIndex, prev[overContainer].length),
+      ]
+
       return {
         ...prev,
-        [activeContainer]: [
-          ...prev[activeContainer].filter((item) => item !== active.id),
-        ],
-        [overContainer]: [
-          ...prev[overContainer].slice(0, newIndex),
-          items[activeContainer][activeIndex],
-          ...prev[overContainer].slice(newIndex, prev[overContainer].length),
-        ],
+        [activeContainer]: newActiveContainer,
+        [overContainer]: newOverContainer.filter((id) => id !== over.id),
+      }
+    })
+
+    setRefereceItems((prev) => {
+      const newActiveContainer = structuredClone(prev[activeContainer])
+
+      const overId = prev[overContainer].find((id) => id === over.id)
+      newActiveContainer[activeIndex] = overId ?? null
+
+      const newOverContainer = structuredClone(prev[overContainer])
+      newOverContainer[overIndex] = active.id
+
+      return {
+        ...prev,
+        [activeContainer]: newActiveContainer,
+        [overContainer]: newOverContainer,
       }
     })
   }
@@ -211,14 +247,28 @@ function EventPage() {
       return
     }
 
-    const overGroupSize = over?.data.current?.sortable.items.length
-    if (overGroupSize >= MAX_GROUP_SIZE) return setItems(backupItems)
+    const overGroup = over?.data.current?.sortable.items.filter((item: never) =>
+      referenceItems[overContainer].includes(item)
+    ) as string[]
+
+    if (overGroup.length >= MAX_GROUP_SIZE && !overGroup.includes(active.id)) {
+      setItems(backupItems.items)
+      return setRefereceItems(backupItems.items)
+    }
 
     const activeIndex = items[activeContainer].indexOf(active.id)
     const overIndex = items[overContainer].indexOf(over.id)
 
     if (activeIndex !== overIndex) {
       setItems((items) => ({
+        ...items,
+        [overContainer]: arrayMove(
+          items[overContainer],
+          activeIndex,
+          overIndex
+        ),
+      }))
+      setRefereceItems((items) => ({
         ...items,
         [overContainer]: arrayMove(
           items[overContainer],
