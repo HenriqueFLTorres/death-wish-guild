@@ -10,19 +10,19 @@ moment.locale("fr")
 
 interface EventCardProps {
   name: string
+  location: string
   type: string
-  category: string
-  date: number
+  start_time: number
   id: number
 }
 
 function EventCard(props: EventCardProps) {
-  const { date, id } = props
+  const { start_time, name, type, location, id } = props
 
   const pathname = usePathname()
 
-  const weekday = moment(date).format("dddd")
-  const formattedDate = moment(date).format("LL")
+  const weekday = moment(start_time).format("dddd")
+  const formattedDate = moment(start_time).format("LL")
 
   return (
     <li
@@ -38,11 +38,11 @@ function EventCard(props: EventCardProps) {
 
         <div className="z-10 flex w-full flex-col p-2 text-left shadow">
           <small className="text-xs font-light text-primary-200">
-            Guild Raid - Boss
+            {location}
           </small>
 
           <h2 className="flex from-white to-neutral-300 text-xl font-semibold drop-shadow-[0_0_2px_#ffffff50]">
-            Chernobog | Normal
+            {name}
           </h2>
 
           <p className="flex items-center gap-1 text-xs">
@@ -52,7 +52,7 @@ function EventCard(props: EventCardProps) {
               src={"/event-indicator/guild.png"}
               width={14}
             />
-            Guilda
+            {type}
           </p>
 
           <footer className="flex w-full items-end justify-between gap-4">
@@ -64,7 +64,7 @@ function EventCard(props: EventCardProps) {
               <div className="grid h-5 w-5 place-items-center rounded-sm border border-primary bg-primary-600">
                 <Moon className="fill-white" size={12} />
               </div>
-              <p className="font-semibold">{moment(date).format("LT")}</p>
+              <p className="font-semibold">{moment(start_time).format("LT")}</p>
             </div>
           </footer>
         </div>

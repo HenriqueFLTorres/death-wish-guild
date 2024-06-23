@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 import Image from "next/image"
 
+import QueryClientProvider from "./_providers/QueryClientProvider"
 import { Navbar } from "@/components/global/Navbar"
 import { cn } from "@/lib/utils"
 import "./globals.css"
@@ -29,8 +30,10 @@ export default function RootLayout({
           "flex flex-col items-center gap-12 bg-neutral-900"
         )}
       >
-        <Navbar />
-        {children}
+        <QueryClientProvider>
+          <Navbar />
+          {children}
+        </QueryClientProvider>
         <Image
           alt=""
           className="fixed -z-[1] object-cover blur"

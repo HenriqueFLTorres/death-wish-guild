@@ -1,10 +1,13 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { format, startOfDay } from "date-fns"
 import { CalendarDays, CalendarIcon } from "lucide-react"
+import moment from "moment"
 import Image from "next/image"
 
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
 import { eventSchema } from "./event.schema"
@@ -37,6 +40,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import DateTimePicker from "@/components/ui/timer-picker"
+import { EVENTS } from "@/lib/QueryKeys"
+import { createClient } from "@/lib/supabase/client"
 
 interface TLEvent {
   name: string
@@ -44,20 +49,64 @@ interface TLEvent {
   type: "GUILD" | "PVP" | "PVE" | "DOMINION_EVENT" | "OTHER"
 }
 
+interface EventFromDB {
+  start_time: Date
+  name: string
+  location: string
+  type: string
+}
+
 function CreateEvent() {
+  const [isOpen, setIsOpen] = useState(false)
+  const supabase = createClient()
+
+  const queryClient = useQueryClient()
+
+  const { mutate } = useMutation({
+    mutationKey: [EVENTS.CREATE_EVENT],
+    mutationFn: async (data: EventFromDB) => {
+      const { error } = await supabase.from("events").insert(data)
+
+      if (error != null) throw new Error(`Failed to create event: ${error}`)
+    },
+    onSuccess: () => setIsOpen(false),
+    onMutate: async (newEvent) => {
+      await queryClient.cancelQueries({ queryKey: [EVENTS.GET_EVENTS] })
+
+      const previousEvents = queryClient.getQueryData([EVENTS.GET_EVENTS])
+
+      queryClient.setQueryData([EVENTS.GET_EVENTS], (old: EventFromDB[]) => [
+        ...old,
+        newEvent,
+      ])
+
+      return { previousEvents }
+    },
+    onError: (_, __, context) => {
+      if (context?.previousEvents != null)
+        queryClient.setQueryData([EVENTS.GET_EVENTS], context.previousEvents)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [EVENTS.GET_EVENTS] })
+    },
+  })
+
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      startDate: new Date(),
+      startDate: startOfDay(new Date()),
     },
   })
 
   function onSubmit(values: z.infer<typeof eventSchema>) {
-    console.log(values)
+    const { startTime, startDate, ...restEvent } = values
+    const summedStartTime = moment(startDate).add(startTime).toDate()
+
+    mutate({ start_time: summedStartTime, ...restEvent })
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant={"secondary"}>Criar um evento</Button>
       </DialogTrigger>
@@ -116,10 +165,7 @@ function CreateEvent() {
                       </FormControl>
                       <SelectContent>
                         {EVENTS_OPTIONS.map((option) => (
-                          <SelectItem
-                            key={option.location}
-                            value={option.location}
-                          >
+                          <SelectItem key={option.name} value={option.location}>
                             {option.location}
                           </SelectItem>
                         ))}
@@ -241,7 +287,7 @@ function CreateEvent() {
             </div>
 
             <Button className="w-full" type="submit">
-              Submit
+              Criar
             </Button>
           </form>
         </Form>
@@ -266,11 +312,6 @@ const EVENTS_OPTIONS: TLEvent[] = [
   {
     name: "Desert Caravan",
     location: "Moonlight Desert",
-    type: "PVE",
-  },
-  {
-    name: "Hidden Brown Mica",
-    location: "Abandoned Stonemason Town",
     type: "PVE",
   },
   {
