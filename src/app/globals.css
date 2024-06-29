@@ -52,6 +52,17 @@
     mask-image: linear-gradient(to left, rgba(0, 0, 0, 100), rgba(0, 0, 0, 0));
   }
 
+  .fade-to-bottom {
+    -webkit-mask-image: -webkit-gradient(
+      linear,
+      top center,
+      bottom center,
+      from(rgba(0, 0, 0, 100)),
+      to(rgba(0, 0, 0, 0))
+    );
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 100), rgba(0, 0, 0, 0));
+  }
+
   .scrollbar::-webkit-scrollbar {
     width: 14px !important;
     height: 14px;

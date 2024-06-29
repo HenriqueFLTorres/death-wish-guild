@@ -61,6 +61,7 @@ function CreateEvent() {
     defaultValues: {
       startDate: startOfDay(new Date()),
       confirmed_players: [],
+      confirmation_type: "PER_GROUP",
     },
   })
 
@@ -103,6 +104,37 @@ function CreateEvent() {
                       {EVENTS_OPTIONS.map((option) => (
                         <SelectItem key={option.name} value={option.name}>
                           {option.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="confirmation_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Confirmação</FormLabel>
+
+                  <Select
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um tipo de confirmação" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {CONFIRMATION_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option === "PER_PLAYER"
+                            ? "Por jogador"
+                            : "Por grupo"}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -263,6 +295,11 @@ function CreateEvent() {
 }
 
 export { CreateEvent }
+
+const CONFIRMATION_OPTIONS: SelectEvent["confirmation_type"][] = [
+  "PER_PLAYER",
+  "PER_GROUP",
+]
 
 const EVENTS_OPTIONS: Pick<SelectEvent, "name" | "location" | "type">[] = [
   {

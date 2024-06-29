@@ -14,11 +14,16 @@ export const usersTable = pgTable("users", {
 })
 
 const eventTypeEnum = pgEnum("type", ["PVP", "PVE", "GUILD", "OTHER"])
+const eventConfirmationTypeEnum = pgEnum("confirmation_type", [
+  "PER_PLAYER",
+  "PER_GROUP",
+])
 
 export const eventsTable = pgTable("events", {
   id: integer("id").primaryKey(),
   start_time: timestamp("start_time").notNull(),
   name: text("name").notNull(),
+  confirmation_type: eventConfirmationTypeEnum("confirmation_type").notNull(),
   location: text("location").notNull(),
   type: eventTypeEnum("type").notNull(),
   groups: jsonb("groups").$type<EventGroups>().default({}),

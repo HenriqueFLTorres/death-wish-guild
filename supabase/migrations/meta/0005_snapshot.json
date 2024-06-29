@@ -1,6 +1,6 @@
 {
-  "id": "e17d530f-573c-44f9-8d72-336e0417a317",
-  "prevId": "b2b823f9-b8cc-40ed-83f6-3f9089dd9164",
+  "id": "a4c67454-65a7-4bca-948d-1454d630b166",
+  "prevId": "e17d530f-573c-44f9-8d72-336e0417a317",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -10,7 +10,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true
         },
@@ -23,6 +23,13 @@
         "name": {
           "name": "name",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "confirmation_type": {
+          "name": "confirmation_type",
+          "type": "confirmation_type",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -48,7 +55,7 @@
         },
         "confirmed_players": {
           "name": "confirmed_players",
-          "type": "bigint[]",
+          "type": "integer[]",
           "primaryKey": false,
           "notNull": true,
           "default": []
@@ -65,7 +72,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true
         },
