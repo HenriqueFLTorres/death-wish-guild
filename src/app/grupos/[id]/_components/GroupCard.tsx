@@ -7,8 +7,8 @@ import { CSS } from "@dnd-kit/utilities"
 import { Trash } from "lucide-react"
 import type { CSSProperties } from "react"
 import { getUserName } from "../page"
+import { PlayerLeader } from "./PlayerLeader"
 import { PlayerListItem } from "./PlayerListItem"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useGetUsers } from "@/db/hooks/users/useGetUsers"
 import { cn } from "@/lib/utils"
@@ -18,10 +18,11 @@ interface DroppableProps {
   index: number
   containerId: UniqueIdentifier
   children: React.ReactNode
+  isLeader?: boolean
 }
 
 function Droppable(props: DroppableProps) {
-  const { id, index, containerId, children } = props
+  const { id, index, containerId, children, isLeader = false } = props
 
   if (id == null) return null
 
@@ -36,8 +37,9 @@ function Droppable(props: DroppableProps) {
   return (
     <li
       className={cn(
-        "h-8 rounded-full border border-dashed border-transparent transition-all duration-200",
-        { "border-white/30 bg-white/10": isOver }
+        "h-8 w-full rounded-full border border-dashed border-transparent transition-all duration-200",
+        { "border-white/30 bg-white/10": isOver },
+        { "h-10": isLeader }
       )}
       ref={setNodeRef}
     >
@@ -93,9 +95,9 @@ interface GroupCardProps {
 function GroupCard(props: GroupCardProps) {
   const { hasMe = false, items, containerId, onRemove } = props
 
-  const groupSize = items.filter(Boolean).length + 1
-
-  const fullArray = Array.from(Array(5).keys())
+  const groupSize = items.filter(Boolean).length
+  const fullArray = Array.from(Array(6).keys())
+  const leaderId = items[0]
 
   const { data: users = [] } = useGetUsers()
 
@@ -113,15 +115,18 @@ function GroupCard(props: GroupCardProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Avatar>
-          <AvatarImage alt="" size={40} src="/avatar/variant-1.png" />
-        </Avatar>
-        <div className="flex flex-col text-left">
-          <p className="text-xs text-neutral-400">Líder</p>
-          <h4 className="text-with-gradient bg-gradient-to-b from-white to-neutral-300 text-sm font-bold">
-            Alan Bida
-          </h4>
-        </div>
+        <Droppable
+          containerId={containerId}
+          id={leaderId === null ? `${containerId}-0-droppable` : leaderId}
+          index={0}
+          isLeader
+        >
+          <PlayerLeader
+            containerId={containerId}
+            id={leaderId}
+            name={getUserName(leaderId, users)}
+          />
+        </Droppable>
 
         <Button
           className="ml-auto"
@@ -134,7 +139,7 @@ function GroupCard(props: GroupCardProps) {
       </div>
 
       <ol className="flex flex-col gap-1">
-        {fullArray.map((index) => {
+        {fullArray.slice(1).map((index) => {
           const value = items[index]
           const hasId = value != null
 

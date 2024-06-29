@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { db } from "@/db"
 import { eventsTable } from "@/db/schema"
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     const [{ insertedId }] = await db
       .update(eventsTable)
-      .set(body.event)
+      .set({ ...body.event, groups: sql`${body.event.groups}::jsonb` })
       .where(eq(eventsTable.id, Number(id)))
       .returning({ insertedId: eventsTable.id })
 

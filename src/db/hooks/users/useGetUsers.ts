@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import type { SelectUser } from "@/db/schema"
 import { USERS } from "@/lib/QueryKeys"
 
 interface useGetUsersProps {
@@ -14,7 +15,7 @@ function useGetUsers(props?: useGetUsersProps) {
 
         if (!response.ok) throw new Error(response.statusText)
 
-        return response.json()
+        return response.json() as SelectUser[]
       } catch (error) {
         throw new Error(`Failed to fetch users: ${error}`)
       }

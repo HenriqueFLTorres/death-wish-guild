@@ -1,15 +1,14 @@
 import {
-  bigint,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
-  serial,
   text,
   timestamp,
 } from "drizzle-orm/pg-core"
 
 export const usersTable = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey(),
   created_at: timestamp("created_at").notNull(),
   name: text("name").notNull(),
 })
@@ -17,16 +16,13 @@ export const usersTable = pgTable("users", {
 const eventTypeEnum = pgEnum("type", ["PVP", "PVE", "GUILD", "OTHER"])
 
 export const eventsTable = pgTable("events", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey(),
   start_time: timestamp("start_time").notNull(),
   name: text("name").notNull(),
   location: text("location").notNull(),
   type: eventTypeEnum("type").notNull(),
   groups: jsonb("groups").$type<EventGroups>().default({}),
-  confirmed_players: bigint("confirmed_players", { mode: "bigint" })
-    .array()
-    .notNull()
-    .default([]),
+  confirmed_players: integer("confirmed_players").array().notNull().default([]),
 })
 
 export type InsertUser = typeof usersTable.$inferInsert

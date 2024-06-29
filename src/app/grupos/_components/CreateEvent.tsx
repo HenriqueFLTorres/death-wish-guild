@@ -43,7 +43,7 @@ import { useCreateEvent } from "@/db/hooks/events/useCreateEvent"
 import { type InsertEvent, type SelectEvent, eventsTable } from "@/db/schema"
 
 const EventSchema = createInsertSchema(eventsTable)
-  .omit({ start_time: true })
+  .omit({ start_time: true, id: true })
   .and(
     z.object({
       startTime: z.object({ hour: z.number(), minute: z.number() }),

@@ -69,12 +69,18 @@ function EventPage(props: EventPageProps) {
   }, [isSuccess, event?.groups])
 
   useEffect(() => {
-    if (isSuccessUsers)
+    if (isSuccessUsers && isSuccess) {
       setGroupData((prev) => ({
         ...prev,
-        RESERVE_PLAYERS: users?.map((user) => user.id),
+        RESERVE_PLAYERS:
+          users
+            ?.map((user) => user.id)
+            .filter(
+              (userId) => !Object.values(event?.groups).flat().includes(userId)
+            ) ?? [],
       }))
-  }, [isSuccessUsers, users])
+    }
+  }, [isSuccessUsers, users, isSuccess, event?.groups])
 
   if (isLoading || event == null) return null
 
@@ -87,7 +93,7 @@ function EventPage(props: EventPageProps) {
 
     setGroupData((prev) => ({
       ...prev,
-      [newGroupId]: [null, null, null, null, null],
+      [newGroupId]: [null, null, null, null, null, null],
     }))
   }
 
@@ -274,7 +280,7 @@ export const getUserName = (
 ) => {
   if (id == null) return ""
 
-  const user = users.find((user) => user.id === id)
+  const user = users.find((user) => user.id === Number(id))
 
   return user?.name ?? ""
 }

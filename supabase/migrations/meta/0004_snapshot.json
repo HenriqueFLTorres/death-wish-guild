@@ -1,6 +1,6 @@
 {
-  "id": "7b3b66e9-b485-47b1-9fa6-1816ea0215cd",
-  "prevId": "fb7342b4-1f3c-43b0-b050-44e3e08e8635",
+  "id": "e17d530f-573c-44f9-8d72-336e0417a317",
+  "prevId": "b2b823f9-b8cc-40ed-83f6-3f9089dd9164",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -10,7 +10,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "bigint",
           "primaryKey": true,
           "notNull": true
         },
@@ -65,7 +65,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "bigint",
           "primaryKey": true,
           "notNull": true
         },
