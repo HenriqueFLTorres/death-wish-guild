@@ -16,11 +16,13 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
     if (isPlaceholder)
       return (
         <div
-          className="flex h-8 w-full rounded-full opacity-0"
+          className="flex h-8 w-full rounded-full"
           id={id ?? undefined}
           ref={ref}
-          aria-hidden
-        />
+          // aria-hidden
+        >
+          {id}
+        </div>
       )
 
     return (

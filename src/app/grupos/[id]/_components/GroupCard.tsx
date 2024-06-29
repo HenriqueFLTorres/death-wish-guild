@@ -1,59 +1,95 @@
-import type { UniqueIdentifier } from "@dnd-kit/core"
 import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
+  type UniqueIdentifier,
+  useDraggable,
+  useDroppable,
+} from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
 import type { CSSProperties } from "react"
-import { Items } from "../page"
 import { PlayerListItem } from "./PlayerListItem"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { cn } from "@/lib/utils"
 
-interface SortableItemProps {
+interface DroppableProps {
   id: UniqueIdentifier | null
-  isPlaceholder?: boolean
+  index: number
+  containerId: UniqueIdentifier
+  children: React.ReactNode
 }
 
-function SortableItem(props: SortableItemProps) {
-  const { id, isPlaceholder = false } = props
+function Droppable(props: DroppableProps) {
+  const { id, index, containerId, children } = props
 
-  const { attributes, listeners, setNodeRef, transform, transition, isOver } =
-    useSortable({ id: id ?? "", disabled: isPlaceholder })
+  if (id == null) return null
 
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
+  const { isOver, setNodeRef } = useDroppable({
+    id,
+    data: {
+      index,
+      containerId,
+    },
+  })
 
   return (
     <li
-      className="h-8 rounded-full border border-dashed border-transparent transition-all duration-200 data-[isover='true']:border-white/30 data-[isover='true']:bg-white/10"
-      data-isover={isOver}
+      className={cn(
+        "h-8 rounded-full border border-dashed border-transparent transition-all duration-200",
+        { "border-white/30 bg-white/10": isOver }
+      )}
+      ref={setNodeRef}
     >
-      <PlayerListItem
-        id={id}
-        isPlaceholder={isPlaceholder}
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-      />
+      {children}
     </li>
+  )
+}
+
+interface DraggableProps {
+  id: UniqueIdentifier | null
+  index: number
+  containerId: UniqueIdentifier
+}
+
+function Draggable(props: DraggableProps) {
+  const { id, containerId, index } = props
+
+  if (id == null) return null
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id,
+      data: {
+        index,
+        containerId,
+      },
+    })
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    opacity: isDragging ? 0 : 1,
+  }
+
+  return (
+    <PlayerListItem
+      id={id}
+      isPlaceholder={false}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    />
   )
 }
 
 interface GroupCardProps {
   hasMe?: boolean
-  containerItems: (string | null)[]
+  items: (UniqueIdentifier | null)[]
   containerId: UniqueIdentifier
-  REFERENCE_ITEMS: Items
 }
 
 function GroupCard(props: GroupCardProps) {
-  const { hasMe = false, containerItems, containerId, REFERENCE_ITEMS } = props
+  const { hasMe = false, items, containerId } = props
 
-  const membersInGroup = REFERENCE_ITEMS[containerId].filter(Boolean).length + 1
+  const groupSize = items.filter(Boolean).length + 1
+
+  const fullArray = Array.from(Array(5).keys())
 
   return (
     <li
@@ -65,7 +101,7 @@ function GroupCard(props: GroupCardProps) {
           Grupo 1 {hasMe ? "(Meu grupo)" : ""}
         </h3>
 
-        <small>{membersInGroup === 6 ? "Cheio" : `${membersInGroup}/6`}</small>
+        <small>{groupSize === 6 ? "Cheio" : `${groupSize}/6`}</small>
       </div>
 
       <div className="flex items-center gap-2">
@@ -80,23 +116,35 @@ function GroupCard(props: GroupCardProps) {
         </div>
       </div>
 
-      <SortableContext
-        id={containerId}
-        items={containerItems as UniqueIdentifier[]}
-        strategy={verticalListSortingStrategy}
-      >
-        <ol className="flex flex-col gap-1">
-          {containerItems.map((value) =>
-            REFERENCE_ITEMS[containerId].includes(value) ? (
-              <SortableItem id={value} key={value} />
-            ) : (
-              <SortableItem id={value} key={value} isPlaceholder />
-            )
-          )}
-        </ol>
-      </SortableContext>
+      <ol className="flex flex-col gap-1">
+        {fullArray.map((index) => {
+          const value = items[index]
+          const hasId = value != null
+
+          return (
+            <Droppable
+              containerId={containerId}
+              id={hasId ? value : `${containerId}-${index}-droppable`}
+              index={index}
+              key={hasId ? value : `${containerId}-${index}-droppable`}
+            >
+              {hasId ? (
+                <Draggable
+                  containerId={containerId}
+                  id={value}
+                  index={index}
+                  key={value}
+                />
+              ) : null}
+            </Droppable>
+          )
+        })}
+        {/* {containers.map((id) => (
+          <PlaceholderItem id={id} key={id} />
+        ))} */}
+      </ol>
     </li>
   )
 }
 
-export { GroupCard, SortableItem }
+export { GroupCard, Draggable as SortableItem }

@@ -2,16 +2,15 @@
 
 import {
   DndContext,
-  DragEndEvent,
-  DragOverEvent,
-  KeyboardSensor,
+  type DragEndEvent,
+  DragOverlay,
+  type DragStartEvent,
   PointerSensor,
-  closestCenter,
-  defaultAnnouncements,
+  type UniqueIdentifier,
+  pointerWithin,
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { useQuery } from "@tanstack/react-query"
 import { Clock, Users } from "lucide-react"
 import moment from "moment"
@@ -19,13 +18,24 @@ import Image from "next/image"
 import { useState } from "react"
 import { getEventTypeImagePath } from "../_components/EventCard"
 import { GroupCard } from "./_components/GroupCard"
+import { PlayerListItem } from "./_components/PlayerListItem"
 import { EVENTS } from "@/lib/QueryKeys"
 import { createClient } from "@/lib/supabase/client"
 
-const MAX_GROUP_SIZE = 5
+const DEFAULT_ITEMS = {
+  root: ["1", "2", "3", "4", "5"],
+  container1: ["6", "7", "8", null, null],
+  container2: ["11", "12", "13", null, null],
+  container3: [null, null, null, null, null],
+}
 
 export type Items = {
-  [key in string]: (string | null)[]
+  [key in UniqueIdentifier]: (UniqueIdentifier | null)[]
+}
+
+export type NodeData = {
+  index: number
+  containerId: UniqueIdentifier
 }
 
 interface EventPageProps {
@@ -55,29 +65,10 @@ function EventPage(props: EventPageProps) {
     enabled: Number.isInteger(Number(id)),
   })
 
-  const [items, setItems] = useState<Items>({
-    root: ["1", "2", "3", "4", "5"],
-    container1: ["6", "7", "8", "9", "10"],
-    container2: ["11", "12", "13", "14", "15"],
-    container3: ["16", "17", "18", "19", "20"],
-  })
-  const [referenceItems, setRefereceItems] = useState<Items>({
-    root: ["1", "2", "3", "4", "5"],
-    container1: ["6", "7", "8", null, null],
-    container2: ["11", "12", "13", null, null],
-    container3: [null, null, null, null, null],
-  })
-  const [backupItems, setBackupItems] = useState<{
-    items: Items
-    referenceItems: Items
-  }>({ items, referenceItems })
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
+  const [referenceItems, setRefereceItems] = useState<Items>(DEFAULT_ITEMS)
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
+  const sensors = useSensors(useSensor(PointerSensor))
 
   if (isLoading || event == null) return null
 
@@ -85,11 +76,9 @@ function EventPage(props: EventPageProps) {
 
   return (
     <DndContext
-      announcements={defaultAnnouncements}
-      collisionDetection={closestCenter}
+      collisionDetection={pointerWithin}
       sensors={sensors}
       onDragEnd={handleDragEnd}
-      onDragOver={handleDragOver}
       onDragStart={handleDragStart}
     >
       <section className="relative flex w-full flex-col items-center overflow-hidden rounded-xl px-4 py-3">
@@ -139,13 +128,8 @@ function EventPage(props: EventPageProps) {
           </header>
 
           <ul className="mx-auto grid w-max grid-cols-3 place-items-center gap-3">
-            {Object.entries(items).map(([key, items]) => (
-              <GroupCard
-                containerId={key}
-                containerItems={items}
-                key={key}
-                REFERENCE_ITEMS={referenceItems}
-              />
+            {Object.entries(referenceItems).map(([key, items]) => (
+              <GroupCard containerId={key} items={items} key={key} />
             ))}
           </ul>
         </div>
@@ -157,141 +141,63 @@ function EventPage(props: EventPageProps) {
           <Badge>+44</Badge>
         </div> */}
       </section>
+      <DragOverlay className="list-none" wrapperElement="li">
+        {activeId == null ? null : (
+          <PlayerListItem id={activeId} isPlaceholder={false} />
+        )}
+      </DragOverlay>
     </DndContext>
   )
 
-  function findContainer(id: string | undefined | null) {
-    if (id == null) return null
-
-    if (id in items) {
-      return id
-    }
-
-    return Object.keys(referenceItems).find((key) => items[key].includes(id))
-  }
-
-  function handleDragStart() {
-    setBackupItems({ items, referenceItems })
-  }
-
-  function handleDragOver(event: DragOverEvent) {
-    const { active, over } = event
-
-    if (over?.id == null || over == null) return
-
-    // Find the containers
-    const activeContainer = findContainer(active.id)
-    const overContainer = findContainer(over.id)
-
-    if (
-      activeContainer == null ||
-      overContainer == null ||
-      activeContainer === overContainer
-    ) {
-      return
-    }
-
-    const activeItems = items[activeContainer]
-    const overItems = items[overContainer]
-
-    // Find the indexes for the items
-    const activeIndex = activeItems.indexOf(active.id)
-    const overIndex = overItems.indexOf(over.id)
-
-    setItems((prev) => {
-      let newIndex: number
-      if (over.id in prev) {
-        // We're at the root droppable of a container
-        newIndex = overItems.length + 1
-      } else {
-        const isBelowLastItem =
-          active.rect.current.translated != null &&
-          active.rect.current.translated.top > over.rect.top + over.rect.height
-
-        const modifier = isBelowLastItem ? 1 : 0
-
-        newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1
-      }
-
-      const newActiveContainer = structuredClone(prev[activeContainer])
-      newActiveContainer[activeIndex] = over.id
-
-      const newOverContainer = [
-        ...prev[overContainer].slice(0, newIndex),
-        items[activeContainer][activeIndex],
-        ...prev[overContainer].slice(newIndex, prev[overContainer].length),
-      ]
-
-      return {
-        ...prev,
-        [activeContainer]: newActiveContainer,
-        [overContainer]: newOverContainer.filter((id) => id !== over.id),
-      }
-    })
-
-    setRefereceItems((prev) => {
-      const newActiveContainer = structuredClone(prev[activeContainer])
-
-      const overId = prev[overContainer].find((id) => id === over.id)
-      newActiveContainer[activeIndex] = overId ?? null
-
-      const newOverContainer = structuredClone(prev[overContainer])
-      newOverContainer[overIndex] = active.id
-
-      return {
-        ...prev,
-        [activeContainer]: newActiveContainer,
-        [overContainer]: newOverContainer,
-      }
-    })
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id)
   }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
 
+    setActiveId(null)
+
     if (over == null) return
 
-    const activeContainer = findContainer(active.id)
-    const overContainer = findContainer(over.id)
+    const activeData = active.data.current
+    const overData = over.data.current
 
-    if (
-      activeContainer == null ||
-      overContainer == null ||
-      activeContainer !== overContainer
-    ) {
+    if (activeData == null || overData == null) return
+
+    const { index: activeIndex, containerId: activeContainerId }: NodeData =
+      activeData as NodeData
+    const { index: overIndex, containerId: overContainerId }: NodeData =
+      overData as NodeData
+
+    if (activeIndex === overIndex && activeContainerId === overContainerId)
       return
-    }
 
-    const overGroup = over?.data.current?.sortable.items.filter((item: never) =>
-      referenceItems[overContainer].includes(item)
-    ) as string[]
+    setRefereceItems((prev) => {
+      const isOverDroppable = String(over.id).includes("droppable")
+      const isSameContainer = activeContainerId === overContainerId
 
-    if (overGroup.length >= MAX_GROUP_SIZE && !overGroup.includes(active.id)) {
-      setItems(backupItems.items)
-      return setRefereceItems(backupItems.items)
-    }
+      if (isSameContainer) {
+        prev[activeContainerId][activeIndex] = isOverDroppable ? null : over.id
+        prev[activeContainerId][overIndex] = active.id
 
-    const activeIndex = items[activeContainer].indexOf(active.id)
-    const overIndex = items[overContainer].indexOf(over.id)
+        return prev
+      }
 
-    if (activeIndex !== overIndex) {
-      setItems((items) => ({
-        ...items,
-        [overContainer]: arrayMove(
-          items[overContainer],
-          activeIndex,
-          overIndex
-        ),
-      }))
-      setRefereceItems((items) => ({
-        ...items,
-        [overContainer]: arrayMove(
-          items[overContainer],
-          activeIndex,
-          overIndex
-        ),
-      }))
-    }
+      const newActiveContainer = structuredClone(prev[activeContainerId])
+      newActiveContainer[activeIndex] = isOverDroppable
+        ? (null as unknown as UniqueIdentifier)
+        : (over.id as UniqueIdentifier)
+
+      const newOverContainer = structuredClone(prev[overContainerId])
+      newOverContainer[overIndex] = active.id
+
+      return {
+        ...prev,
+        [activeContainerId]: newActiveContainer,
+        [overContainerId]: newOverContainer,
+      }
+    })
   }
 }
 
