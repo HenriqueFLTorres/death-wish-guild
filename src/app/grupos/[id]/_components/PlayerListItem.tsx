@@ -6,24 +6,12 @@ import { type HTMLAttributes, forwardRef, memo } from "react"
 interface PlayerListItemProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "id"> {
   id: UniqueIdentifier | null
-  isPlaceholder: boolean
+  name: string
 }
 
 const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
   (props, ref) => {
-    const { id, isPlaceholder, ...otherProps } = props
-
-    if (isPlaceholder)
-      return (
-        <div
-          className="flex h-8 w-full rounded-full"
-          id={id ?? undefined}
-          ref={ref}
-          // aria-hidden
-        >
-          {id}
-        </div>
-      )
+    const { id, name, ...otherProps } = props
 
     return (
       <div
@@ -48,7 +36,7 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
         />
 
         <p className="text-with-gradient relative z-10 bg-gradient-to-b from-white to-neutral-300 text-sm font-medium">
-          SpamTaxota
+          {name}
         </p>
 
         {id}

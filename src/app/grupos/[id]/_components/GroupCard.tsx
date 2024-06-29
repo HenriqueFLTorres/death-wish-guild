@@ -4,9 +4,15 @@ import {
   useDroppable,
 } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
+import { useQuery } from "@tanstack/react-query"
+import { Trash } from "lucide-react"
 import type { CSSProperties } from "react"
+import { getUserName } from "../page"
 import { PlayerListItem } from "./PlayerListItem"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { USERS } from "@/lib/QueryKeys"
+import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 
 interface DroppableProps {
@@ -46,10 +52,11 @@ interface DraggableProps {
   id: UniqueIdentifier | null
   index: number
   containerId: UniqueIdentifier
+  name: string
 }
 
 function Draggable(props: DraggableProps) {
-  const { id, containerId, index } = props
+  const { id, containerId, index, name } = props
 
   if (id == null) return null
 
@@ -69,7 +76,7 @@ function Draggable(props: DraggableProps) {
   return (
     <PlayerListItem
       id={id}
-      isPlaceholder={false}
+      name={name}
       ref={setNodeRef}
       style={style}
       {...attributes}
@@ -82,14 +89,28 @@ interface GroupCardProps {
   hasMe?: boolean
   items: (UniqueIdentifier | null)[]
   containerId: UniqueIdentifier
+  onRemove: () => void
 }
 
 function GroupCard(props: GroupCardProps) {
-  const { hasMe = false, items, containerId } = props
+  const { hasMe = false, items, containerId, onRemove } = props
 
   const groupSize = items.filter(Boolean).length + 1
 
   const fullArray = Array.from(Array(5).keys())
+
+  const supabase = createClient()
+
+  const { data: users = [] } = useQuery({
+    queryKey: [USERS.GET_USERS],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("users").select()
+
+      if (error != null) throw new Error(`Failed to fetch event: ${error}`)
+
+      return data
+    },
+  })
 
   return (
     <li
@@ -98,7 +119,7 @@ function GroupCard(props: GroupCardProps) {
     >
       <div className="flex w-full justify-between">
         <h3 className="text-with-gradient bg-gradient-to-b from-white to-neutral-300 font-bold">
-          Grupo 1 {hasMe ? "(Meu grupo)" : ""}
+          {containerId} {hasMe ? "(Meu grupo)" : ""}
         </h3>
 
         <small>{groupSize === 6 ? "Cheio" : `${groupSize}/6`}</small>
@@ -114,6 +135,15 @@ function GroupCard(props: GroupCardProps) {
             Alan Bida
           </h4>
         </div>
+
+        <Button
+          className="ml-auto"
+          size={"icon"}
+          variant="destructive"
+          onClick={() => onRemove()}
+        >
+          <Trash size={16} />
+        </Button>
       </div>
 
       <ol className="flex flex-col gap-1">
@@ -134,17 +164,15 @@ function GroupCard(props: GroupCardProps) {
                   id={value}
                   index={index}
                   key={value}
+                  name={getUserName(value, users)}
                 />
               ) : null}
             </Droppable>
           )
         })}
-        {/* {containers.map((id) => (
-          <PlaceholderItem id={id} key={id} />
-        ))} */}
       </ol>
     </li>
   )
 }
 
-export { GroupCard, Draggable as SortableItem }
+export { Draggable, GroupCard }

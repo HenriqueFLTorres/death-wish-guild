@@ -1,7 +1,12 @@
+const USERS = {
+  GET_USERS: "GET_USERS",
+} as const
+
 const EVENTS = {
   GET_EVENTS: "GET_EVENTS",
   GET_EVENT: "GET_EVENT",
   CREATE_EVENT: "CREATE_EVENT",
+  UPDATE_EVENT: "UPDATE_EVENT",
 } as const
 
-export { EVENTS }
+export { EVENTS, USERS }

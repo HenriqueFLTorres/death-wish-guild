@@ -11,23 +11,18 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Clock, Users } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { getEventTypeImagePath } from "../_components/EventCard"
-import { GroupCard } from "./_components/GroupCard"
+import { Draggable, GroupCard } from "./_components/GroupCard"
 import { PlayerListItem } from "./_components/PlayerListItem"
-import { EVENTS } from "@/lib/QueryKeys"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { EVENTS, USERS } from "@/lib/QueryKeys"
 import { createClient } from "@/lib/supabase/client"
-
-const DEFAULT_ITEMS = {
-  root: ["1", "2", "3", "4", "5"],
-  container1: ["6", "7", "8", null, null],
-  container2: ["11", "12", "13", null, null],
-  container3: [null, null, null, null, null],
-}
 
 export type Items = {
   [key in UniqueIdentifier]: (UniqueIdentifier | null)[]
@@ -49,7 +44,11 @@ function EventPage(props: EventPageProps) {
 
   const supabase = createClient()
 
-  const { data: event, isLoading } = useQuery({
+  const {
+    data: event,
+    isLoading,
+    isSuccess,
+  } = useQuery({
     queryKey: [EVENTS.GET_EVENT, id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -65,14 +64,88 @@ function EventPage(props: EventPageProps) {
     enabled: Number.isInteger(Number(id)),
   })
 
+  const { mutate: updateGroups } = useMutation({
+    mutationKey: [EVENTS.UPDATE_EVENT, id],
+    mutationFn: async (newGroups: any) => {
+      const groupsWithoutReserve = structuredClone(newGroups)
+
+      delete groupsWithoutReserve.RESERVE_PLAYERS
+
+      const { error } = await supabase
+        .from("events")
+        .update({ groups: groupsWithoutReserve })
+        .eq("id", id)
+        .select()
+
+      if (error != null) throw new Error(`Failed to update event: ${error}`)
+    },
+  })
+
+  const { data: users = [], isSuccess: isSuccessUsers } = useQuery({
+    queryKey: [USERS.GET_USERS],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("users").select()
+
+      if (error != null) throw new Error(`Failed to fetch event: ${error}`)
+
+      return data
+    },
+    enabled: Number.isInteger(Number(id)),
+  })
+
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
-  const [referenceItems, setRefereceItems] = useState<Items>(DEFAULT_ITEMS)
+  const [groupData, setGroupData] = useState<Items>({
+    RESERVE_PLAYERS: [],
+  })
 
   const sensors = useSensors(useSensor(PointerSensor))
+
+  useEffect(() => {
+    if (isSuccess)
+      setGroupData((prev) => ({
+        RESERVE_PLAYERS: prev.RESERVE_PLAYERS,
+        ...event?.groups,
+      }))
+  }, [isSuccess, event?.groups])
+
+  useEffect(() => {
+    if (isSuccessUsers)
+      setGroupData((prev) => ({
+        ...prev,
+        RESERVE_PLAYERS: users?.map((user) => user.id),
+      }))
+  }, [isSuccessUsers, users])
 
   if (isLoading || event == null) return null
 
   const { name, start_time, type } = event
+
+  const addNewGroup = () => {
+    const dataLength = Object.keys(groupData).length
+
+    const newGroupId = `Grupo ${dataLength + 1}`
+
+    setGroupData((prev) => ({
+      ...prev,
+      [newGroupId]: [null, null, null, null, null],
+    }))
+  }
+
+  const onGroupRemove = (key: UniqueIdentifier) => {
+    if (key === "RESERVE_PLAYERS")
+      throw new Error("Cannot remove reserve players")
+
+    setGroupData((prev) => {
+      const playersRemoved = prev[key].filter(Boolean)
+
+      const newsGroupsData = structuredClone(prev)
+
+      newsGroupsData.RESERVE_PLAYERS.push(...playersRemoved)
+      delete newsGroupsData[key]
+
+      return newsGroupsData
+    })
+  }
 
   return (
     <DndContext
@@ -128,22 +201,50 @@ function EventPage(props: EventPageProps) {
           </header>
 
           <ul className="mx-auto grid w-max grid-cols-3 place-items-center gap-3">
-            {Object.entries(referenceItems).map(([key, items]) => (
-              <GroupCard containerId={key} items={items} key={key} />
-            ))}
+            {Object.entries(groupData).map(([key, items]) =>
+              key === "RESERVE_PLAYERS" ? null : (
+                <GroupCard
+                  containerId={key}
+                  items={items}
+                  key={key}
+                  onRemove={() => onGroupRemove(key)}
+                />
+              )
+            )}
           </ul>
+
+          <footer className="flex w-full gap-4">
+            <Button className="w-full" onClick={addNewGroup}>
+              Adicionar novo grupo
+            </Button>
+            <Button
+              className="w-full"
+              variant={"secondary"}
+              onClick={() => updateGroups(groupData)}
+            >
+              Salvar
+            </Button>
+          </footer>
         </div>
 
-        {/* <div className="fixed bottom-12 flex gap-3 rounded border border-black/30 bg-black/60 px-4 py-2 backdrop-blur-md">
-          <SortableItem id={6} />
-          <SortableItem id={7} />
-          <SortableItem id={8} />
-          <Badge>+44</Badge>
-        </div> */}
+        <div className="fixed bottom-12 flex gap-3 rounded border border-black/30 bg-black/60 px-4 py-2 backdrop-blur-md">
+          {groupData.RESERVE_PLAYERS.slice(0, 3).map((id, index) => (
+            <Draggable
+              containerId={"RESERVE_PLAYERS"}
+              id={id}
+              index={index}
+              key={id}
+              name={getUserName(id, users)}
+            />
+          ))}
+          {groupData.RESERVE_PLAYERS.length > 3 ? (
+            <Badge>+{groupData.RESERVE_PLAYERS.length - 3}</Badge>
+          ) : null}
+        </div>
       </section>
       <DragOverlay className="list-none" wrapperElement="li">
         {activeId == null ? null : (
-          <PlayerListItem id={activeId} isPlaceholder={false} />
+          <PlayerListItem id={activeId} name={getUserName(activeId, users)} />
         )}
       </DragOverlay>
     </DndContext>
@@ -173,7 +274,7 @@ function EventPage(props: EventPageProps) {
     if (activeIndex === overIndex && activeContainerId === overContainerId)
       return
 
-    setRefereceItems((prev) => {
+    setGroupData((prev) => {
       const isOverDroppable = String(over.id).includes("droppable")
       const isSameContainer = activeContainerId === overContainerId
 
@@ -192,6 +293,10 @@ function EventPage(props: EventPageProps) {
       const newOverContainer = structuredClone(prev[overContainerId])
       newOverContainer[overIndex] = active.id
 
+      // prevent nulls from being added to reserve players
+      const activeIsReserve = activeContainerId === "RESERVE_PLAYERS"
+      if (activeIsReserve) newActiveContainer.splice(activeIndex, 1)
+
       return {
         ...prev,
         [activeContainerId]: newActiveContainer,
@@ -202,3 +307,11 @@ function EventPage(props: EventPageProps) {
 }
 
 export default EventPage
+
+export const getUserName = (id: UniqueIdentifier | null, users: any[]) => {
+  if (id == null) return ""
+
+  const user = users.find((user) => user.id === Number(id))
+
+  return user?.name
+}
