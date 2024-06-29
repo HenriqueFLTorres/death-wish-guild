@@ -4,15 +4,13 @@ import {
   useDroppable,
 } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
-import { useQuery } from "@tanstack/react-query"
 import { Trash } from "lucide-react"
 import type { CSSProperties } from "react"
 import { getUserName } from "../page"
 import { PlayerListItem } from "./PlayerListItem"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { USERS } from "@/lib/QueryKeys"
-import { createClient } from "@/lib/supabase/client"
+import { useGetUsers } from "@/db/hooks/users/useGetUsers"
 import { cn } from "@/lib/utils"
 
 interface DroppableProps {
@@ -99,18 +97,7 @@ function GroupCard(props: GroupCardProps) {
 
   const fullArray = Array.from(Array(5).keys())
 
-  const supabase = createClient()
-
-  const { data: users = [] } = useQuery({
-    queryKey: [USERS.GET_USERS],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("users").select()
-
-      if (error != null) throw new Error(`Failed to fetch event: ${error}`)
-
-      return data
-    },
-  })
+  const { data: users = [] } = useGetUsers()
 
   return (
     <li

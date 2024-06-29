@@ -11,7 +11,6 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import { useMutation, useQuery } from "@tanstack/react-query"
 import { Clock, Users } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
@@ -21,8 +20,10 @@ import { Draggable, GroupCard } from "./_components/GroupCard"
 import { PlayerListItem } from "./_components/PlayerListItem"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { EVENTS, USERS } from "@/lib/QueryKeys"
-import { createClient } from "@/lib/supabase/client"
+import { useGetEvent } from "@/db/hooks/events/useGetEvent"
+import { useUpdateEventGroups } from "@/db/hooks/events/useUpdateEventGroups"
+import { useGetUsers } from "@/db/hooks/users/useGetUsers"
+import type { SelectUser } from "@/db/schema"
 
 export type Items = {
   [key in UniqueIdentifier]: (UniqueIdentifier | null)[]
@@ -42,54 +43,13 @@ function EventPage(props: EventPageProps) {
 
   const id = params.id
 
-  const supabase = createClient()
+  const { data: event, isLoading, isSuccess } = useGetEvent({ id })
 
-  const {
-    data: event,
-    isLoading,
-    isSuccess,
-  } = useQuery({
-    queryKey: [EVENTS.GET_EVENT, id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("events")
-        .select()
-        .match({ id })
-        .single()
-
-      if (error != null) throw new Error(`Failed to fetch event: ${error}`)
-
-      return data
-    },
-    enabled: Number.isInteger(Number(id)),
+  const { mutate: updateGroups } = useUpdateEventGroups({
+    id,
   })
 
-  const { mutate: updateGroups } = useMutation({
-    mutationKey: [EVENTS.UPDATE_EVENT, id],
-    mutationFn: async (newGroups: any) => {
-      const groupsWithoutReserve = structuredClone(newGroups)
-
-      delete groupsWithoutReserve.RESERVE_PLAYERS
-
-      const { error } = await supabase
-        .from("events")
-        .update({ groups: groupsWithoutReserve })
-        .eq("id", id)
-        .select()
-
-      if (error != null) throw new Error(`Failed to update event: ${error}`)
-    },
-  })
-
-  const { data: users = [], isSuccess: isSuccessUsers } = useQuery({
-    queryKey: [USERS.GET_USERS],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("users").select()
-
-      if (error != null) throw new Error(`Failed to fetch event: ${error}`)
-
-      return data
-    },
+  const { data: users = [], isSuccess: isSuccessUsers } = useGetUsers({
     enabled: Number.isInteger(Number(id)),
   })
 
@@ -308,10 +268,13 @@ function EventPage(props: EventPageProps) {
 
 export default EventPage
 
-export const getUserName = (id: UniqueIdentifier | null, users: any[]) => {
+export const getUserName = (
+  id: UniqueIdentifier | null,
+  users: SelectUser[]
+) => {
   if (id == null) return ""
 
-  const user = users.find((user) => user.id === Number(id))
+  const user = users.find((user) => user.id === id)
 
-  return user?.name
+  return user?.name ?? ""
 }
