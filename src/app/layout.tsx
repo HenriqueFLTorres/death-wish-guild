@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 import Image from "next/image"
 
+import NextAuthProvider from "./_providers/NextAuthProvider"
 import QueryClientProvider from "./_providers/QueryClientProvider"
 import { Navbar } from "@/components/global/Navbar"
 import { cn } from "@/lib/utils"
@@ -30,10 +31,12 @@ export default function RootLayout({
           "flex flex-col items-center gap-12 bg-neutral-900"
         )}
       >
-        <QueryClientProvider>
-          <Navbar />
-          {children}
-        </QueryClientProvider>
+        <NextAuthProvider>
+          <QueryClientProvider>
+            <Navbar />
+            {children}
+          </QueryClientProvider>
+        </NextAuthProvider>
         <Image
           alt=""
           className="fixed -z-[1] object-cover blur"
