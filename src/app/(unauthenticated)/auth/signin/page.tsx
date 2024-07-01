@@ -49,7 +49,7 @@ function SignIn() {
 
         <Button
           className="relative z-10 w-full"
-          onClick={() => signIn("discord")}
+          onClick={() => signIn("discord", { callbackUrl: "/" })}
         >
           <Discord />
           Acessar com o Discord

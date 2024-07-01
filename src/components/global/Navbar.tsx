@@ -97,7 +97,7 @@ const Navbar = () => {
             <a href="/api/auth/signout">Deslogar</a>
           </div>
         ) : (
-          <a href="/api/auth/signin">Logar</a>
+          <a href="/auth/signin">Logar</a>
         )}
       </nav>
     </div>

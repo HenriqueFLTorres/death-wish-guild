@@ -1,51 +1,33 @@
 "use client"
 
-import { RotateCcw, ShieldAlert } from "lucide-react"
+import { RotateCcw } from "lucide-react"
 import Image from "next/image"
-import Link from "next/link"
 import { signIn } from "next-auth/react"
+import { AccessDeniedMessage } from "./_components/AccessDenied"
+import { LoginErrorMessage } from "./_components/LoginError"
 import { Button } from "@/components/ui/button"
 
-function ErrorPage() {
+interface ErrorPageProps {
+  searchParams: { error: string }
+}
+
+function ErrorPage(props: ErrorPageProps) {
+  const { searchParams } = props
+
+  const error = searchParams.error
+
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <section className="relative flex w-full max-w-screen-sm flex-col items-center justify-center gap-8 overflow-hidden rounded-lg bg-gradient-to-b from-secondary-600/40 to-secondary-400/40 p-4 pb-4 drop-shadow-md backdrop-blur-md">
-        <header className="relative z-10 flex w-full items-center gap-4">
-          <ShieldAlert size={48} />
-          <h1 className="text-left text-3xl font-semibold drop-shadow">
-            Oops, algo deu errado!
-          </h1>
-        </header>
-
-        <div className="relative z-10 flex flex-col gap-4 text-left">
-          <p>Você ainda não está autorizado a acessar a nossa plataforma.</p>
-
-          <p>
-            Certifique-se de que nossos administradores tenham seu{" "}
-            <strong>ID de usuário do Discord</strong> para você se registrar em
-            nossa plataforma.
-          </p>
-
-          <div className="flex flex-col gap-2">
-            <p>Para mais ajuda</p>
-
-            <ul className="flex list-disc flex-col pl-6">
-              <li>
-                <Link
-                  className="underline"
-                  href="https://support.discord.com/hc/pt-br/articles/206346498-Onde-posso-encontrar-minhas-IDs-de-Usu%C3%A1rio-Servidor-Mensagem"
-                  passHref
-                >
-                  Onde posso encontrar meu ID de Usuário do Discord
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
+    <main className="flex min-h-screen w-full items-center justify-center">
+      <section className="relative flex w-full max-w-screen-sm flex-col justify-center gap-8 overflow-hidden rounded-lg bg-gradient-to-b from-secondary-600/40 to-secondary-400/40 p-4 pb-4 drop-shadow-md backdrop-blur-md">
+        {error === "AccessDenied" ? (
+          <AccessDeniedMessage />
+        ) : (
+          <LoginErrorMessage error={error} />
+        )}
 
         <Button
           className="relative z-10 w-full"
-          onClick={() => signIn("discord")}
+          onClick={() => signIn("discord", { callbackUrl: "/" })}
         >
           <RotateCcw />
           Tentar novamente
