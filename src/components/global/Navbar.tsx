@@ -85,13 +85,17 @@ const Navbar = () => {
         </ul>
 
         {status === "authenticated" ? (
-          <Image
-            alt={`${session?.user?.name} logo`}
-            className="h-10 w-10 rounded-full border-2 border-primary object-cover drop-shadow-[0_0_4px_#7B53A7]"
-            height={40}
-            src={session?.user?.image ?? "/avatar/variant-1.png"}
-            width={40}
-          />
+          <div className="flex items-center gap-4">
+            <Image
+              alt={`${session?.user?.name} logo`}
+              className="h-10 w-10 rounded-full border-2 border-primary object-cover drop-shadow-[0_0_4px_#7B53A7]"
+              height={40}
+              src={session?.user?.image ?? "/avatar/variant-1.png"}
+              width={40}
+            />
+
+            <a href="/api/auth/signout">Deslogar</a>
+          </div>
         ) : (
           <a href="/api/auth/signin">Logar</a>
         )}

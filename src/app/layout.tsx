@@ -1,10 +1,8 @@
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
-import Image from "next/image"
 
 import NextAuthProvider from "./_providers/NextAuthProvider"
 import QueryClientProvider from "./_providers/QueryClientProvider"
-import { Navbar } from "@/components/global/Navbar"
 import { cn } from "@/lib/utils"
 import "./globals.css"
 
@@ -32,17 +30,8 @@ export default function RootLayout({
         )}
       >
         <NextAuthProvider>
-          <QueryClientProvider>
-            <Navbar />
-            {children}
-          </QueryClientProvider>
+          <QueryClientProvider>{children}</QueryClientProvider>
         </NextAuthProvider>
-        <Image
-          alt=""
-          className="fixed -z-[1] object-cover blur"
-          src={"/background-blur.png"}
-          fill
-        />
       </body>
     </html>
   )

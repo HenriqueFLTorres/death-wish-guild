@@ -7,6 +7,10 @@ if (process.env.DISCORD_CLIENT_SECRET == null)
   throw new Error("DISCORD_CLIENT_SECRET is not set")
 
 const handler = NextAuth({
+  pages: {
+    signIn: "/auth/signin",
+    error: "/auth/error",
+  },
   providers: [
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID,
