@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PartyPopperIcon, Rocket } from "lucide-react"
 import Image from "next/image"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -30,11 +30,14 @@ const onboardingSchema = z.object({
 })
 
 function OnboardUser() {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
   const router = useRouter()
 
   const { mutate } = useCompleteOnboarding({
-    onSuccess: () => router.push("/"),
+    onSuccess: async () => {
+      await update({ ...session, user: { ...session?.user, isBoarded: true } })
+      router.push("/")
+    },
   })
 
   const form = useForm<z.infer<typeof onboardingSchema>>({
