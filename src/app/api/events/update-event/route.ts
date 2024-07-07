@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const [{ insertedId }] = await db
       .update(eventsTable)
       .set({ ...body.event, groups: sql`${body.event.groups}::jsonb` })
-      .where(eq(eventsTable.id, Number(id)))
+      .where(eq(eventsTable.id, id))
       .returning({ insertedId: eventsTable.id })
 
     return NextResponse.json({ insertedId }, { status: 201 })

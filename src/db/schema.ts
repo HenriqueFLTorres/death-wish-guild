@@ -1,5 +1,4 @@
 import {
-  bigint,
   boolean,
   integer,
   jsonb,
@@ -18,16 +17,14 @@ const eventConfirmationTypeEnum = pgEnum("confirmation_type", [
 ])
 
 export const eventsTable = pgTable("events", {
-  id: bigint("id", { mode: "bigint" }).primaryKey(),
+  id: integer("id"),
   startTime: timestamp("start_time", { withTimezone: true }).notNull(),
   name: text("name").notNull(),
   confirmationType: eventConfirmationTypeEnum("confirmation_type").notNull(),
   location: text("location").notNull(),
   type: eventTypeEnum("event_type").notNull(),
   groups: jsonb("groups").$type<EventGroups>().default({}),
-  confirmedPlayers: bigint("confirmed_players", { mode: "bigint" })
-    .array()
-    .notNull(),
+  confirmedPlayers: text("confirmed_players").array(),
 })
 
 const userRoleEnum = pgEnum("role_type", ["ADMIN", "MODERATOR", "MEMBER"])

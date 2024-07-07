@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const [event] = await db
       .select()
       .from(eventsTable)
-      .where(eq(eventsTable.id, Number(body.id)))
+      .where(eq(eventsTable.id, body.id))
       .limit(1)
 
     return NextResponse.json(event, { status: 200 })

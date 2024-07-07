@@ -14,7 +14,10 @@ export async function POST(request: Request) {
 
     const [{ insertedId }] = await db
       .insert(eventsTable)
-      .values({ ...body.event, start_time: new Date(body.event.start_time) })
+      .values({
+        ...body.event,
+        startTime: new Date(body.event.startTime),
+      })
       .returning({ insertedId: eventsTable.id })
 
     return NextResponse.json({ insertedId }, { status: 201 })

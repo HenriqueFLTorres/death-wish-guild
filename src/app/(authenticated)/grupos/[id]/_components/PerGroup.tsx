@@ -73,7 +73,10 @@ function PerGroup(props: PerGroupProps) {
           users
             ?.map((user) => user.id)
             .filter(
-              (userId) => !Object.values(event?.groups).flat().includes(userId)
+              (userId) =>
+                !Object.values(event?.groups ?? {})
+                  .flat()
+                  .includes(userId)
             ) ?? [],
       }))
     }
@@ -81,7 +84,7 @@ function PerGroup(props: PerGroupProps) {
 
   if (isLoading || event == null) return null
 
-  const { name, start_time, type } = event
+  const { name, startTime, type } = event
 
   const addNewGroup = () => {
     const dataLength = Object.keys(groupData).length
@@ -136,8 +139,8 @@ function PerGroup(props: PerGroupProps) {
                 </div>
 
                 <p className="font-semibold drop-shadow">
-                  {moment(start_time).format("LT")} -{" "}
-                  {moment(start_time).fromNow()}
+                  {moment(startTime).format("LT")} -{" "}
+                  {moment(startTime).fromNow()}
                 </p>
               </div>
             </div>

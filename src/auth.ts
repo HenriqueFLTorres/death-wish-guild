@@ -42,7 +42,8 @@ export const nextAuthConfig: NextAuthConfig = {
         user: {
           ...session.user,
           ...myUser,
-          displayName: myUser.displayName ?? session.user.name,
+          name: myUser.displayName ?? session.user.name,
+          originalName: session.user.name,
         },
       }
     },

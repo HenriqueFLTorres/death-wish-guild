@@ -1,6 +1,6 @@
 {
-  "id": "4ae7699b-7f67-4318-89d9-0af697604e8e",
-  "prevId": "a91414ea-71f6-4c01-ad83-72681f4e0ec6",
+  "id": "58cb2ab0-670a-4bcf-b2ef-2c6bfdc670cc",
+  "prevId": "4049fedc-d0d1-4295-873a-d49de8af98da",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -109,8 +109,8 @@
         "id": {
           "name": "id",
           "type": "bigint",
-          "primaryKey": true,
-          "notNull": true
+          "primaryKey": false,
+          "notNull": false
         },
         "start_time": {
           "name": "start_time",
@@ -155,11 +155,53 @@
           "name": "confirmed_players",
           "type": "bigint[]",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.session": {
+      "name": "session",
+      "schema": "",
+      "columns": {
+        "sessionToken": {
+          "name": "sessionToken",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires": {
+          "name": "expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_userId_user_id_fk": {
+          "name": "session_userId_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -211,6 +253,20 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'MEMBER'"
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "class": {
+          "name": "class",
+          "type": "class_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DPS'"
         }
       },
       "indexes": {},

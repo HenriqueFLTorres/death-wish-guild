@@ -43,7 +43,7 @@ import { useCreateEvent } from "@/db/hooks/events/useCreateEvent"
 import { type InsertEvent, type SelectEvent, eventsTable } from "@/db/schema"
 
 const eventSchema = createInsertSchema(eventsTable)
-  .omit({ start_time: true, id: true })
+  .omit({ startTime: true, id: true, confirmedPlayers: true })
   .and(
     z.object({
       startTime: z.object({ hour: z.number(), minute: z.number() }),
@@ -60,8 +60,7 @@ function CreateEvent() {
     resolver: zodResolver(eventSchema),
     defaultValues: {
       startDate: startOfDay(new Date()),
-      confirmed_players: [],
-      confirmation_type: "PER_GROUP",
+      confirmationType: "PER_GROUP",
     },
   })
 
@@ -69,7 +68,7 @@ function CreateEvent() {
     const { startTime, startDate, ...restEvent } = values
     const summedStartTime = moment(startDate).add(startTime).toDate()
 
-    mutate({ ...restEvent, start_time: summedStartTime } as InsertEvent)
+    mutate({ ...restEvent, startTime: summedStartTime } as InsertEvent)
   }
 
   return (
@@ -115,7 +114,7 @@ function CreateEvent() {
 
             <FormField
               control={form.control}
-              name="confirmation_type"
+              name="confirmationType"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tipo de Confirmação</FormLabel>
@@ -296,7 +295,7 @@ function CreateEvent() {
 
 export { CreateEvent }
 
-const CONFIRMATION_OPTIONS: SelectEvent["confirmation_type"][] = [
+const CONFIRMATION_OPTIONS: SelectEvent["confirmationType"][] = [
   "PER_PLAYER",
   "PER_GROUP",
 ]

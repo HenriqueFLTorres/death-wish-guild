@@ -5,36 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1720222850882,
-      "tag": "0000_powerful_old_lace",
+      "when": 1720373772043,
+      "tag": "0000_elite_iceman",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1720223260064,
-      "tag": "0001_striped_warpath",
+      "when": 1720373972297,
+      "tag": "0001_wandering_zaladane",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1720239139027,
-      "tag": "0002_gifted_mulholland_black",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1720279020727,
-      "tag": "0003_little_forge",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1720279255774,
-      "tag": "0004_luxuriant_vector",
+      "when": 1720374497014,
+      "tag": "0002_kind_firelord",
       "breakpoints": true
     }
   ]

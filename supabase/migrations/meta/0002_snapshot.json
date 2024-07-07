@@ -1,6 +1,6 @@
 {
-  "id": "773a4a44-2655-47bb-8f1e-5727b0e9b4f7",
-  "prevId": "4ae7699b-7f67-4318-89d9-0af697604e8e",
+  "id": "3135f332-b88c-492d-8448-2c6c99dbd169",
+  "prevId": "58cb2ab0-670a-4bcf-b2ef-2c6bfdc670cc",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -109,8 +109,8 @@
         "id": {
           "name": "id",
           "type": "bigint",
-          "primaryKey": true,
-          "notNull": true
+          "primaryKey": false,
+          "notNull": false
         },
         "start_time": {
           "name": "start_time",
@@ -153,9 +153,9 @@
         },
         "confirmed_players": {
           "name": "confirmed_players",
-          "type": "bigint[]",
+          "type": "text[]",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -253,6 +253,20 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'MEMBER'"
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "class": {
+          "name": "class",
+          "type": "class_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DPS'"
         }
       },
       "indexes": {},

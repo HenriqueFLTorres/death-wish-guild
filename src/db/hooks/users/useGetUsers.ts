@@ -14,8 +14,9 @@ function useGetUsers(props?: useGetUsersProps) {
         const response = await fetch("/api/user/get-users")
 
         if (!response.ok) throw new Error(response.statusText)
+        const users = await response.json()
 
-        return response.json() as SelectUser[]
+        return users as SelectUser[]
       } catch (error) {
         throw new Error(`Failed to fetch users: ${error}`)
       }

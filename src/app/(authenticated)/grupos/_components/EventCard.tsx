@@ -8,16 +8,16 @@ import { usePathname } from "next/navigation"
 import type { SelectEvent } from "@/db/schema"
 
 function EventCard(props: SelectEvent) {
-  const { start_time, name, type, location, id } = props
+  const { startTime, name, type, location, id } = props
 
   const pathname = usePathname()
 
-  const isNight = moment(start_time).isAfter(
+  const isNight = moment(startTime).isAfter(
     moment().startOf("day").add(18, "hours")
   )
 
-  const weekday = moment(start_time).format("dddd")
-  const formattedDate = moment(start_time).format("LL")
+  const weekday = moment(startTime).format("dddd")
+  const formattedDate = moment(startTime).format("LL")
 
   return (
     <li
@@ -63,7 +63,7 @@ function EventCard(props: SelectEvent) {
                   <Sun className="fill-white" size={12} />
                 )}
               </div>
-              <p className="font-semibold">{moment(start_time).format("LT")}</p>
+              <p className="font-semibold">{moment(startTime).format("LT")}</p>
             </div>
           </footer>
         </div>
