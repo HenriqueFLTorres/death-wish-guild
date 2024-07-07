@@ -12,6 +12,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@auth/drizzle-adapter": "^1.4.1",
+    "@auth/supabase-adapter": "^1.4.1",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^3.6.0",
@@ -21,8 +23,8 @@
     "@radix-ui/react-popover": "^1.1.1",
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
-    "@supabase/ssr": "^0.3.0",
-    "@supabase/supabase-js": "^2.43.5",
+    "@supabase/ssr": "^0.4.0",
+    "@supabase/supabase-js": "^2.44.2",
     "@tanstack/react-query": "^5.45.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -33,7 +35,7 @@
     "lucide-react": "^0.396.0",
     "moment": "^2.30.1",
     "next": "14.2.4",
-    "next-auth": "^4.24.7",
+    "next-auth": "^5.0.0-beta.19",
     "postgres": "^3.4.4",
     "react": "^18",
     "react-aria-components": "^1.2.1",

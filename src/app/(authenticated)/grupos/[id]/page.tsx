@@ -152,7 +152,7 @@ export const getUserName = (
 ) => {
   if (id == null) return ""
 
-  const user = users.find((user) => user.id === Number(id))
+  const user = users.find((user) => user.id === id)
 
   return user?.name ?? ""
 }

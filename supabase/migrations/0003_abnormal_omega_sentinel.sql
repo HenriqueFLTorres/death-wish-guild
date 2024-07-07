@@ -1,1 +1,0 @@
-ALTER TABLE "events" ALTER COLUMN "start_time" SET DATA TYPE timestamp;

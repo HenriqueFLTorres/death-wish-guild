@@ -42,7 +42,7 @@ import DateTimePicker from "@/components/ui/timer-picker"
 import { useCreateEvent } from "@/db/hooks/events/useCreateEvent"
 import { type InsertEvent, type SelectEvent, eventsTable } from "@/db/schema"
 
-const EventSchema = createInsertSchema(eventsTable)
+const eventSchema = createInsertSchema(eventsTable)
   .omit({ start_time: true, id: true })
   .and(
     z.object({
@@ -56,8 +56,8 @@ function CreateEvent() {
 
   const { mutate } = useCreateEvent({ onSuccess: () => setIsOpen(false) })
 
-  const form = useForm<z.infer<typeof EventSchema>>({
-    resolver: zodResolver(EventSchema),
+  const form = useForm<z.infer<typeof eventSchema>>({
+    resolver: zodResolver(eventSchema),
     defaultValues: {
       startDate: startOfDay(new Date()),
       confirmed_players: [],
@@ -65,7 +65,7 @@ function CreateEvent() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof EventSchema>) {
+  function onSubmit(values: z.infer<typeof eventSchema>) {
     const { startTime, startDate, ...restEvent } = values
     const summedStartTime = moment(startDate).add(startTime).toDate()
 
