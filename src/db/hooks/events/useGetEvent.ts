@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { SelectEvent } from "@/db/schema"
 import { EVENTS } from "@/lib/QueryKeys"
 
 interface useGetEventProps {
@@ -18,8 +19,9 @@ function useGetEvent(props: useGetEventProps) {
         })
 
         if (!response.ok) throw new Error(response.statusText)
+        const event = await response.json()
 
-        return response.json()
+        return event as SelectEvent
       } catch (error) {
         throw new Error(`Failed to fetch event: ${error}`)
       }

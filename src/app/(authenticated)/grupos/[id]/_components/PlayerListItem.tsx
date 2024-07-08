@@ -1,21 +1,25 @@
-import type { UniqueIdentifier } from "@dnd-kit/core"
-import { Sword } from "lucide-react"
+import { Cross, Shield, Sword } from "lucide-react"
 import Image from "next/image"
 import { type HTMLAttributes, forwardRef, memo } from "react"
+import { RangedDPS } from "@/components/icons/RangedDPS"
+import type { SelectUser } from "@/db/schema"
+import { cn } from "@/lib/utils"
 
-interface PlayerListItemProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, "id"> {
-  id: UniqueIdentifier | null
-  name: string
-}
+type PlayerListItemProps = Omit<HTMLAttributes<HTMLDivElement>, "id"> &
+  Pick<SelectUser, "name" | "class" | "image" | "id">
 
 const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
   (props, ref) => {
-    const { id, name, ...otherProps } = props
+    const { name, class: gameRole, image, className, ...otherProps } = props
+
+    const ClassIcon = getIconByClass(gameRole)
 
     return (
       <div
-        className="relative flex h-8 w-full items-center gap-2 overflow-hidden rounded-full border-2 border-black/10 bg-black/20 px-2 py-1"
+        className={cn(
+          "relative flex h-8 shrink-0 items-center gap-2 overflow-hidden rounded-full border-2 border-black/10 bg-black/20 px-2 py-1",
+          className
+        )}
         ref={ref}
         {...otherProps}
       >
@@ -23,7 +27,7 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
           alt=""
           className="relative z-10 h-6 w-6 rounded-full object-cover"
           height={24}
-          src="/avatar/variant-1.png"
+          src={image ?? ""}
           width={24}
         />
 
@@ -39,12 +43,15 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
           {name}
         </p>
 
-        {id}
-
-        <Sword className="relative z-10 ml-auto fill-white" size={20} />
+        <span className="relative z-10 ml-auto grid shrink-0 place-items-center">
+          <ClassIcon className="fill-white" size={20} />
+        </span>
 
         <span
-          className="absolute right-0 z-[0] h-full w-24 translate-x-1/2 bg-red-900/50 blur-lg"
+          className={cn(
+            "absolute right-0 z-[0] h-full w-24 translate-x-1/2 blur-lg",
+            getClassColor(gameRole)
+          )}
           aria-hidden
         />
       </div>
@@ -56,3 +63,33 @@ PlayerListItemComponent.displayName = "PlayerListItem"
 const PlayerListItem = memo(PlayerListItemComponent)
 
 export { PlayerListItem }
+
+function getIconByClass(gameClass: SelectUser["class"]) {
+  switch (gameClass) {
+    case "DPS":
+      return Sword
+    case "RANGED_DPS":
+      return RangedDPS
+    case "TANK":
+      return Shield
+    case "SUPPORT":
+      return Cross
+    default:
+      return Sword
+  }
+}
+
+function getClassColor(gameClass: SelectUser["class"]) {
+  switch (gameClass) {
+    case "DPS":
+      return "bg-red-700/50"
+    case "RANGED_DPS":
+      return "bg-purple-700/50"
+    case "TANK":
+      return "bg-sky-700/50"
+    case "SUPPORT":
+      return "bg-emerald-700/50"
+    default:
+      return "bg-red-700/50"
+  }
+}

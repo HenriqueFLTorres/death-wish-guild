@@ -12,12 +12,11 @@ import {
 import { Clock, Users } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { getEventTypeImagePath } from "../../_components/EventCard"
-import { getUserName } from "../page"
-import { Draggable, GroupCard } from "./GroupCard"
+import { GroupCard } from "./GroupCard"
 import { PlayerListItem } from "./PlayerListItem"
-import { Badge } from "@/components/ui/badge"
+import { ReservePlayers } from "./ReserverPlayers"
 import { Button } from "@/components/ui/button"
 import { useUpdateEventGroups } from "@/db/hooks/events/useUpdateEventGroups"
 import { useGetUsers } from "@/db/hooks/users/useGetUsers"
@@ -56,6 +55,11 @@ function PerGroup(props: PerGroupProps) {
   })
 
   const sensors = useSensors(useSensor(PointerSensor))
+
+  const activeUser = useMemo(
+    () => users.find((user) => user.id === activeId),
+    [activeId, users]
+  )
 
   useEffect(() => {
     if (isSuccess)
@@ -193,24 +197,16 @@ function PerGroup(props: PerGroupProps) {
           </footer>
         </div>
 
-        <div className="fixed bottom-12 flex gap-3 rounded border border-black/30 bg-black/60 px-4 py-2 backdrop-blur-md">
-          {groupData.RESERVE_PLAYERS.slice(0, 3).map((id, index) => (
-            <Draggable
-              containerId={"RESERVE_PLAYERS"}
-              id={id}
-              index={index}
-              key={id}
-              name={getUserName(id, users)}
-            />
-          ))}
-          {groupData.RESERVE_PLAYERS.length > 3 ? (
-            <Badge>+{groupData.RESERVE_PLAYERS.length - 3}</Badge>
-          ) : null}
-        </div>
+        <ReservePlayers RESERVE_PLAYERS={groupData.RESERVE_PLAYERS} />
       </section>
       <DragOverlay className="list-none" wrapperElement="li">
-        {activeId == null ? null : (
-          <PlayerListItem id={activeId} name={getUserName(activeId, users)} />
+        {activeId == null || activeUser == null ? null : (
+          <PlayerListItem
+            class={activeUser.class}
+            id={activeUser.id}
+            image={activeUser.image}
+            name={activeUser.name}
+          />
         )}
       </DragOverlay>
     </DndContext>

@@ -6,7 +6,6 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { Trash } from "lucide-react"
 import type { CSSProperties } from "react"
-import { getUserName } from "../page"
 import { PlayerLeader } from "./PlayerLeader"
 import { PlayerListItem } from "./PlayerListItem"
 import { Button } from "@/components/ui/button"
@@ -52,13 +51,16 @@ interface DraggableProps {
   id: UniqueIdentifier | null
   index: number
   containerId: UniqueIdentifier
-  name: string
+  className?: string
 }
 
 function Draggable(props: DraggableProps) {
-  const { id, containerId, index, name } = props
+  const { id, containerId, index, className } = props
 
-  if (id == null) return null
+  const { data: users = [] } = useGetUsers()
+  const currentUser = users.find((user) => user.id === id)
+
+  if (id == null || currentUser == null) return null
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -75,8 +77,11 @@ function Draggable(props: DraggableProps) {
 
   return (
     <PlayerListItem
-      id={id}
-      name={name}
+      class={currentUser.class}
+      className={className}
+      id={currentUser.id}
+      image={currentUser.image}
+      name={currentUser.name}
       ref={setNodeRef}
       style={style}
       {...attributes}
@@ -101,6 +106,8 @@ function GroupCard(props: GroupCardProps) {
 
   const { data: users = [] } = useGetUsers()
 
+  const leaderUser = users.find((user) => user.id === leaderId)
+
   return (
     <li
       className="flex h-full w-64 select-none flex-col gap-4 rounded border-2 border-black/30 bg-black/60 from-primary-700/40 to-primary-500/40 p-3 backdrop-blur-xl data-[hasme='true']:border-primary/50 data-[hasme='true']:bg-gradient-to-b"
@@ -124,7 +131,8 @@ function GroupCard(props: GroupCardProps) {
           <PlayerLeader
             containerId={containerId}
             id={leaderId}
-            name={getUserName(leaderId, users)}
+            image={leaderUser?.image ?? null}
+            name={leaderUser?.name ?? null}
           />
         </Droppable>
 
@@ -156,7 +164,6 @@ function GroupCard(props: GroupCardProps) {
                   id={value}
                   index={index}
                   key={value}
-                  name={getUserName(value, users)}
                 />
               ) : null}
             </Droppable>

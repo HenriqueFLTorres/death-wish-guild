@@ -3,15 +3,15 @@ import { CSS } from "@dnd-kit/utilities"
 import { Crown } from "lucide-react"
 import type { CSSProperties } from "react"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import type { SelectUser } from "@/db/schema"
 
-interface PlayerLeaderProps {
-  name: string
+interface PlayerLeaderProps extends Pick<SelectUser, "name" | "image"> {
   id: UniqueIdentifier | null
   containerId: UniqueIdentifier
 }
 
 function PlayerLeader(props: PlayerLeaderProps) {
-  const { id, containerId, name } = props
+  const { id, containerId, name, image } = props
 
   if (id == null) return <LeaderPlaceholder />
 
@@ -38,7 +38,7 @@ function PlayerLeader(props: PlayerLeaderProps) {
       {...listeners}
     >
       <Avatar>
-        <AvatarImage alt="" size={40} src="/avatar/variant-1.png" />
+        <AvatarImage alt="" size={40} src={image ?? undefined} />
       </Avatar>
       <div className="flex flex-col text-left">
         <p className="text-xs text-neutral-400">Líder</p>

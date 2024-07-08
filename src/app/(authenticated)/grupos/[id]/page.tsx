@@ -4,6 +4,7 @@ import type { UniqueIdentifier } from "@dnd-kit/core"
 import { Check, Clock, DoorOpen, NotebookPen, Users } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 import { getEventTypeImagePath } from "../_components/EventCard"
 import { PerGroup } from "./_components/PerGroup"
 import { PlayerListItem } from "./_components/PlayerListItem"
@@ -18,6 +19,7 @@ interface EventPageProps {
 
 function EventPage(props: EventPageProps) {
   const { params } = props
+  const { data: session } = useSession()
 
   const { data: users = [] } = useGetUsers({
     enabled: Number.isInteger(Number(params.id)),
@@ -27,9 +29,9 @@ function EventPage(props: EventPageProps) {
 
   const { data: event, isLoading, isSuccess } = useGetEvent({ id })
 
-  if (isLoading) return null
+  if (isLoading || event == null) return null
 
-  if (event.confirmation_type === "PER_GROUP")
+  if (event?.confirmationType === "PER_GROUP")
     return (
       <PerGroup
         event={event}
@@ -39,10 +41,11 @@ function EventPage(props: EventPageProps) {
       />
     )
 
-  const { name, start_time, type, confirmed_players } = event
+  event.confirmedPlayers = event.confirmedPlayers ?? []
+  const { name, startTime, type, confirmedPlayers } = event
 
   const fullArray = Array.from(Array(5).keys()).map(() => null)
-  const hasUsersConfirmed = confirmed_players.length > 0
+  const hasUsersConfirmed = confirmedPlayers.length > 0
 
   return (
     <section className="relative flex w-full flex-col items-center overflow-hidden rounded-xl px-4 py-3 pb-24">
@@ -64,8 +67,7 @@ function EventPage(props: EventPageProps) {
               </div>
 
               <p className="font-semibold drop-shadow">
-                {moment(start_time).format("LT")} -{" "}
-                {moment(start_time).fromNow()}
+                {moment(startTime).format("LT")} - {moment(startTime).fromNow()}
               </p>
             </div>
           </div>
@@ -94,7 +96,7 @@ function EventPage(props: EventPageProps) {
         <div className="flex h-full w-full max-w-96 select-none flex-col gap-2 rounded border-2 border-black/30 bg-black/60 from-primary-700/40 to-primary-500/40 p-3 backdrop-blur-xl">
           <ul className="fade-to-bottom flex flex-col gap-2">
             {fullArray.map((_, index) => {
-              const userId = confirmed_players[index]
+              const userId = confirmedPlayers[index]
 
               if (userId == null) return <PerPlayerPlaceholder key={index} />
 
@@ -110,11 +112,11 @@ function EventPage(props: EventPageProps) {
 
           <p className="text-center text-sm">
             {hasUsersConfirmed
-              ? `${confirmed_players.length} jogadores já estão confirmados`
+              ? `${confirmedPlayers.length} jogadores já estão confirmados`
               : "Seja o primeiro a confirmar presença!"}
           </p>
 
-          {confirmed_players.includes(1) === true ? (
+          {confirmedPlayers.includes(session?.user.id ?? "") === true ? (
             <Button className="group relative overflow-hidden bg-primary-600 hover:border-red-700 hover:bg-red-900 hover:bg-none hover:text-red-100 hover:shadow-none">
               <span className="absolute flex -translate-y-10 items-center gap-2 transition-transform group-hover:translate-y-0">
                 <DoorOpen />
