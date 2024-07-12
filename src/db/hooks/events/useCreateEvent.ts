@@ -13,7 +13,7 @@ function useCreateEvent(props: useCreateEventProps) {
 
   return useMutation({
     mutationKey: [EVENTS.CREATE_EVENT],
-    mutationFn: async (eventData: InsertEvent) => {
+    mutationFn: async (eventData: Omit<InsertEvent, "id">) => {
       const response = await fetch("/api/events/create-event", {
         method: "POST",
         body: JSON.stringify({

@@ -138,7 +138,7 @@ function GroupCard(props: GroupCardProps) {
 
         <Button
           className="ml-auto"
-          size={"icon"}
+          size="icon"
           variant="destructive"
           onClick={() => onRemove()}
         >

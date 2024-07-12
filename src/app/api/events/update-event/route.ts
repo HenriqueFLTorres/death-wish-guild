@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm"
 import { NextResponse } from "next/server"
+import { events } from "@/../supabase/migrations/schema"
 import { db } from "@/db"
-import { eventsTable } from "@/db/schema"
 
 export async function POST(request: Request) {
   try {
@@ -16,10 +16,10 @@ export async function POST(request: Request) {
     const id = body.event.id
 
     const [{ insertedId }] = await db
-      .update(eventsTable)
+      .update(events)
       .set({ ...body.event, groups: sql`${body.event.groups}::jsonb` })
-      .where(eq(eventsTable.id, id))
-      .returning({ insertedId: eventsTable.id })
+      .where(eq(events.id, id))
+      .returning({ insertedId: events.id })
 
     return NextResponse.json({ insertedId }, { status: 201 })
   } catch (error) {

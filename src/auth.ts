@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm"
 import NextAuth, { type NextAuthConfig } from "next-auth"
 import DiscordProvider from "next-auth/providers/discord"
 import { db } from "./db"
-import { users } from "./db/schema"
+import { user } from "@/../supabase/migrations/schema"
 
 if (process.env.DISCORD_CLIENT_ID == null)
   throw new Error("DISCORD_CLIENT_ID is not set")
@@ -33,8 +33,8 @@ export const nextAuthConfig: NextAuthConfig = {
 
       const [myUser] = await db
         .select()
-        .from(users)
-        .where(eq(users.email, session.user.email))
+        .from(user)
+        .where(eq(user.email, session.user.email))
         .limit(1)
 
       return {
@@ -42,7 +42,7 @@ export const nextAuthConfig: NextAuthConfig = {
         user: {
           ...session.user,
           ...myUser,
-          name: myUser.displayName ?? session.user.name,
+          name: myUser.display_name ?? session.user.name,
           originalName: session.user.name,
         },
       }

@@ -8,16 +8,16 @@ import { usePathname } from "next/navigation"
 import type { SelectEvent } from "@/db/schema"
 
 function EventCard(props: SelectEvent) {
-  const { startTime, name, type, location, id } = props
+  const { start_time, name, event_type, location, id } = props
 
   const pathname = usePathname()
 
-  const isNight = moment(startTime).isAfter(
+  const isNight = moment(start_time).isAfter(
     moment().startOf("day").add(18, "hours")
   )
 
-  const weekday = moment(startTime).format("dddd")
-  const formattedDate = moment(startTime).format("LL")
+  const weekday = moment(start_time).format("dddd")
+  const formattedDate = moment(start_time).format("LL")
 
   return (
     <li
@@ -44,10 +44,10 @@ function EventCard(props: SelectEvent) {
             <Image
               alt=""
               height={14}
-              src={getEventTypeImagePath(type)}
+              src={getEventTypeImagePath(event_type)}
               width={14}
             />
-            {type}
+            {event_type}
           </p>
 
           <footer className="flex w-full items-end justify-between gap-4">
@@ -63,7 +63,7 @@ function EventCard(props: SelectEvent) {
                   <Sun className="fill-white" size={12} />
                 )}
               </div>
-              <p className="font-semibold">{moment(startTime).format("LT")}</p>
+              <p className="font-semibold">{moment(start_time).format("LT")}</p>
             </div>
           </footer>
         </div>
@@ -72,7 +72,7 @@ function EventCard(props: SelectEvent) {
           alt="chernobog guild raid"
           className="fade-image absolute right-0 h-full object-cover"
           height={90}
-          src={"/event-preview/chernobog.png"}
+          src="/event-preview/chernobog.png"
           width={197}
         />
       </Link>

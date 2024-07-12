@@ -21,7 +21,7 @@ function AlreadyOnboarded() {
 
         <Link
           className={buttonVariants({ className: "relative z-10 w-full" })}
-          href={"/"}
+          href="/"
         >
           <House />
           Retornar a página principal

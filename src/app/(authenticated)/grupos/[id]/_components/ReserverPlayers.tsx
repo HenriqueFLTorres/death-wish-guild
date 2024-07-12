@@ -14,7 +14,7 @@ function ReservePlayers(props: ReservePlayersProps) {
       {RESERVE_PLAYERS.slice(0, 3).map((id, index) => (
         <Draggable
           className="min-w-40"
-          containerId={"RESERVE_PLAYERS"}
+          containerId="RESERVE_PLAYERS"
           id={id}
           index={index}
           key={id}

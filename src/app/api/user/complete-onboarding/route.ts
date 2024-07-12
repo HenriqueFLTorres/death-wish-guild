@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
+import { user } from "@/../supabase/migrations/schema"
 import { db } from "@/db"
-import { users } from "@/db/schema"
 
 export async function POST(request: Request) {
   try {
@@ -14,14 +14,14 @@ export async function POST(request: Request) {
       )
 
     const [{ updatedId }] = await db
-      .update(users)
+      .update(user)
       .set({
-        isBoarded: true,
+        is_boarded: true,
         class: body.class,
-        displayName: body.displayName,
+        display_name: body.display_name,
       })
-      .where(eq(users.id, body.id))
-      .returning({ updatedId: users.id })
+      .where(eq(user.id, body.id))
+      .returning({ updatedId: user.id })
 
     return NextResponse.json({ updatedId }, { status: 201 })
   } catch (error) {

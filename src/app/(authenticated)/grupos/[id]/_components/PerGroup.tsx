@@ -20,7 +20,7 @@ import { ReservePlayers } from "./ReserverPlayers"
 import { Button } from "@/components/ui/button"
 import { useUpdateEventGroups } from "@/db/hooks/events/useUpdateEventGroups"
 import { useGetUsers } from "@/db/hooks/users/useGetUsers"
-import { SelectEvent } from "@/db/schema"
+import type { SelectEvent } from "@/db/schema"
 
 export type Items = {
   [key in UniqueIdentifier]: (UniqueIdentifier | null)[]
@@ -65,7 +65,7 @@ function PerGroup(props: PerGroupProps) {
     if (isSuccess)
       setGroupData((prev) => ({
         RESERVE_PLAYERS: prev.RESERVE_PLAYERS,
-        ...event?.groups,
+        ...(event?.groups as Record<string, UniqueIdentifier[]>),
       }))
   }, [isSuccess, event?.groups])
 
@@ -88,7 +88,7 @@ function PerGroup(props: PerGroupProps) {
 
   if (isLoading || event == null) return null
 
-  const { name, startTime, type } = event
+  const { name, start_time, event_type } = event
 
   const addNewGroup = () => {
     const dataLength = Object.keys(groupData).length
@@ -128,7 +128,7 @@ function PerGroup(props: PerGroupProps) {
         <Image
           alt=""
           className="absolute object-cover"
-          src={"/background-2.png"}
+          src="/background-2.png"
           fill
         />
 
@@ -143,8 +143,8 @@ function PerGroup(props: PerGroupProps) {
                 </div>
 
                 <p className="font-semibold drop-shadow">
-                  {moment(startTime).format("LT")} -{" "}
-                  {moment(startTime).fromNow()}
+                  {moment(start_time).format("LT")} -{" "}
+                  {moment(start_time).fromNow()}
                 </p>
               </div>
             </div>
@@ -154,10 +154,10 @@ function PerGroup(props: PerGroupProps) {
                 <Image
                   alt=""
                   height={14}
-                  src={getEventTypeImagePath(type)}
+                  src={getEventTypeImagePath(event_type)}
                   width={14}
                 />
-                {type}
+                {event_type}
               </p>
 
               <div className="flex items-center gap-2">
@@ -189,7 +189,7 @@ function PerGroup(props: PerGroupProps) {
             </Button>
             <Button
               className="w-full"
-              variant={"secondary"}
+              variant="secondary"
               onClick={() => updateGroups(groupData)}
             >
               Salvar

@@ -119,7 +119,7 @@ function NotBoardedWarning() {
       <p className="text-sm">
         Você ainda não terminou o seu registro e terás acesso limitado à
         plataforma,{" "}
-        <Link className="underline" href={"/auth/onboarding"}>
+        <Link className="underline" href="/auth/onboarding">
           clique aqui
         </Link>{" "}
         para finaliza-lo

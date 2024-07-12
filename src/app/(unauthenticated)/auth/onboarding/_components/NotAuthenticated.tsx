@@ -22,7 +22,7 @@ function NotAuthenticated() {
 
           <Link
             className={buttonVariants({ className: "relative z-10 w-full" })}
-            href={"/auth/signin"}
+            href="/auth/signin"
           >
             <DoorOpen />
             Ir para página de login

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
+import { events } from "@/../supabase/migrations/schema"
 import { db } from "@/db"
-import { eventsTable } from "@/db/schema"
 
 export async function POST(request: Request) {
   try {
@@ -13,12 +13,12 @@ export async function POST(request: Request) {
       )
 
     const [{ insertedId }] = await db
-      .insert(eventsTable)
+      .insert(events)
       .values({
         ...body.event,
         startTime: new Date(body.event.startTime),
       })
-      .returning({ insertedId: eventsTable.id })
+      .returning({ insertedId: events.id })
 
     return NextResponse.json({ insertedId }, { status: 201 })
   } catch (error) {

@@ -13,7 +13,7 @@ export default function AuthenticatedLayout({
       <Image
         alt=""
         className="fixed -z-[1] object-cover blur"
-        src={"/background-blur.png"}
+        src="/background-blur.png"
         fill
       />
     </>

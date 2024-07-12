@@ -31,7 +31,7 @@ function EventPage(props: EventPageProps) {
 
   if (isLoading || event == null) return null
 
-  if (event?.confirmationType === "PER_GROUP")
+  if (event?.confirmation_type === "PER_GROUP")
     return (
       <PerGroup
         event={event}
@@ -41,18 +41,18 @@ function EventPage(props: EventPageProps) {
       />
     )
 
-  event.confirmedPlayers = event.confirmedPlayers ?? []
-  const { name, startTime, type, confirmedPlayers } = event
+  event.confirmed_players = event.confirmed_players ?? []
+  const { name, start_time, event_type, confirmed_players } = event
 
   const fullArray = Array.from(Array(5).keys()).map(() => null)
-  const hasUsersConfirmed = confirmedPlayers.length > 0
+  const hasUsersConfirmed = confirmed_players.length > 0
 
   return (
     <section className="relative flex w-full flex-col items-center overflow-hidden rounded-xl px-4 py-3 pb-24">
       <Image
         alt=""
         className="absolute object-cover"
-        src={"/background-2.png"}
+        src="/background-2.png"
         fill
       />
 
@@ -67,7 +67,8 @@ function EventPage(props: EventPageProps) {
               </div>
 
               <p className="font-semibold drop-shadow">
-                {moment(startTime).format("LT")} - {moment(startTime).fromNow()}
+                {moment(start_time).format("LT")} -{" "}
+                {moment(start_time).fromNow()}
               </p>
             </div>
           </div>
@@ -77,10 +78,10 @@ function EventPage(props: EventPageProps) {
               <Image
                 alt=""
                 height={14}
-                src={getEventTypeImagePath(type)}
+                src={getEventTypeImagePath(event_type)}
                 width={14}
               />
-              {type}
+              {event_type}
             </p>
 
             <div className="flex items-center gap-2">
@@ -96,15 +97,19 @@ function EventPage(props: EventPageProps) {
         <div className="flex h-full w-full max-w-96 select-none flex-col gap-2 rounded border-2 border-black/30 bg-black/60 from-primary-700/40 to-primary-500/40 p-3 backdrop-blur-xl">
           <ul className="fade-to-bottom flex flex-col gap-2">
             {fullArray.map((_, index) => {
-              const userId = confirmedPlayers[index]
+              const userId = confirmed_players[index]
+              const user = users.find((user) => user.id === userId)
 
-              if (userId == null) return <PerPlayerPlaceholder key={index} />
+              if (userId == null || user == null)
+                return <PerPlayerPlaceholder key={index} />
 
               return (
                 <PlayerListItem
+                  class={user.class}
                   id={userId}
-                  key={index}
-                  name={getUserName(userId, users)}
+                  image={user.image}
+                  key={userId}
+                  name={user.display_name}
                 />
               )
             })}
@@ -112,11 +117,11 @@ function EventPage(props: EventPageProps) {
 
           <p className="text-center text-sm">
             {hasUsersConfirmed
-              ? `${confirmedPlayers.length} jogadores já estão confirmados`
+              ? `${confirmed_players.length} jogadores já estão confirmados`
               : "Seja o primeiro a confirmar presença!"}
           </p>
 
-          {confirmedPlayers.includes(session?.user.id ?? "") === true ? (
+          {confirmed_players.includes(session?.user.id ?? "") === true ? (
             <Button className="group relative overflow-hidden bg-primary-600 hover:border-red-700 hover:bg-red-900 hover:bg-none hover:text-red-100 hover:shadow-none">
               <span className="absolute flex -translate-y-10 items-center gap-2 transition-transform group-hover:translate-y-0">
                 <DoorOpen />

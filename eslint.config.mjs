@@ -46,6 +46,10 @@ const config = tseslint.config(
       "no-undef": "off",
       "no-unused-vars": "off",
       "no-console": ["error", { allow: ["warn", "error"] }],
+      "react/jsx-curly-brace-presence": [
+        "error",
+        { props: "never", children: "never" },
+      ],
     },
   },
   {

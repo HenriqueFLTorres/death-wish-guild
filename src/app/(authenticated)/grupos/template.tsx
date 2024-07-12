@@ -30,7 +30,7 @@ export default async function Template(props: TemplateProps) {
       <Image
         alt=""
         className="pointer-events-none absolute w-full scale-125 object-cover"
-        src={"/groups-decal.png"}
+        src="/groups-decal.png"
         fill
       />
 

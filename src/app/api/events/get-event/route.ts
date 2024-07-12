@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
+import { events } from "@/../supabase/migrations/schema"
 import { db } from "@/db"
-import { eventsTable } from "@/db/schema"
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
 
     const [event] = await db
       .select()
-      .from(eventsTable)
-      .where(eq(eventsTable.id, body.id))
+      .from(events)
+      .where(eq(events.id, body.id))
       .limit(1)
 
     return NextResponse.json(event, { status: 200 })

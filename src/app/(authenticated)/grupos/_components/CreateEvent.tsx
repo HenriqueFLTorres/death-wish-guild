@@ -10,6 +10,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { events } from "@/../supabase/migrations/schema"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -40,14 +41,14 @@ import {
 } from "@/components/ui/select"
 import DateTimePicker from "@/components/ui/timer-picker"
 import { useCreateEvent } from "@/db/hooks/events/useCreateEvent"
-import { type InsertEvent, type SelectEvent, eventsTable } from "@/db/schema"
+import type { SelectEvent } from "@/db/schema"
 
-const eventSchema = createInsertSchema(eventsTable)
-  .omit({ startTime: true, id: true, confirmedPlayers: true })
+const eventSchema = createInsertSchema(events)
+  .omit({ start_time: true, id: true, confirmed_players: true, groups: true })
   .and(
     z.object({
-      startTime: z.object({ hour: z.number(), minute: z.number() }),
-      startDate: z.date(),
+      start_time: z.object({ hour: z.number(), minute: z.number() }),
+      start_date: z.date(),
     })
   )
 
@@ -59,22 +60,25 @@ function CreateEvent() {
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      startDate: startOfDay(new Date()),
-      confirmationType: "PER_GROUP",
+      start_date: startOfDay(new Date()),
+      confirmation_type: "PER_GROUP",
     },
   })
 
   function onSubmit(values: z.infer<typeof eventSchema>) {
-    const { startTime, startDate, ...restEvent } = values
-    const summedStartTime = moment(startDate).add(startTime).toDate()
+    const { start_time, start_date, ...restEvent } = values
+    const summedStartTime = moment(start_date).add(start_time).toDate()
 
-    mutate({ ...restEvent, startTime: summedStartTime } as InsertEvent)
+    mutate({
+      ...restEvent,
+      start_time: summedStartTime.toDateString(),
+    })
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant={"secondary"}>Criar um evento</Button>
+        <Button variant="secondary">Criar um evento</Button>
       </DialogTrigger>
       <DialogContent className="gap-6">
         <DialogTitle>
@@ -114,7 +118,7 @@ function CreateEvent() {
 
             <FormField
               control={form.control}
-              name="confirmationType"
+              name="confirmation_type"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tipo de Confirmação</FormLabel>
@@ -175,7 +179,7 @@ function CreateEvent() {
 
               <FormField
                 control={form.control}
-                name="type"
+                name="confirmation_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de Evento</FormLabel>
@@ -191,7 +195,7 @@ function CreateEvent() {
                       </FormControl>
                       <SelectContent>
                         <SelectContent>
-                          <SelectItem value={"GUILD"}>
+                          <SelectItem value="GUILD">
                             <Image
                               alt=""
                               className="shrink-0"
@@ -201,7 +205,7 @@ function CreateEvent() {
                             />
                             Guild
                           </SelectItem>
-                          <SelectItem value={"PVP"}>
+                          <SelectItem value="PVP">
                             <Image
                               alt=""
                               className="shrink-0"
@@ -211,7 +215,7 @@ function CreateEvent() {
                             />
                             PVP
                           </SelectItem>
-                          <SelectItem value={"PVE"}>
+                          <SelectItem value="PVE">
                             <Image
                               alt=""
                               className="shrink-0"
@@ -221,10 +225,10 @@ function CreateEvent() {
                             />
                             PVE
                           </SelectItem>
-                          <SelectItem value={"DOMINION_EVENT"}>
+                          <SelectItem value="DOMINION_EVENT">
                             Dominion
                           </SelectItem>
-                          <SelectItem value={"OTHER"}>Other</SelectItem>
+                          <SelectItem value="OTHER">Other</SelectItem>
                         </SelectContent>
                       </SelectContent>
                     </Select>
@@ -237,7 +241,7 @@ function CreateEvent() {
             <div className="flex gap-4">
               <FormField
                 control={form.control}
-                name="startDate"
+                name="start_date"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Data de início</FormLabel>
@@ -270,7 +274,7 @@ function CreateEvent() {
 
               <FormField
                 control={form.control}
-                name="startTime"
+                name="start_time"
                 render={({ field }) => (
                   <FormItem>
                     <DateTimePicker
@@ -295,70 +299,71 @@ function CreateEvent() {
 
 export { CreateEvent }
 
-const CONFIRMATION_OPTIONS: SelectEvent["confirmationType"][] = [
+const CONFIRMATION_OPTIONS: SelectEvent["confirmation_type"][] = [
   "PER_PLAYER",
   "PER_GROUP",
 ]
 
-const EVENTS_OPTIONS: Pick<SelectEvent, "name" | "location" | "type">[] = [
-  {
-    name: "Blood Mushroom Gathering",
-    location: "Sandworm Lair",
-    type: "GUILD",
-  },
-  {
-    name: "Dark Destroyers",
-    location: "Ruins of Turayne",
-    type: "GUILD",
-  },
-  {
-    name: "Desert Caravan",
-    location: "Moonlight Desert",
-    type: "PVE",
-  },
-  {
-    name: "Lantern Seed Festival",
-    location: "Nesting Grounds",
-    type: "PVE",
-  },
-  {
-    name: "Starlight Stones Ritual",
-    location: "Urstella Fields",
-    type: "PVE",
-  },
-  {
-    name: "Stop the Mana Frenzy",
-    location: "Manawastes",
-    type: "PVE",
-  },
-  {
-    name: "Wolf Hunting Contest",
-    location: "Blackhowl Plains",
-    type: "PVE",
-  },
-  {
-    name: "Operation: Talisman Delivery",
-    location: "Akidu Valley",
-    type: "GUILD",
-  },
-  {
-    name: "Chernobog",
-    location: "Abandoned Stonemason Town",
-    type: "PVP",
-  },
-  {
-    name: "Excavator-9",
-    location: "Monolith Wastelands",
-    type: "PVP",
-  },
-  {
-    name: "Kowazan",
-    location: "Grayclaw Forest",
-    type: "PVE",
-  },
-  {
-    name: "Talus",
-    location: "The Raging Wilds",
-    type: "PVE",
-  },
-]
+const EVENTS_OPTIONS: Pick<SelectEvent, "name" | "location" | "event_type">[] =
+  [
+    {
+      name: "Blood Mushroom Gathering",
+      location: "Sandworm Lair",
+      event_type: "GUILD",
+    },
+    {
+      name: "Dark Destroyers",
+      location: "Ruins of Turayne",
+      event_type: "GUILD",
+    },
+    {
+      name: "Desert Caravan",
+      location: "Moonlight Desert",
+      event_type: "PVE",
+    },
+    {
+      name: "Lantern Seed Festival",
+      location: "Nesting Grounds",
+      event_type: "PVE",
+    },
+    {
+      name: "Starlight Stones Ritual",
+      location: "Urstella Fields",
+      event_type: "PVE",
+    },
+    {
+      name: "Stop the Mana Frenzy",
+      location: "Manawastes",
+      event_type: "PVE",
+    },
+    {
+      name: "Wolf Hunting Contest",
+      location: "Blackhowl Plains",
+      event_type: "PVE",
+    },
+    {
+      name: "Operation: Talisman Delivery",
+      location: "Akidu Valley",
+      event_type: "GUILD",
+    },
+    {
+      name: "Chernobog",
+      location: "Abandoned Stonemason Town",
+      event_type: "PVP",
+    },
+    {
+      name: "Excavator-9",
+      location: "Monolith Wastelands",
+      event_type: "PVP",
+    },
+    {
+      name: "Kowazan",
+      location: "Grayclaw Forest",
+      event_type: "PVE",
+    },
+    {
+      name: "Talus",
+      location: "The Raging Wilds",
+      event_type: "PVE",
+    },
+  ]
