@@ -64,7 +64,7 @@ const PlayerListItem = memo(PlayerListItemComponent)
 
 export { PlayerListItem }
 
-function getIconByClass(gameClass: SelectUser["class"]) {
+export function getIconByClass(gameClass: SelectUser["class"]) {
   switch (gameClass) {
     case "DPS":
       return Sword
@@ -79,7 +79,7 @@ function getIconByClass(gameClass: SelectUser["class"]) {
   }
 }
 
-function getClassColor(gameClass: SelectUser["class"]) {
+export function getClassColor(gameClass: SelectUser["class"]) {
   switch (gameClass) {
     case "DPS":
       return "bg-red-700/50"

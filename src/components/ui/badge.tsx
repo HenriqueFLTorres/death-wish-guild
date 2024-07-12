@@ -4,11 +4,13 @@ import type { HTMLAttributes } from "react"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border border-black/60 px-2 py-1 text-xs font-semibold transition-colors",
+  "inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold transition-colors",
   {
     variants: {
       variant: {
-        default: "bg-black/40 text-neutral-50",
+        primary:
+          "bg-gradient-to-b from-primary-400 border-primary-600 to-primary-600 text-white",
+        default: "bg-black/40 text-neutral-50 border-black/60",
       },
     },
     defaultVariants: {

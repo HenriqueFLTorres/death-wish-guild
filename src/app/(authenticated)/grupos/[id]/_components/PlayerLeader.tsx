@@ -2,7 +2,7 @@ import { type UniqueIdentifier, useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
 import { Crown } from "lucide-react"
 import type { CSSProperties } from "react"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Avatar } from "@/components/ui/avatar"
 import type { SelectUser } from "@/db/schema"
 
 interface PlayerLeaderProps extends Pick<SelectUser, "name" | "image"> {
@@ -37,9 +37,7 @@ function PlayerLeader(props: PlayerLeaderProps) {
       {...attributes}
       {...listeners}
     >
-      <Avatar>
-        <AvatarImage alt="" size={40} src={image ?? undefined} />
-      </Avatar>
+      <Avatar fallbackText={name} src={image} />
       <div className="flex flex-col text-left">
         <p className="text-xs text-neutral-400">Líder</p>
         <h4 className="text-with-gradient bg-gradient-to-b from-white to-neutral-300 text-sm font-bold">

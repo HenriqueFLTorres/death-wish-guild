@@ -1,20 +1,17 @@
 "use client"
 
 import {
-  Backpack,
+  BookLock,
   CircleAlert,
-  Crown,
   LayoutDashboard,
   type LucideIcon,
-  Scale,
-  ScrollText,
   Users,
 } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { useSession } from "next-auth/react"
+import { Avatar } from "../ui/avatar"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -35,25 +32,30 @@ const links: NavegationLink[] = [
     label: "Grupos",
     path: "/grupos",
   },
+  // {
+  //   icon: Crown,
+  //   label: "Ranking",
+  //   path: "/ranking",
+  // },
+  // {
+  //   icon: Backpack,
+  //   label: "Gerenciar Items",
+  //   path: "/gerenciar-items",
+  // },
+  // {
+  //   icon: Scale,
+  //   label: "Leilão",
+  //   path: "/leilao",
+  // },
+  // {
+  //   icon: ScrollText,
+  //   label: "Log de Eventos",
+  //   path: "/log-de-eventos",
+  // },
   {
-    icon: Crown,
-    label: "Ranking",
-    path: "/ranking",
-  },
-  {
-    icon: Backpack,
-    label: "Gerenciar Items",
-    path: "/gerenciar-items",
-  },
-  {
-    icon: Scale,
-    label: "Leilão",
-    path: "/leilao",
-  },
-  {
-    icon: ScrollText,
-    label: "Log de Eventos",
-    path: "/log-de-eventos",
+    icon: BookLock,
+    label: "Admin Dashboard",
+    path: "/admin",
   },
 ]
 
@@ -90,12 +92,10 @@ const Navbar = () => {
 
           {status === "authenticated" ? (
             <div className="flex items-center gap-4">
-              <Image
-                alt={`${session?.user?.name} logo`}
-                className="h-10 w-10 rounded-full border-2 border-primary object-cover drop-shadow-[0_0_4px_#7B53A7]"
-                height={40}
-                src={session?.user?.image ?? "/avatar/variant-1.png"}
-                width={40}
+              <Avatar
+                className="border-2 border-primary object-cover drop-shadow-[0_0_4px_#7B53A7]"
+                fallbackText={session.user.name}
+                src={session.user.image}
               />
 
               <a href="/api/auth/signout">Deslogar</a>

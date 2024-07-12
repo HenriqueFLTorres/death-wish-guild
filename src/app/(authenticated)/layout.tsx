@@ -12,7 +12,7 @@ export default function AuthenticatedLayout({
       {children}
       <Image
         alt=""
-        className="fixed -z-[1] object-cover blur"
+        className="pointer-events-none fixed -z-[1] min-h-screen select-none object-cover blur"
         src="/background-blur.png"
         fill
       />
