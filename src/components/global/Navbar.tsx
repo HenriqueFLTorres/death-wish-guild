@@ -19,18 +19,21 @@ type NavegationLink = {
   icon: LucideIcon
   label: string
   path: string
+  isAdmin: boolean
 }
 
 const links: NavegationLink[] = [
   {
     icon: LayoutDashboard,
     label: "Dashboard",
-    path: "/dashboard",
+    path: "/",
+    isAdmin: false,
   },
   {
     icon: Users,
     label: "Grupos",
     path: "/grupos",
+    isAdmin: false,
   },
   // {
   //   icon: Crown,
@@ -56,12 +59,14 @@ const links: NavegationLink[] = [
     icon: BookLock,
     label: "Admin Dashboard",
     path: "/admin",
+    isAdmin: true,
   },
 ]
 
 const Navbar = () => {
   const { data: session, status } = useSession()
 
+  const isUserAdmin = session?.user.role === "ADMIN"
   const pathname = usePathname()
 
   return (
@@ -69,25 +74,28 @@ const Navbar = () => {
       <div className="flex w-full items-center justify-center bg-gradient-to-r from-neutral-900 to-neutral-800">
         <nav className="flex h-16 w-full max-w-screen-xl items-center justify-around">
           <ul className="flex gap-3">
-            {links.map(({ icon: Icon, label, path }) => (
-              <li key={label}>
-                <Link
-                  className={cn(
-                    buttonVariants({
-                      variant: pathname.includes(path)
-                        ? "default"
-                        : "secondary",
-                    })
-                  )}
-                  href={path}
-                >
-                  <Icon className="stroke-neutral-100" />
-                  <span className="text-with-gradient bg-gradient-to-b from-white to-neutral-300 font-semibold">
-                    {label}
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {links.map(
+              ({ icon: Icon, label, path, isAdmin }) =>
+                ((isAdmin === true && isUserAdmin) || isAdmin === false) && (
+                  <li key={label}>
+                    <Link
+                      className={cn(
+                        buttonVariants({
+                          variant: pathname.includes(path)
+                            ? "default"
+                            : "secondary",
+                        })
+                      )}
+                      href={path}
+                    >
+                      <Icon className="stroke-neutral-100" />
+                      <span className="text-with-gradient bg-gradient-to-b from-white to-neutral-300 font-semibold">
+                        {label}
+                      </span>
+                    </Link>
+                  </li>
+                )
+            )}
           </ul>
 
           {status === "authenticated" ? (
