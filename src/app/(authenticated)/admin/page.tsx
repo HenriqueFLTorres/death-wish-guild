@@ -7,9 +7,17 @@ import { trpc } from "@/trpc-client/client"
 function Admin() {
   const { data: users = [] } = trpc.getUsers.useQuery()
 
-  // const { mutate: mutateUserRole } = useUpdateUserRole()
+  const utils = trpc.useUtils()
+  const { mutate: mutateUserRole } = trpc.updateUserRole.useMutation({
+    onSuccess: () => utils.getUsers.invalidate(),
+  })
 
-  return <DataTable columns={columns()} data={users} />
+  return (
+    <DataTable
+      columns={columns(({ role, userID }) => mutateUserRole({ role, userID }))}
+      data={users}
+    />
+  )
 }
 
 export default Admin

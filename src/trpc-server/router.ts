@@ -17,7 +17,21 @@ export const appRouter = router({
       })
     )
     .mutation(async (opts) => {
-      const { input } = opts
+      const { input, ctx } = opts
+      const currentUser = ctx.session?.user
+
+      if (currentUser?.role !== "ADMIN") throw new Error("Unauthorized")
+      if (currentUser.id === input.userID)
+        throw new Error("You cannot change your own role")
+
+      const [targetUser] = await db
+        .select()
+        .from(user)
+        .where(eq(user.id, input.userID))
+        .limit(1)
+
+      if (targetUser.role === "ADMIN")
+        throw new Error("You cannot change the role of an admin")
 
       await db
         .update(user)
