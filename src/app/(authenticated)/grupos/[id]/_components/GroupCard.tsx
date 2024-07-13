@@ -9,8 +9,8 @@ import type { CSSProperties } from "react"
 import { PlayerLeader } from "./PlayerLeader"
 import { PlayerListItem } from "./PlayerListItem"
 import { Button } from "@/components/ui/button"
-import { useGetUsers } from "@/db/hooks/users/useGetUsers"
 import { cn } from "@/lib/utils"
+import { trpc } from "@/trpc-client/client"
 
 interface DroppableProps {
   id: UniqueIdentifier | null
@@ -57,7 +57,7 @@ interface DraggableProps {
 function Draggable(props: DraggableProps) {
   const { id, containerId, index, className } = props
 
-  const { data: users = [] } = useGetUsers()
+  const { data: users = [] } = trpc.getUsers.useQuery()
   const currentUser = users.find((user) => user.id === id)
 
   if (id == null || currentUser == null) return null
@@ -104,7 +104,7 @@ function GroupCard(props: GroupCardProps) {
   const fullArray = Array.from(Array(6).keys())
   const leaderId = items[0]
 
-  const { data: users = [] } = useGetUsers()
+  const { data: users = [] } = trpc.getUsers.useQuery()
 
   const leaderUser = users.find((user) => user.id === leaderId)
 

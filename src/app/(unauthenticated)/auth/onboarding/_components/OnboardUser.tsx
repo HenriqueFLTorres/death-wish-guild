@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useCompleteOnboarding } from "@/db/hooks/users/useCompleteOnboarding"
+import { trpc } from "@/trpc-client/client"
 
 const onboardingSchema = z.object({
   class: z.enum(["DPS", "RANGED_DPS", "TANK", "SUPPORT"]),
@@ -33,7 +33,7 @@ function OnboardUser() {
   const { data: session, update } = useSession()
   const router = useRouter()
 
-  const { mutate } = useCompleteOnboarding({
+  const { mutate } = trpc.completeOnboarding.useMutation({
     onSuccess: async () => {
       await update({ ...session, user: { ...session?.user, isBoarded: true } })
       router.push("/")
@@ -49,7 +49,7 @@ function OnboardUser() {
   })
 
   const onSubmit = (values: z.infer<typeof onboardingSchema>) =>
-    mutate({ id: session?.user.id, ...values })
+    mutate({ userID: session?.user.id, ...values })
 
   return (
     <section className="relative flex w-full max-w-screen-sm flex-col items-center justify-center gap-8 overflow-hidden rounded-lg bg-gradient-to-b from-secondary-600/40 to-secondary-400/40 p-4 pb-4 drop-shadow-md backdrop-blur-md">

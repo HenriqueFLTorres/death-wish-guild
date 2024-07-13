@@ -9,9 +9,8 @@ import { getEventTypeImagePath } from "../_components/EventCard"
 import { PerGroup } from "./_components/PerGroup"
 import { PlayerListItem } from "./_components/PlayerListItem"
 import { Button } from "@/components/ui/button"
-import { useGetEvent } from "@/db/hooks/events/useGetEvent"
-import { useGetUsers } from "@/db/hooks/users/useGetUsers"
 import type { SelectUser } from "@/db/schema"
+import { trpc } from "@/trpc-client/client"
 
 interface EventPageProps {
   params: { id: string }
@@ -21,15 +20,17 @@ function EventPage(props: EventPageProps) {
   const { params } = props
   const { data: session } = useSession()
 
-  const { data: users = [] } = useGetUsers({
-    enabled: Number.isInteger(Number(params.id)),
-  })
+  const { data: users = [] } = trpc.getUsers.useQuery()
 
   const id = params.id
 
-  const { data: event, isLoading, isSuccess } = useGetEvent({ id })
+  const {
+    data: event,
+    isLoading,
+    isSuccess,
+  } = trpc.getEvent.useQuery({ id: Number(id) })
 
-  if (isLoading || event == null) return null
+  if (Boolean(isLoading) || event == null) return null
 
   if (event?.confirmation_type === "PER_GROUP")
     return (

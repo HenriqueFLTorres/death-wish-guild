@@ -18,9 +18,8 @@ import { GroupCard } from "./GroupCard"
 import { PlayerListItem } from "./PlayerListItem"
 import { ReservePlayers } from "./ReserverPlayers"
 import { Button } from "@/components/ui/button"
-import { useUpdateEventGroups } from "@/db/hooks/events/useUpdateEventGroups"
-import { useGetUsers } from "@/db/hooks/users/useGetUsers"
 import type { SelectEvent } from "@/db/schema"
+import { trpc } from "@/trpc-client/client"
 
 export type Items = {
   [key in UniqueIdentifier]: (UniqueIdentifier | null)[]
@@ -41,13 +40,10 @@ interface PerGroupProps {
 function PerGroup(props: PerGroupProps) {
   const { id, event, isLoading, isSuccess } = props
 
-  const { data: users = [], isSuccess: isSuccessUsers } = useGetUsers({
-    enabled: Number.isInteger(Number(id)),
-  })
+  const { data: users = [], isSuccess: isSuccessUsers } =
+    trpc.getUsers.useQuery()
 
-  const { mutate: updateGroups } = useUpdateEventGroups({
-    id,
-  })
+  const { mutate: updateGroups } = trpc.updateEventGroup.useMutation()
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
   const [groupData, setGroupData] = useState<Items>({
@@ -70,7 +66,7 @@ function PerGroup(props: PerGroupProps) {
   }, [isSuccess, event?.groups])
 
   useEffect(() => {
-    if (isSuccessUsers && isSuccess) {
+    if (Boolean(isSuccessUsers) && isSuccess) {
       setGroupData((prev) => ({
         ...prev,
         RESERVE_PLAYERS:
@@ -190,7 +186,9 @@ function PerGroup(props: PerGroupProps) {
             <Button
               className="w-full"
               variant="secondary"
-              onClick={() => updateGroups(groupData)}
+              onClick={() =>
+                updateGroups({ id: Number(id), groups: groupData })
+              }
             >
               Salvar
             </Button>

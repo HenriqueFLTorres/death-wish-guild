@@ -2,10 +2,10 @@
 
 import { CreateEvent } from "./CreateEvent"
 import { EventCard } from "./EventCard"
-import { useGetEvents } from "@/db/hooks/events/useGetEvents"
+import { trpc } from "@/trpc-client/client"
 
 function Events() {
-  const { data: events = [] } = useGetEvents()
+  const { data: events = [] } = trpc.getEvents.useQuery()
 
   const eventsSortedByDate = events.sort(
     (a, b) => Number(new Date(b.start_time)) - Number(new Date(a.start_time))

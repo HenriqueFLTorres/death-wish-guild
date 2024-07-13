@@ -40,10 +40,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import DateTimePicker from "@/components/ui/timer-picker"
-import { useCreateEvent } from "@/db/hooks/events/useCreateEvent"
 import type { SelectEvent } from "@/db/schema"
+import { trpc } from "@/trpc-client/client"
 
-const eventSchema = createInsertSchema(events)
+export const eventSchema = createInsertSchema(events)
   .omit({ start_time: true, id: true, confirmed_players: true, groups: true })
   .and(
     z.object({
@@ -55,7 +55,9 @@ const eventSchema = createInsertSchema(events)
 function CreateEvent() {
   const [isOpen, setIsOpen] = useState(false)
 
-  const { mutate } = useCreateEvent({ onSuccess: () => setIsOpen(false) })
+  const { mutate } = trpc.createEvent.useMutation({
+    onSuccess: () => setIsOpen(false),
+  })
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
@@ -71,7 +73,7 @@ function CreateEvent() {
 
     mutate({
       ...restEvent,
-      start_time: summedStartTime.toDateString(),
+      start_time: summedStartTime,
     })
   }
 

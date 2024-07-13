@@ -2,12 +2,14 @@
 
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
-import { useGetUsers } from "@/db/hooks/users/useGetUsers"
+import { trpc } from "@/trpc-client/client"
 
 function Admin() {
-  const { data: users = [] } = useGetUsers()
+  const { data: users = [] } = trpc.getUsers.useQuery()
 
-  return <DataTable columns={columns} data={users} />
+  // const { mutate: mutateUserRole } = useUpdateUserRole()
+
+  return <DataTable columns={columns()} data={users} />
 }
 
 export default Admin
