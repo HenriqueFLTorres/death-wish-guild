@@ -8,7 +8,7 @@ import {
   Users,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { redirect, usePathname } from "next/navigation"
 
 import { useSession } from "next-auth/react"
 import { Avatar } from "../ui/avatar"
@@ -65,6 +65,8 @@ const links: NavegationLink[] = [
 
 const Navbar = () => {
   const { data: session, status } = useSession()
+
+  if (status === "unauthenticated") redirect("/auth/signin")
 
   const isUserAdmin = session?.user.role === "ADMIN"
   const pathname = usePathname()

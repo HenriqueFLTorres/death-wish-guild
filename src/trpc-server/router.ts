@@ -1,15 +1,20 @@
 import { eq, sql } from "drizzle-orm"
 import { z } from "zod"
 import { events, user } from "../../supabase/migrations/schema"
-import { publicProcedure, router } from "./index"
+import {
+  adminProcedure,
+  authenticatedProcedure,
+  publicProcedure,
+  router,
+} from "./index"
 import { db } from "@/db"
 
 export const appRouter = router({
-  getUsers: publicProcedure.query(async () => {
+  getUsers: authenticatedProcedure.query(async () => {
     const users = await db.select().from(user)
     return users
   }),
-  updateUserRole: publicProcedure
+  updateUserRole: adminProcedure
     .input(
       z.object({
         userID: z.string(),
@@ -20,8 +25,7 @@ export const appRouter = router({
       const { input, ctx } = opts
       const currentUser = ctx.session?.user
 
-      if (currentUser?.role !== "ADMIN") throw new Error("Unauthorized")
-      if (currentUser.id === input.userID)
+      if (currentUser?.id === input.userID)
         throw new Error("You cannot change your own role")
 
       const [targetUser] = await db
@@ -64,7 +68,7 @@ export const appRouter = router({
         .returning({ updatedID: user.id })
       return updatedID
     }),
-  getEvent: publicProcedure
+  getEvent: authenticatedProcedure
     .input(z.object({ id: z.number() }))
     .query(async (opts) => {
       const { input } = opts
@@ -77,11 +81,11 @@ export const appRouter = router({
 
       return event
     }),
-  getEvents: publicProcedure.query(async () => {
+  getEvents: authenticatedProcedure.query(async () => {
     const eventsData = await db.select().from(events)
     return eventsData
   }),
-  createEvent: publicProcedure
+  createEvent: adminProcedure
     .input(
       z.object({
         start_time: z.date(),
@@ -104,7 +108,7 @@ export const appRouter = router({
 
       return insertedID
     }),
-  updateEventGroup: publicProcedure
+  updateEventGroup: adminProcedure
     .input(z.object({ id: z.number(), groups: z.any() }))
     .mutation(async (opts) => {
       const { input } = opts
