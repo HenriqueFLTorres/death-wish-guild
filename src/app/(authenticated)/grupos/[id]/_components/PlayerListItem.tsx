@@ -2,6 +2,7 @@ import { Cross, Shield, Sword } from "lucide-react"
 import Image from "next/image"
 import { type HTMLAttributes, forwardRef, memo } from "react"
 import { RangedDPS } from "@/components/icons/RangedDPS"
+import { Avatar } from "@/components/ui/avatar"
 import type { SelectUser } from "@/db/schema"
 import { cn } from "@/lib/utils"
 
@@ -23,12 +24,11 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
         ref={ref}
         {...otherProps}
       >
-        <Image
-          alt=""
-          className="relative z-10 h-6 w-6 rounded-full object-cover"
-          height={24}
-          src={image ?? ""}
-          width={24}
+        <Avatar
+          className="relative z-10 [&>span]:text-[0.5rem]"
+          fallbackText={name}
+          size={24}
+          src={image}
         />
 
         <Image

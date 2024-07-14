@@ -121,6 +121,42 @@ export const appRouter = router({
 
       return updatedID
     }),
+  confirmEvent: authenticatedProcedure
+    .input(z.object({ eventID: z.number() }))
+    .mutation(async (opts) => {
+      const { ctx, input } = opts
+
+      const eventID = input.eventID
+      const userID = ctx.session?.user.id
+
+      const [{ updatedID }] = await db
+        .update(events)
+        .set({
+          confirmed_players: sql`array_append(confirmed_players, ${userID})`,
+        })
+        .where(eq(events.id, eventID))
+        .returning({ updatedID: user.id })
+
+      return updatedID
+    }),
+  removeEventConfirmation: authenticatedProcedure
+    .input(z.object({ eventID: z.number() }))
+    .mutation(async (opts) => {
+      const { ctx, input } = opts
+
+      const eventID = input.eventID
+      const userID = ctx.session?.user.id
+
+      const [{ updatedID }] = await db
+        .update(events)
+        .set({
+          confirmed_players: sql`array_remove(confirmed_players, ${userID})`,
+        })
+        .where(eq(events.id, eventID))
+        .returning({ updatedID: user.id })
+
+      return updatedID
+    }),
 })
 
 export type AppRouter = typeof appRouter

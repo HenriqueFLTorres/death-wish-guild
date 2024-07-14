@@ -30,6 +30,15 @@ function EventPage(props: EventPageProps) {
     isSuccess,
   } = trpc.getEvent.useQuery({ id: Number(id) })
 
+  const utils = trpc.useUtils()
+  const { mutate: confirmPresence } = trpc.confirmEvent.useMutation({
+    onSuccess: () => utils.getEvent.invalidate({ id: Number(id) }),
+  })
+
+  const { mutate: removePresence } = trpc.removeEventConfirmation.useMutation({
+    onSuccess: () => utils.getEvent.invalidate({ id: Number(id) }),
+  })
+
   if (Boolean(isLoading) || event == null) return null
 
   if (event?.confirmation_type === "PER_GROUP")
@@ -54,6 +63,12 @@ function EventPage(props: EventPageProps) {
         alt=""
         className="absolute object-cover"
         src="/background-2.png"
+        fill
+      />
+      <Image
+        alt=""
+        className="absolute object-cover"
+        src="/event-preview/ahzreil.webp"
         fill
       />
 
@@ -90,7 +105,9 @@ function EventPage(props: EventPageProps) {
                 <Users size={12} />
               </div>
 
-              <p className="font-medium drop-shadow">53/56</p>
+              <p className="font-medium drop-shadow">
+                {confirmed_players.length}/56
+              </p>
             </div>
           </div>
         </header>
@@ -123,7 +140,10 @@ function EventPage(props: EventPageProps) {
           </p>
 
           {confirmed_players.includes(session?.user.id ?? "") === true ? (
-            <Button className="group relative overflow-hidden bg-primary-600 hover:border-red-700 hover:bg-red-900 hover:bg-none hover:text-red-100 hover:shadow-none">
+            <Button
+              className="group relative overflow-hidden bg-primary-600 hover:border-red-700 hover:bg-red-900 hover:bg-none hover:text-red-100 hover:shadow-none"
+              onClick={() => removePresence({ eventID: Number(id) })}
+            >
               <span className="absolute flex -translate-y-10 items-center gap-2 transition-transform group-hover:translate-y-0">
                 <DoorOpen />
                 Tirar confirmação
@@ -135,7 +155,7 @@ function EventPage(props: EventPageProps) {
               </span>
             </Button>
           ) : (
-            <Button>
+            <Button onClick={() => confirmPresence({ eventID: Number(id) })}>
               <NotebookPen />
               Confirmar presença
             </Button>

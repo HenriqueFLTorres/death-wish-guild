@@ -72,8 +72,8 @@ function EventCard(props: SelectEvent) {
           alt="chernobog guild raid"
           className="fade-image absolute right-0 h-full object-cover"
           height={90}
-          src="/event-preview/chernobog.png"
-          width={197}
+          src="/event-preview/chernobog.webp"
+          width={300}
         />
       </Link>
     </li>
