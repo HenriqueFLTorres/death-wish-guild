@@ -11,7 +11,7 @@ import Link from "next/link"
 import { redirect, usePathname } from "next/navigation"
 
 import { useSession } from "next-auth/react"
-import { Avatar } from "../ui/avatar"
+import { Avatar } from "@/components/ui/avatar"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -69,35 +69,15 @@ const Navbar = () => {
   if (status === "unauthenticated") redirect("/auth/signin")
 
   const isUserAdmin = session?.user.role === "ADMIN"
-  const pathname = usePathname()
 
   return (
     <>
       <div className="flex w-full items-center justify-center bg-gradient-to-r from-neutral-900 to-neutral-800">
         <nav className="flex h-16 w-full max-w-screen-xl items-center justify-around">
           <ul className="flex gap-3">
-            {links.map(
-              ({ icon: Icon, label, path, isAdmin }) =>
-                ((isAdmin === true && isUserAdmin) || isAdmin === false) && (
-                  <li key={label}>
-                    <Link
-                      className={cn(
-                        buttonVariants({
-                          variant: pathname.includes(path)
-                            ? "default"
-                            : "secondary",
-                        })
-                      )}
-                      href={path}
-                    >
-                      <Icon className="stroke-neutral-100" />
-                      <span className="text-with-gradient bg-gradient-to-b from-white to-neutral-300 font-semibold">
-                        {label}
-                      </span>
-                    </Link>
-                  </li>
-                )
-            )}
+            {links.map((props) => (
+              <NavLink isUserAdmin={isUserAdmin} key={props.label} {...props} />
+            ))}
           </ul>
 
           {status === "authenticated" ? (
@@ -121,6 +101,40 @@ const Navbar = () => {
 }
 
 export { Navbar }
+
+interface NavLinkProps extends NavegationLink {
+  isUserAdmin: boolean
+}
+
+function NavLink(props: NavLinkProps) {
+  const { icon: Icon, label, path, isAdmin, isUserAdmin } = props
+
+  const pathname = usePathname()
+
+  if (isAdmin && !isUserAdmin) return null
+
+  const isInPath =
+    (path === "/" && pathname === "/") ||
+    (pathname.includes(path) && path !== "/")
+
+  return (
+    <li key={label}>
+      <Link
+        className={cn(
+          buttonVariants({
+            variant: isInPath ? "default" : "secondary",
+          })
+        )}
+        href={path}
+      >
+        <Icon className="stroke-neutral-100" />
+        <span className="text-with-gradient bg-gradient-to-b from-white to-neutral-300 font-semibold">
+          {label}
+        </span>
+      </Link>
+    </li>
+  )
+}
 
 function NotBoardedWarning() {
   return (
