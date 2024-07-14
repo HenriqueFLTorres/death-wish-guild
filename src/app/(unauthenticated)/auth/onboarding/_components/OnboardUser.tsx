@@ -98,10 +98,10 @@ function OnboardUser() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="border-primary bg-primary-600 [&>div>div:focus]:bg-primary-500">
-                      <SelectItem value="DPS">DPS</SelectItem>
-                      <SelectItem value="RANGED_DPS">DPS Ranged</SelectItem>
-                      <SelectItem value="SUPPORT">Support</SelectItem>
-                      <SelectItem value="TANK">Tank</SelectItem>
+                      <SelectItem label="DPS" value="DPS" />
+                      <SelectItem label="RANGED_DPS" value="RANGED_DPS" />
+                      <SelectItem label="SUPPORT" value="SUPPORT" />
+                      <SelectItem label="TANK" value="TANK" />
                     </SelectContent>
                   </Select>
                   <FormMessage />

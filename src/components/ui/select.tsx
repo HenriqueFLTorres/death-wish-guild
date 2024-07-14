@@ -36,7 +36,7 @@ const SelectTrigger = forwardRef<
 >(({ className, children, ...props }, ref) => (
   <Trigger
     className={cn(
-      "flex h-10 w-full items-center justify-between rounded-md border border-secondary bg-secondary-600 px-3 py-2 text-sm ring-offset-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "flex h-10 w-full items-center gap-2 rounded-md border border-secondary bg-secondary-600 px-3 py-2 text-sm ring-offset-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-neutral-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       className
     )}
     ref={ref}
@@ -44,7 +44,7 @@ const SelectTrigger = forwardRef<
   >
     {children}
     <Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50" />
+      <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
     </Icon>
   </Trigger>
 ))
@@ -94,8 +94,8 @@ SelectLabel.displayName = Label.displayName
 
 const SelectItem = forwardRef<
   ElementRef<typeof Item>,
-  ComponentPropsWithoutRef<typeof Item>
->(({ className, children, ...props }, ref) => (
+  ComponentPropsWithoutRef<typeof Item> & { label?: string }
+>(({ className, children, label, ...props }, ref) => (
   <Item
     className={cn(
       "relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-neutral-800 focus:text-neutral-100 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -110,7 +110,7 @@ const SelectItem = forwardRef<
       </ItemIndicator>
     </span>
 
-    <ItemText>{children}</ItemText>
+    {label == null ? children : <ItemText>{label}</ItemText>}
   </Item>
 ))
 SelectItem.displayName = Item.displayName

@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { SelectItemText } from "@radix-ui/react-select"
 import { format, startOfDay } from "date-fns"
 import { createInsertSchema } from "drizzle-zod"
 import { CalendarDays, CalendarIcon } from "lucide-react"
@@ -35,7 +36,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -102,15 +105,60 @@ function CreateEvent() {
                   >
                     <FormControl>
                       <SelectTrigger>
+                        {field.value.length > 0 ? (
+                          <Image
+                            alt=""
+                            height={24}
+                            src={`/event-icon/${formatName(field.value)}.png`}
+                            width={24}
+                          />
+                        ) : null}
                         <SelectValue placeholder="Selecione um evento" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {EVENTS_OPTIONS.map((option) => (
-                        <SelectItem key={option.name} value={option.name}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
+                      <SelectGroup>
+                        <SelectLabel>Boss Mundial</SelectLabel>
+                        {WORLD_BOSS_EVENTS.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            <Image
+                              alt=""
+                              height={24}
+                              src="/event-icon/worldboss.png"
+                              width={24}
+                            />
+                            <SelectItemText>{option}</SelectItemText>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Eventos Dinâmicos</SelectLabel>
+                        {DYNAMIC_EVENTS.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            <Image
+                              alt=""
+                              height={24}
+                              src={`/event-icon/${formatName(option)}.png`}
+                              width={24}
+                            />
+                            <SelectItemText>{option}</SelectItemText>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Field Bosses</SelectLabel>
+                        {FIELD_BOSS_EVENTS.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            <Image
+                              alt=""
+                              height={24}
+                              src={`/event-icon/${formatName(option)}.png`}
+                              width={24}
+                            />
+                            <SelectItemText>{option}</SelectItemText>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -136,11 +184,15 @@ function CreateEvent() {
                     </FormControl>
                     <SelectContent>
                       {CONFIRMATION_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option === "PER_PLAYER"
-                            ? "Por jogador"
-                            : "Por grupo"}
-                        </SelectItem>
+                        <SelectItem
+                          key={option}
+                          label={
+                            option === "PER_PLAYER"
+                              ? "Por jogador"
+                              : "Por grupo"
+                          }
+                          value={option}
+                        />
                       ))}
                     </SelectContent>
                   </Select>
@@ -168,9 +220,11 @@ function CreateEvent() {
                       </FormControl>
                       <SelectContent>
                         {EVENTS_OPTIONS.map((option) => (
-                          <SelectItem key={option.name} value={option.location}>
-                            {option.location}
-                          </SelectItem>
+                          <SelectItem
+                            key={option.name}
+                            label={option.location}
+                            value={option.location}
+                          />
                         ))}
                       </SelectContent>
                     </Select>
@@ -230,7 +284,7 @@ function CreateEvent() {
                           <SelectItem value="DOMINION_EVENT">
                             Dominion
                           </SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
+                          <SelectItem label="Outro" value="OTHER" />
                         </SelectContent>
                       </SelectContent>
                     </Select>
@@ -369,3 +423,44 @@ const EVENTS_OPTIONS: Pick<SelectEvent, "name" | "location" | "event_type">[] =
       event_type: "PVE",
     },
   ]
+
+const DYNAMIC_EVENTS = [
+  "Blood Mushroom Gathering",
+  "Dark Destroyers",
+  "Desert Caravan",
+  "Festival of Fire",
+  "Hidden Brown Mica",
+  "Lantern Seed Festival",
+  "Lift the Moonlight Spell",
+  "Operation: Talisman Delivery",
+  "Requiem of Light",
+  "Starlight Stones Ritual",
+  "Stop the Mana Frenzy",
+  "Wolf Hunting Contest",
+]
+
+const WORLD_BOSS_EVENTS = ["Courte's Wraith", "Desert Overlord"]
+
+const FIELD_BOSS_EVENTS = [
+  "Adentus",
+  "Ahzreil",
+  "Aridus",
+  "Chernobog",
+  "Cornelius",
+  "Excavator-9",
+  "Grand Aelon",
+  "Junobote",
+  "Kowazan",
+  "Malakar",
+  "Minezerok",
+  "Morokai",
+  "Nirma",
+  "Talus",
+]
+
+function formatName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/\s/g, "-")
+    .replace(/[^a-zA-Z0-9-]/g, "")
+}
