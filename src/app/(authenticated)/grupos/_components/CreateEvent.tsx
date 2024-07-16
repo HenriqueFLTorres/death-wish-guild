@@ -4,13 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { SelectItemText } from "@radix-ui/react-select"
 import { format, startOfDay } from "date-fns"
 import { createInsertSchema } from "drizzle-zod"
-import { CalendarDays, CalendarIcon } from "lucide-react"
+import { CalendarDays, CalendarIcon, Dices, User, Users } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
 
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { SelectEvent } from "./SelectEvent"
 import { events } from "@/../supabase/migrations/schema"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -36,14 +37,11 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 import DateTimePicker from "@/components/ui/timer-picker"
-import type { SelectEvent } from "@/db/schema"
 import { trpc } from "@/trpc-client/client"
 
 export const eventSchema = createInsertSchema(events)
@@ -92,79 +90,7 @@ function CreateEvent() {
 
         <Form {...form}>
           <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Evento</FormLabel>
-
-                  <Select
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        {field.value.length > 0 ? (
-                          <Image
-                            alt=""
-                            height={24}
-                            src={`/event-icon/${formatName(field.value)}.png`}
-                            width={24}
-                          />
-                        ) : null}
-                        <SelectValue placeholder="Selecione um evento" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Boss Mundial</SelectLabel>
-                        {WORLD_BOSS_EVENTS.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            <Image
-                              alt=""
-                              height={24}
-                              src="/event-icon/worldboss.png"
-                              width={24}
-                            />
-                            <SelectItemText>{option}</SelectItemText>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                      <SelectGroup>
-                        <SelectLabel>Eventos Dinâmicos</SelectLabel>
-                        {DYNAMIC_EVENTS.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            <Image
-                              alt=""
-                              height={24}
-                              src={`/event-icon/${formatName(option)}.png`}
-                              width={24}
-                            />
-                            <SelectItemText>{option}</SelectItemText>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                      <SelectGroup>
-                        <SelectLabel>Field Bosses</SelectLabel>
-                        {FIELD_BOSS_EVENTS.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            <Image
-                              alt=""
-                              height={24}
-                              src={`/event-icon/${formatName(option)}.png`}
-                              width={24}
-                            />
-                            <SelectItemText>{option}</SelectItemText>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <SelectEvent control={form.control} />
 
             <FormField
               control={form.control}
@@ -179,21 +105,23 @@ function CreateEvent() {
                   >
                     <FormControl>
                       <SelectTrigger>
+                        {field.value === "PER_PLAYER" ? (
+                          <User size={16} />
+                        ) : (
+                          <Users size={16} />
+                        )}
                         <SelectValue placeholder="Selecione um tipo de confirmação" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {CONFIRMATION_OPTIONS.map((option) => (
-                        <SelectItem
-                          key={option}
-                          label={
-                            option === "PER_PLAYER"
-                              ? "Por jogador"
-                              : "Por grupo"
-                          }
-                          value={option}
-                        />
-                      ))}
+                      <SelectItem value="PER_PLAYER">
+                        <User size={16} />
+                        <SelectItemText>Por jogador</SelectItemText>
+                      </SelectItem>
+                      <SelectItem value="PER_GROUP">
+                        <Users size={16} />
+                        <SelectItemText>Por grupo</SelectItemText>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -201,98 +129,73 @@ function CreateEvent() {
               )}
             />
 
-            <div className="flex gap-4">
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Localização</FormLabel>
+            <FormField
+              control={form.control}
+              name="event_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Evento</FormLabel>
 
-                    <Select
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Localização" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {EVENTS_OPTIONS.map((option) => (
-                          <SelectItem
-                            key={option.name}
-                            label={option.location}
-                            value={option.location}
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        {field.value === "OTHER" ? (
+                          <Dices size={16} />
+                        ) : (
+                          <Image
+                            alt=""
+                            className="shrink-0"
+                            height={16}
+                            src={`/event-indicator/${field.value.toLowerCase()}.png`}
+                            width={16}
                           />
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmation_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo de Evento</FormLabel>
-
-                    <Select
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Tipo" />
-                        </SelectTrigger>
-                      </FormControl>
+                        )}
+                        <SelectValue placeholder="Tipo de evento" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
                       <SelectContent>
-                        <SelectContent>
-                          <SelectItem value="GUILD">
-                            <Image
-                              alt=""
-                              className="shrink-0"
-                              height={16}
-                              src="/event-indicator/guild.png"
-                              width={16}
-                            />
-                            Guild
-                          </SelectItem>
-                          <SelectItem value="PVP">
-                            <Image
-                              alt=""
-                              className="shrink-0"
-                              height={16}
-                              src="/event-indicator/battle.png"
-                              width={16}
-                            />
-                            PVP
-                          </SelectItem>
-                          <SelectItem value="PVE">
-                            <Image
-                              alt=""
-                              className="shrink-0"
-                              height={16}
-                              src="/event-indicator/peace.png"
-                              width={16}
-                            />
-                            PVE
-                          </SelectItem>
-                          <SelectItem value="DOMINION_EVENT">
-                            Dominion
-                          </SelectItem>
-                          <SelectItem label="Outro" value="OTHER" />
-                        </SelectContent>
+                        <SelectItem value="GUILD">
+                          <Image
+                            alt=""
+                            className="shrink-0"
+                            height={16}
+                            src="/event-indicator/guild.png"
+                            width={16}
+                          />
+                          <SelectItemText>Guilda</SelectItemText>
+                        </SelectItem>
+                        <SelectItem value="PVP">
+                          <Image
+                            alt=""
+                            className="shrink-0"
+                            height={16}
+                            src="/event-indicator/pvp.png"
+                            width={16}
+                          />
+                          <SelectItemText>PvP</SelectItemText>
+                        </SelectItem>
+                        <SelectItem value="PVE">
+                          <Image
+                            alt=""
+                            className="shrink-0"
+                            height={16}
+                            src="/event-indicator/pve.png"
+                            width={16}
+                          />
+                          <SelectItemText>PvE</SelectItemText>
+                        </SelectItem>
+                        <SelectItem value="OTHER">
+                          <Dices size={16} />
+                          <SelectItemText>Outro</SelectItemText>
+                        </SelectItem>
                       </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="flex gap-4">
               <FormField
@@ -354,113 +257,3 @@ function CreateEvent() {
 }
 
 export { CreateEvent }
-
-const CONFIRMATION_OPTIONS: SelectEvent["confirmation_type"][] = [
-  "PER_PLAYER",
-  "PER_GROUP",
-]
-
-const EVENTS_OPTIONS: Pick<SelectEvent, "name" | "location" | "event_type">[] =
-  [
-    {
-      name: "Blood Mushroom Gathering",
-      location: "Sandworm Lair",
-      event_type: "GUILD",
-    },
-    {
-      name: "Dark Destroyers",
-      location: "Ruins of Turayne",
-      event_type: "GUILD",
-    },
-    {
-      name: "Desert Caravan",
-      location: "Moonlight Desert",
-      event_type: "PVE",
-    },
-    {
-      name: "Lantern Seed Festival",
-      location: "Nesting Grounds",
-      event_type: "PVE",
-    },
-    {
-      name: "Starlight Stones Ritual",
-      location: "Urstella Fields",
-      event_type: "PVE",
-    },
-    {
-      name: "Stop the Mana Frenzy",
-      location: "Manawastes",
-      event_type: "PVE",
-    },
-    {
-      name: "Wolf Hunting Contest",
-      location: "Blackhowl Plains",
-      event_type: "PVE",
-    },
-    {
-      name: "Operation: Talisman Delivery",
-      location: "Akidu Valley",
-      event_type: "GUILD",
-    },
-    {
-      name: "Chernobog",
-      location: "Abandoned Stonemason Town",
-      event_type: "PVP",
-    },
-    {
-      name: "Excavator-9",
-      location: "Monolith Wastelands",
-      event_type: "PVP",
-    },
-    {
-      name: "Kowazan",
-      location: "Grayclaw Forest",
-      event_type: "PVE",
-    },
-    {
-      name: "Talus",
-      location: "The Raging Wilds",
-      event_type: "PVE",
-    },
-  ]
-
-const DYNAMIC_EVENTS = [
-  "Blood Mushroom Gathering",
-  "Dark Destroyers",
-  "Desert Caravan",
-  "Festival of Fire",
-  "Hidden Brown Mica",
-  "Lantern Seed Festival",
-  "Lift the Moonlight Spell",
-  "Operation: Talisman Delivery",
-  "Requiem of Light",
-  "Starlight Stones Ritual",
-  "Stop the Mana Frenzy",
-  "Wolf Hunting Contest",
-]
-
-const WORLD_BOSS_EVENTS = ["Courte's Wraith", "Desert Overlord"]
-
-const FIELD_BOSS_EVENTS = [
-  "Adentus",
-  "Ahzreil",
-  "Aridus",
-  "Chernobog",
-  "Cornelius",
-  "Excavator-9",
-  "Grand Aelon",
-  "Junobote",
-  "Kowazan",
-  "Malakar",
-  "Minezerok",
-  "Morokai",
-  "Nirma",
-  "Talus",
-]
-
-function formatName(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/\s/g, "-")
-    .replace(/[^a-zA-Z0-9-]/g, "")
-}
