@@ -6,6 +6,7 @@ import moment from "moment"
 import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { getEventTypeImagePath } from "../_components/EventCard"
+import { FIELD_BOSS_EVENTS } from "../_components/SelectEvent"
 import { PerGroup } from "./_components/PerGroup"
 import { PlayerListItem } from "./_components/PlayerListItem"
 import { Button } from "@/components/ui/button"
@@ -56,21 +57,25 @@ function EventPage(props: EventPageProps) {
 
   const fullArray = Array.from(Array(5).keys()).map(() => null)
   const hasUsersConfirmed = confirmed_players.length > 0
+  const previewImage = getPreviewImage(name)
 
   return (
     <section className="relative flex w-full flex-col items-center overflow-hidden rounded-xl px-4 py-3 pb-24">
-      <Image
-        alt=""
-        className="absolute object-cover"
-        src="/background-2.png"
-        fill
-      />
-      <Image
-        alt=""
-        className="absolute object-cover"
-        src="/event-preview/ahzreil.webp"
-        fill
-      />
+      {previewImage == null ? (
+        <Image
+          alt=""
+          className="absolute object-cover"
+          src="/background-2.png"
+          fill
+        />
+      ) : (
+        <Image
+          alt=""
+          className="absolute object-cover opacity-50"
+          src={previewImage}
+          fill
+        />
+      )}
 
       <div className="relative flex w-full flex-col items-center gap-12">
         <header className="flex w-full flex-col gap-2 text-left">
@@ -183,4 +188,15 @@ export const getUserName = (
   const user = users.find((user) => user.id === id)
 
   return user?.name ?? ""
+}
+
+const getPreviewImage = (name: string) => {
+  if (!FIELD_BOSS_EVENTS.includes(name)) return null
+
+  const formattedName = name
+    .toLowerCase()
+    .replace(/\s/g, "-")
+    .replace(/[^a-zA-Z0-9-]/g, "")
+
+  return `/event-preview/${formattedName}.webp`
 }

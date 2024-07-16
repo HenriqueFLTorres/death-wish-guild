@@ -65,6 +65,7 @@ function CreateEvent() {
     defaultValues: {
       start_date: startOfDay(new Date()),
       confirmation_type: "PER_GROUP",
+      event_type: "GUILD",
     },
   })
 
@@ -146,7 +147,7 @@ function CreateEvent() {
                             alt=""
                             className="shrink-0"
                             height={16}
-                            src={`/event-indicator/${field.value.toLowerCase()}.png`}
+                            src={`/event-indicator/${field.value?.toLowerCase()}.png`}
                             width={16}
                           />
                         )}

@@ -164,7 +164,7 @@ const DYNAMIC_EVENTS = [
 
 const WORLD_BOSS_EVENTS = ["Courte's Wraith", "Desert Overlord"]
 
-const FIELD_BOSS_EVENTS = [
+export const FIELD_BOSS_EVENTS = [
   "Adentus",
   "Ahzreil",
   "Aridus",
