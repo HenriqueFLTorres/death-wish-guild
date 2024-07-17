@@ -1,5 +1,5 @@
 import { config } from "dotenv"
-import { type PostgresJsDatabase, drizzle } from "drizzle-orm/postgres-js"
+import { drizzle } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
 import * as schema from "@/../supabase/migrations/schema"
 
@@ -15,11 +15,5 @@ const drizzleClient = drizzle(
   { schema }
 )
 
-declare global {
-  interface Global {
-    database: PostgresJsDatabase<typeof schema> | undefined
-  }
-}
-
 export const db = global.database ?? drizzleClient
-if (process.env.NODE_ENV !== "production") global.database = db
+if (process.env.NODE_ENV !== "production") globalThis.database = db

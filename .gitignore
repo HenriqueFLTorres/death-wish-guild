@@ -36,5 +36,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# supabase migrations
-/supabase/migrations/
+# idea
+/.idea/

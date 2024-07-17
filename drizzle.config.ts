@@ -6,7 +6,7 @@ if (process.env.DATABASE_URL == null)
   throw new Error("DATABASE_URL is required")
 
 export default defineConfig({
-  schema: "./src/db/schema.ts",
+  schema: "./supabase/migrations/schema.ts",
   out: "./supabase/migrations",
   dialect: "postgresql",
   dbCredentials: {

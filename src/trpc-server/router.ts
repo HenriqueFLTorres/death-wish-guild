@@ -99,9 +99,7 @@ export const appRouter = router({
 
       const [{ insertedID }] = await db
         .insert(events)
-        .values({
-          ...input,
-        })
+        .values(input)
         .returning({ insertedID: events.id })
 
       return insertedID

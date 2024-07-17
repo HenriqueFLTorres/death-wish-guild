@@ -42,7 +42,7 @@ function Events() {
           })
         }, timeUntilNotification)
       })
-      .filter(Boolean)
+      .filter(Boolean) as NodeJS.Timeout[]
 
     return () => {
       notificationIDs.forEach(clearTimeout)
