@@ -88,9 +88,8 @@ export const appRouter = router({
   createEvent: adminProcedure
     .input(
       z.object({
-        start_time: z.date(),
+        start_time: z.string(),
         name: z.string(),
-        location: z.string(),
         confirmation_type: z.enum(["PER_PLAYER", "PER_GROUP"]),
         event_type: z.enum(["PVP", "PVE", "GUILD", "OTHER"]),
       })
@@ -102,7 +101,6 @@ export const appRouter = router({
         .insert(events)
         .values({
           ...input,
-          start_time: input.start_time.toDateString(),
         })
         .returning({ insertedID: events.id })
 

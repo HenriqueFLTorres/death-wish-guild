@@ -82,6 +82,23 @@ function SelectEvent(props: SelectEventProps) {
                   />
                   <CommandList className="scrollbar">
                     <CommandEmpty>Evento não encontrado.</CommandEmpty>
+                    <CommandGroup heading="Eventos Especiais">
+                      {SPECIAL_EVENTS.map((option) => (
+                        <CommandItem
+                          key={option}
+                          value={option}
+                          onSelect={() => field.onChange(option)}
+                        >
+                          <Image
+                            alt=""
+                            height={24}
+                            src={`/event-icon/${formatName(option)}.png`}
+                            width={24}
+                          />
+                          {option}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
                     <CommandGroup heading="Bosses Mundial">
                       {WORLD_BOSS_EVENTS.map((option) => (
                         <CommandItem
@@ -147,7 +164,7 @@ function SelectEvent(props: SelectEventProps) {
 
 export { SelectEvent }
 
-const DYNAMIC_EVENTS = [
+export const DYNAMIC_EVENTS = [
   "Blood Mushroom Gathering",
   "Dark Destroyers",
   "Desert Caravan",
@@ -162,7 +179,7 @@ const DYNAMIC_EVENTS = [
   "Wolf Hunting Contest",
 ]
 
-const WORLD_BOSS_EVENTS = ["Courte's Wraith", "Desert Overlord"]
+export const WORLD_BOSS_EVENTS = ["Courte's Wraith", "Desert Overlord"]
 
 export const FIELD_BOSS_EVENTS = [
   "Adentus",
@@ -181,10 +198,13 @@ export const FIELD_BOSS_EVENTS = [
   "Talus",
 ]
 
-const ALL_POSSIBLE_OPTIONS = [
+export const SPECIAL_EVENTS = ["Vienta Tax Delivery", "Stonegard Siege Warfare"]
+
+export const ALL_POSSIBLE_OPTIONS = [
   ...DYNAMIC_EVENTS,
   ...WORLD_BOSS_EVENTS,
   ...FIELD_BOSS_EVENTS,
+  ...SPECIAL_EVENTS,
 ]
 
 function formatName(name: string) {

@@ -45,7 +45,12 @@ import DateTimePicker from "@/components/ui/timer-picker"
 import { trpc } from "@/trpc-client/client"
 
 export const eventSchema = createInsertSchema(events)
-  .omit({ start_time: true, id: true, confirmed_players: true, groups: true })
+  .omit({
+    start_time: true,
+    id: true,
+    confirmed_players: true,
+    groups: true,
+  })
   .and(
     z.object({
       start_time: z.object({ hour: z.number(), minute: z.number() }),
@@ -71,7 +76,7 @@ function CreateEvent() {
 
   function onSubmit(values: z.infer<typeof eventSchema>) {
     const { start_time, start_date, ...restEvent } = values
-    const summedStartTime = moment(start_date).add(start_time).toDate()
+    const summedStartTime = moment(start_date).add(start_time).toISOString()
 
     mutate({
       ...restEvent,
@@ -248,7 +253,7 @@ function CreateEvent() {
             </div>
 
             <Button className="w-full" type="submit">
-              Criar
+              Criar Evento
             </Button>
           </form>
         </Form>

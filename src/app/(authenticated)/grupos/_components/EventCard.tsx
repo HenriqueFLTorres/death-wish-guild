@@ -5,10 +5,11 @@ import moment from "moment"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { getPreviewImage } from "../[id]/page"
 import type { SelectEvent } from "@/db/schema"
 
 function EventCard(props: SelectEvent) {
-  const { start_time, name, event_type, location, id } = props
+  const { start_time, name, event_type, id } = props
 
   const pathname = usePathname()
 
@@ -18,6 +19,8 @@ function EventCard(props: SelectEvent) {
 
   const weekday = moment(start_time).format("dddd")
   const formattedDate = moment(start_time).format("LL")
+
+  const previewImage = getPreviewImage(name)
 
   return (
     <li
@@ -32,9 +35,9 @@ function EventCard(props: SelectEvent) {
         <div className="absolute inset-0 bg-gradient-to-b from-primary-700 to-primary-500 opacity-0 transition-opacity group-hover:opacity-40" />
 
         <div className="z-10 flex w-full flex-col p-2 text-left shadow">
-          <small className="text-xs font-light text-primary-200">
+          {/* <small className="text-xs font-light text-primary-200">
             {location}
-          </small>
+          </small> */}
 
           <h2 className="flex from-white to-neutral-300 text-xl font-semibold drop-shadow-[0_0_2px_#ffffff50]">
             {name}
@@ -68,13 +71,15 @@ function EventCard(props: SelectEvent) {
           </footer>
         </div>
 
-        <Image
-          alt="chernobog guild raid"
-          className="fade-image absolute right-0 h-full object-cover"
-          height={90}
-          src="/event-preview/chernobog.webp"
-          width={300}
-        />
+        {previewImage == null ? null : (
+          <Image
+            alt=""
+            className="absolute right-0 h-full w-full object-cover opacity-60"
+            height={90}
+            src={previewImage}
+            width={318}
+          />
+        )}
       </Link>
     </li>
   )

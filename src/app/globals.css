@@ -41,17 +41,6 @@
     @apply inline-block bg-clip-text text-transparent;
   }
 
-  .fade-image {
-    -webkit-mask-image: -webkit-gradient(
-      linear,
-      right center,
-      left center,
-      from(rgba(0, 0, 0, 100)),
-      to(rgba(0, 0, 0, 0))
-    );
-    mask-image: linear-gradient(to left, rgba(0, 0, 0, 100), rgba(0, 0, 0, 0));
-  }
-
   .fade-to-bottom {
     -webkit-mask-image: -webkit-gradient(
       linear,

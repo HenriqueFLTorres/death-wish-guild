@@ -6,7 +6,7 @@ import moment from "moment"
 import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { getEventTypeImagePath } from "../_components/EventCard"
-import { FIELD_BOSS_EVENTS } from "../_components/SelectEvent"
+import { ALL_POSSIBLE_OPTIONS } from "../_components/SelectEvent"
 import { PerGroup } from "./_components/PerGroup"
 import { PlayerListItem } from "./_components/PlayerListItem"
 import { Button } from "@/components/ui/button"
@@ -190,8 +190,8 @@ export const getUserName = (
   return user?.name ?? ""
 }
 
-const getPreviewImage = (name: string) => {
-  if (!FIELD_BOSS_EVENTS.includes(name)) return null
+export const getPreviewImage = (name: string) => {
+  if (!ALL_POSSIBLE_OPTIONS.includes(name)) return null
 
   const formattedName = name
     .toLowerCase()
