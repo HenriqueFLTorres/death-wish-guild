@@ -36,8 +36,8 @@ function Events() {
         if (timeUntilNotification <= 0) return null
 
         return setTimeout(() => {
-          new Notification("Upcoming Event", {
-            body: `Your event "${event.name}" is starting soon.`,
+          new Notification(event.name, {
+            body: `O evento "${event.name}" será iniciado em breve.`,
             icon: "/favicon.ico",
           })
         }, timeUntilNotification)
