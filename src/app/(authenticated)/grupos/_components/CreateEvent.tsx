@@ -61,8 +61,12 @@ export const eventSchema = createInsertSchema(events)
 function CreateEvent() {
   const [isOpen, setIsOpen] = useState(false)
 
+  const utils = trpc.useUtils()
   const { mutate } = trpc.createEvent.useMutation({
-    onSuccess: () => setIsOpen(false),
+    onSuccess: () => {
+      utils.getEvents.invalidate()
+      setIsOpen(false)
+    },
   })
 
   const form = useForm<z.infer<typeof eventSchema>>({
