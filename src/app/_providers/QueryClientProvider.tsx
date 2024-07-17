@@ -9,7 +9,10 @@ import type { ReactNode } from "react"
 import superjson from "superjson"
 import { trpc } from "@/trpc-client/client"
 
-const url = "http://localhost:3000/api/trpc"
+const url =
+  process.env.NODE_ENV === "production"
+    ? "https://death-wish-guild.vercel.app/api/trpc"
+    : "http://localhost:3000/api/trpc"
 
 function makeQueryClient() {
   return new QueryClient({
