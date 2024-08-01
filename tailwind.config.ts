@@ -26,6 +26,7 @@ const config = {
           500: "#4D3368",
           600: "#3B2553",
           700: "#2A173F",
+          800: "#20192F",
         },
         secondary: {
           DEFAULT: "#2F2F2F",

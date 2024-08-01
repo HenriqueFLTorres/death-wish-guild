@@ -26,7 +26,7 @@ export default function RootLayout({
       <body
         className={cn(
           poppins.className,
-          "flex h-screen flex-col items-center gap-12 bg-neutral-900"
+          "h-screen overflow-hidden bg-primary-800"
         )}
       >
         <NextAuthProvider>
