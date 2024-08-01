@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Navbar } from "@/components/global/Navbar"
+import { Sidebar } from "@/components/global/Sidebar"
 
 export default function AuthenticatedLayout({
   children,
@@ -7,15 +7,15 @@ export default function AuthenticatedLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <Navbar />
+    <div className="flex h-screen w-screen items-center justify-center gap-12 pl-14">
+      <Sidebar />
       {children}
       <Image
         alt=""
-        className="pointer-events-none fixed -z-[1] min-h-screen select-none object-cover blur"
-        src="/background-blur.png"
+        className="pointer-events-none fixed -z-[1] min-h-screen scale-125 select-none object-cover blur"
+        src="/background-decals.png"
         fill
       />
-    </>
+    </div>
   )
 }
