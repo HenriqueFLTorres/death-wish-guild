@@ -11,6 +11,7 @@ const badgeVariants = cva(
         primary:
           "bg-gradient-to-b from-primary-400 border-primary-600 to-primary-600 text-white",
         default: "bg-black/40 text-neutral-50 border-black/60",
+        success: "bg-green-600/20 border-green-600/40",
       },
     },
     defaultVariants: {
