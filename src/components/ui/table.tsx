@@ -9,13 +9,11 @@ import { cn } from "@/lib/utils"
 
 const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto rounded-md border border-black/50 bg-black/40">
-      <table
-        className={cn("w-full caption-bottom text-sm", className)}
-        ref={ref}
-        {...props}
-      />
-    </div>
+    <table
+      className={cn("w-full caption-bottom text-sm", className)}
+      ref={ref}
+      {...props}
+    />
   )
 )
 Table.displayName = "Table"
@@ -24,11 +22,7 @@ const TableHeader = forwardRef<
   HTMLTableSectionElement,
   HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead
-    className={cn("border-black/50 [&_tr]:border-b", className)}
-    ref={ref}
-    {...props}
-  />
+  <thead className={cn("[&_tr]:border-b", className)} ref={ref} {...props} />
 ))
 TableHeader.displayName = "TableHeader"
 
@@ -50,7 +44,7 @@ const TableFooter = forwardRef<
 >(({ className, ...props }, ref) => (
   <tfoot
     className={cn(
-      "border-t border-black/50 bg-neutral-800/50 font-medium [&>tr]:last:border-b-0",
+      "border-t border-neutral-800 bg-neutral-800/50 font-medium [&>tr]:last:border-b-0",
       className
     )}
     ref={ref}
@@ -65,7 +59,7 @@ const TableRow = forwardRef<
 >(({ className, ...props }, ref) => (
   <tr
     className={cn(
-      "border-b border-black/50 transition-colors hover:bg-neutral-800/50 data-[state=selected]:bg-neutral-800",
+      "transition-colors hover:bg-black/20 data-[state=selected]:bg-black/50",
       className
     )}
     ref={ref}
@@ -80,7 +74,7 @@ const TableHead = forwardRef<
 >(({ className, ...props }, ref) => (
   <th
     className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-neutral-400 [&:has([role=checkbox])]:pr-0",
+      "px-3 py-4 text-center font-semibold text-neutral-500 [&:has([role=checkbox])]:pr-0",
       className
     )}
     ref={ref}
@@ -94,7 +88,7 @@ const TableCell = forwardRef<
   TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
   <td
-    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    className={cn("p-4 text-center [&:has([role=checkbox])]:pr-0", className)}
     ref={ref}
     {...props}
   />

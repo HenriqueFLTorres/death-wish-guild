@@ -8,8 +8,16 @@ export const sessionRelations = relations(session, ({ one }) => ({
   }),
 }))
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ one, many }) => ({
   sessions: many(session),
+  user: one(user, {
+    fields: [user.invited_by],
+    references: [user.id],
+    relationName: "user_invited_by_user_id",
+  }),
+  users: many(user, {
+    relationName: "user_invited_by_user_id",
+  }),
   user_events: many(user_events),
   accounts: many(account),
 }))

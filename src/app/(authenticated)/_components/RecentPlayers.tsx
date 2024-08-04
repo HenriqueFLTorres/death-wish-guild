@@ -5,7 +5,6 @@ import { Avatar } from "@/components/ui/avatar"
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { translateGameClass } from "@/lib/utils"
@@ -33,16 +32,15 @@ function RecentPlayers() {
 
               <div className="ml-auto flex flex-col gap-2 text-end leading-none">
                 <p className="text-xs text-neutral-400">entrou a</p>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <p>{moment(created_at).fromNow()}</p>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {moment(created_at).format("MMMM Do YYYY, h:mm:ss a")}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+
+                <Tooltip>
+                  <TooltipTrigger>
+                    <p>{moment(created_at).fromNow()}</p>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {moment(created_at).format("MMMM Do YYYY, h:mm:ss a")}
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </li>
           )

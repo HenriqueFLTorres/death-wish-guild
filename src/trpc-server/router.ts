@@ -14,6 +14,10 @@ export const appRouter = router({
     const users = await db.select().from(user)
     return users
   }),
+  getUsersForRecruitment: authenticatedProcedure.query(async () => {
+    const users = await db.select().from(user).where(eq(user.is_boarded, false))
+    return users
+  }),
   getPlayersByClass: authenticatedProcedure.query(async () => {
     const users = await db
       .select({

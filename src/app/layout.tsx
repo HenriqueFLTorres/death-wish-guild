@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google"
 
 import NextAuthProvider from "./_providers/NextAuthProvider"
 import QueryClientProvider from "./_providers/QueryClientProvider"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import "./globals.css"
 
@@ -30,7 +31,9 @@ export default function RootLayout({
         )}
       >
         <NextAuthProvider>
-          <QueryClientProvider>{children}</QueryClientProvider>
+          <TooltipProvider>
+            <QueryClientProvider>{children}</QueryClientProvider>
+          </TooltipProvider>
         </NextAuthProvider>
       </body>
     </html>

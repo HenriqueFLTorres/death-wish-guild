@@ -1,5 +1,6 @@
 import {
   boolean,
+  foreignKey,
   integer,
   jsonb,
   pgEnum,
@@ -81,22 +82,37 @@ export const session = pgTable("session", {
   expires: timestamp("expires", { mode: "string" }).notNull(),
 })
 
-export const user = pgTable("user", {
-  id: text("id").primaryKey().notNull(),
-  name: text("name"),
-  email: text("email").notNull(),
-  emailVerified: timestamp("emailVerified", { mode: "string" }),
-  image: text("image"),
-  is_boarded: boolean("is_boarded").default(false).notNull(),
-  role: role_type("role").default("MEMBER").notNull(),
-  display_name: text("display_name"),
-  class: class_type("class").default("DPS").notNull(),
-  finished_events_count: integer("finished_events_count").default(0).notNull(),
-  created_at: timestamp("created_at", { mode: "string" })
-    .defaultNow()
-    .notNull(),
-  points: integer("points").default(0).notNull(),
-})
+export const user = pgTable(
+  "user",
+  {
+    id: text("id").primaryKey().notNull(),
+    name: text("name"),
+    email: text("email").notNull(),
+    emailVerified: timestamp("emailVerified", { mode: "string" }),
+    image: text("image"),
+    is_boarded: boolean("is_boarded").default(false).notNull(),
+    role: role_type("role").default("MEMBER").notNull(),
+    display_name: text("display_name"),
+    class: class_type("class").default("DPS").notNull(),
+    finished_events_count: integer("finished_events_count")
+      .default(0)
+      .notNull(),
+    created_at: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    points: integer("points").default(0).notNull(),
+    invited_by: text("invited_by"),
+  },
+  (table) => {
+    return {
+      user_invited_by_fkey: foreignKey({
+        columns: [table.invited_by],
+        foreignColumns: [table.id],
+        name: "user_invited_by_fkey",
+      }),
+    }
+  }
+)
 
 export const events = pgTable("events", {
   id: serial("id").primaryKey().notNull(),

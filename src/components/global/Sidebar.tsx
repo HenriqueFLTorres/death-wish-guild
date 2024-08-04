@@ -43,6 +43,11 @@ const links: NavegationLink[] = [
     path: "/grupos",
   },
   {
+    icon: Users,
+    label: "Membros",
+    path: "/membros",
+  },
+  {
     icon: Crown,
     label: "Ranking",
     path: "/ranking",
