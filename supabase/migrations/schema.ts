@@ -95,6 +95,7 @@ export const user = pgTable("user", {
   created_at: timestamp("created_at", { mode: "string" })
     .defaultNow()
     .notNull(),
+  points: integer("points").default(0).notNull(),
 })
 
 export const events = pgTable("events", {

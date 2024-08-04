@@ -34,6 +34,15 @@ export const appRouter = router({
 
     return users
   }),
+  getPlayersPointsRanking: authenticatedProcedure.query(async () => {
+    const users = await db
+      .select()
+      .from(user)
+      .orderBy(desc(user.points))
+      .limit(5)
+
+    return users
+  }),
   updateUserRole: adminProcedure
     .input(
       z.object({
