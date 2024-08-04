@@ -14,6 +14,17 @@ export const appRouter = router({
     const users = await db.select().from(user)
     return users
   }),
+  getPlayersByClass: authenticatedProcedure.query(async () => {
+    const users = await db
+      .select({
+        class: user.class,
+        count: sql<number>`cast(count(${user.id}) as int)`,
+      })
+      .from(user)
+      .groupBy(user.class)
+
+    return users
+  }),
   updateUserRole: adminProcedure
     .input(
       z.object({
