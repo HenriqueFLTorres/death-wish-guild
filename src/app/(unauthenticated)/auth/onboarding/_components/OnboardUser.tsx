@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PartyPopperIcon, Rocket } from "lucide-react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -26,17 +25,15 @@ import { trpc } from "@/trpc-client/client"
 
 const onboardingSchema = z.object({
   class: z.enum(["DPS", "RANGED_DPS", "TANK", "SUPPORT"]),
-  displayName: z.string(),
+  display_name: z.string(),
 })
 
 function OnboardUser() {
   const { data: session, update } = useSession()
-  const router = useRouter()
 
   const { mutate } = trpc.completeOnboarding.useMutation({
     onSuccess: async () => {
-      await update({ ...session, user: { ...session?.user, isBoarded: true } })
-      router.push("/")
+      await update({ ...session, user: { ...session?.user, is_boarded: true } })
     },
   })
 
@@ -44,7 +41,7 @@ function OnboardUser() {
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
       class: session?.user.class ?? "DPS",
-      displayName: session?.user.name,
+      display_name: session?.user.name,
     },
   })
 
@@ -70,7 +67,7 @@ function OnboardUser() {
           <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
-              name="displayName"
+              name="display_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nome em jogo</FormLabel>

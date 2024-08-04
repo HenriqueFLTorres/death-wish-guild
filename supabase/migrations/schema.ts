@@ -90,18 +90,17 @@ export const user = pgTable(
     email: text("email").notNull(),
     emailVerified: timestamp("emailVerified", { mode: "string" }),
     image: text("image"),
-    is_boarded: boolean("is_boarded").default(false).notNull(),
+    is_recruited: boolean("is_recruited").default(false).notNull(),
     role: role_type("role").default("MEMBER").notNull(),
     display_name: text("display_name"),
     class: class_type("class").default("DPS").notNull(),
     finished_events_count: integer("finished_events_count")
       .default(0)
       .notNull(),
-    created_at: timestamp("created_at", { mode: "string" })
-      .defaultNow()
-      .notNull(),
+    joined_at: timestamp("joined_at", { mode: "string" }),
     points: integer("points").default(0).notNull(),
     invited_by: text("invited_by"),
+    is_boarded: boolean("is_boarded").default(false).notNull(),
   },
   (table) => {
     return {

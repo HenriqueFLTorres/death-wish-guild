@@ -14,7 +14,8 @@ export const publicProcedure = t.procedure
 export const authenticatedProcedure = t.procedure.use((opts) => {
   const { ctx } = opts
 
-  if (ctx.session == null) throw new TRPCError({ code: "UNAUTHORIZED" })
+  if (ctx.session == null || Boolean(ctx.session.user.is_recruited) === false)
+    throw new TRPCError({ code: "UNAUTHORIZED" })
 
   return opts.next()
 })

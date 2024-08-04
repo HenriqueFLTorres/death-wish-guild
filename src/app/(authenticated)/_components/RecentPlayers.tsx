@@ -17,7 +17,7 @@ function RecentPlayers() {
     <DashboardCard icon={UserPlus} title="Membros Recentes">
       <ul className="flex flex-col divide-y divide-neutral-800 px-3 py-4">
         {recentPlayers.map(
-          ({ id, class: gameClass, display_name: name, created_at, image }) => (
+          ({ id, class: gameClass, display_name: name, joined_at, image }) => (
             <li
               className="flex items-center gap-2 px-0.5 py-2.5 text-sm first-of-type:pt-0 last-of-type:pb-0"
               key={id}
@@ -35,10 +35,10 @@ function RecentPlayers() {
 
                 <Tooltip>
                   <TooltipTrigger>
-                    <p>{moment(created_at).fromNow()}</p>
+                    <p>{moment(joined_at).fromNow()}</p>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {moment(created_at).format("MMMM Do YYYY, h:mm:ss a")}
+                    {moment(joined_at).format("MMMM Do YYYY, h:mm:ss a")}
                   </TooltipContent>
                 </Tooltip>
               </div>
