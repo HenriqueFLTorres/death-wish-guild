@@ -226,9 +226,7 @@ function CreateEvent() {
                       </PopoverTrigger>
                       <PopoverContent align="start" className="w-auto p-0">
                         <Calendar
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
+                          disabled={(date) => date < startOfDay(new Date())}
                           mode="single"
                           selected={field.value}
                           initialFocus

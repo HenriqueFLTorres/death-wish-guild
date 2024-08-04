@@ -90,9 +90,9 @@ export { EventCard, getEventTypeImagePath }
 function getEventTypeImagePath(type: string) {
   switch (type) {
     case "PVE":
-      return "/event-indicator/peace.png"
+      return "/event-indicator/pve.png"
     case "PVP":
-      return "/event-indicator/battle.png"
+      return "/event-indicator/pvp.png"
     default:
       return "/event-indicator/guild.png"
   }

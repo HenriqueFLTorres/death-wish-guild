@@ -11,6 +11,7 @@ import { PerGroup } from "./_components/PerGroup"
 import { PlayerListItem } from "./_components/PlayerListItem"
 import { Button } from "@/components/ui/button"
 import type { SelectUser } from "@/db/schema"
+import { toKebabCase } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
 
 interface EventPageProps {
@@ -193,10 +194,7 @@ export const getUserName = (
 export const getPreviewImage = (name: string) => {
   if (!ALL_POSSIBLE_OPTIONS.includes(name)) return null
 
-  const formattedName = name
-    .toLowerCase()
-    .replace(/\s/g, "-")
-    .replace(/[^a-zA-Z0-9-]/g, "")
+  const formattedName = toKebabCase(name)
 
   return `/event-preview/${formattedName}.webp`
 }

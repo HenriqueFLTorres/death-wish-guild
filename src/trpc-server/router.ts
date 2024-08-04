@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm"
+import { asc, desc, eq, gte, sql } from "drizzle-orm"
 import { z } from "zod"
 import { events, user } from "../../supabase/migrations/schema"
 import {
@@ -112,6 +112,16 @@ export const appRouter = router({
     }),
   getEvents: authenticatedProcedure.query(async () => {
     const eventsData = await db.select().from(events)
+    return eventsData
+  }),
+  getNextEvents: authenticatedProcedure.query(async () => {
+    const eventsData = await db
+      .select()
+      .from(events)
+      .where(gte(events.start_time, new Date().toDateString()))
+      .orderBy(asc(events.start_time))
+      .limit(5)
+
     return eventsData
   }),
   createEvent: adminProcedure
