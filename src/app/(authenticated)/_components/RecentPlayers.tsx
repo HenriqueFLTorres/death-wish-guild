@@ -1,28 +1,49 @@
 import { UserPlus } from "lucide-react"
+import moment from "moment"
 import { DashboardCard } from "./DashboardCard"
 import { Avatar } from "@/components/ui/avatar"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { trpc } from "@/trpc-client/client"
 
 function RecentPlayers() {
+  const { data: recentPlayers = [] } = trpc.getRecentPlayers.useQuery()
+
   return (
     <DashboardCard icon={UserPlus} title="Membros Recentes">
       <ul className="flex flex-col divide-y divide-neutral-800 px-3 py-4">
-        {Array.from(Array(5).keys()).map((index) => (
-          <li
-            className="flex items-center gap-2 px-0.5 py-2.5 text-sm first-of-type:pt-0 last-of-type:pb-0"
-            key={index}
-          >
-            <Avatar fallbackText="" src="/avatar/variant-1.png" />
-            <div className="flex flex-col gap-2 leading-none">
-              <h3 className="text-base font-semibold">SpamTaxota</h3>
-              <p className="flex items-center gap-2">Ranged DPS</p>
-            </div>
+        {recentPlayers.map(
+          ({ id, class: gameClass, display_name: name, created_at, image }) => (
+            <li
+              className="flex items-center gap-2 px-0.5 py-2.5 text-sm first-of-type:pt-0 last-of-type:pb-0"
+              key={id}
+            >
+              <Avatar fallbackText={name} src={image} />
+              <div className="flex flex-col gap-2 leading-none">
+                <h3 className="text-base font-semibold">{name}</h3>
+                <p className="flex items-center gap-2">{gameClass}</p>
+              </div>
 
-            <div className="ml-auto flex flex-col gap-2 text-end leading-none">
-              <p className="text-xs text-neutral-400">entrou a</p>
-              <p>1 dia atrás</p>
-            </div>
-          </li>
-        ))}
+              <div className="ml-auto flex flex-col gap-2 text-end leading-none">
+                <p className="text-xs text-neutral-400">entrou a</p>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <p>{moment(created_at).fromNow()}</p>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {moment(created_at).format("MMMM Do YYYY, h:mm:ss a")}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </li>
+          )
+        )}
       </ul>
     </DashboardCard>
   )

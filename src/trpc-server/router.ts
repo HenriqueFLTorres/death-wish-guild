@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm"
+import { desc, eq, sql } from "drizzle-orm"
 import { z } from "zod"
 import { events, user } from "../../supabase/migrations/schema"
 import {
@@ -22,6 +22,15 @@ export const appRouter = router({
       })
       .from(user)
       .groupBy(user.class)
+
+    return users
+  }),
+  getRecentPlayers: authenticatedProcedure.query(async () => {
+    const users = await db
+      .select()
+      .from(user)
+      .orderBy(desc(user.created_at))
+      .limit(5)
 
     return users
   }),
