@@ -1,6 +1,7 @@
 import { Users } from "lucide-react"
 import { getIconByClass } from "../grupos/[id]/_components/PlayerListItem"
 import { DashboardCard } from "./DashboardCard"
+import { translateGameClass } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
 
 function PlayerCount() {
@@ -17,7 +18,7 @@ function PlayerCount() {
               key={gameClass}
             >
               <Icon className="fill-neutral-100" size={20} />
-              <p>{gameClass}</p>
+              <p>{translateGameClass(gameClass)}</p>
 
               <b className="ml-auto font-semibold">{count}</b>
             </li>

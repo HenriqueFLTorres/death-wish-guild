@@ -1,7 +1,7 @@
 import { Crown } from "lucide-react"
 import { DashboardCard } from "./DashboardCard"
 import { Avatar } from "@/components/ui/avatar"
-import { cn } from "@/lib/utils"
+import { cn, translateGameClass } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
 
 function PointsRanking() {
@@ -35,7 +35,9 @@ function PointsRanking() {
               <Avatar fallbackText={name} src={image} />
               <div className="flex flex-col gap-2 leading-none">
                 <h3 className="text-base font-semibold">{name}</h3>
-                <p className="flex items-center gap-2">{gameClass}</p>
+                <p className="flex items-center gap-2">
+                  {translateGameClass(gameClass)}
+                </p>
               </div>
 
               <div className="ml-auto flex flex-col gap-2 text-end leading-none">
