@@ -15,8 +15,8 @@ function AlreadyOnboarded() {
 
       <div className="relative z-10 flex flex-col gap-4">
         <p className="text-left">
-          Parece que você já está registrado em nossa plataforma, caso deseja
-          mudar suas informações contate-nos através do nosso grupo do discord.
+          Parece que você já está cadastrado em nossa plataforma, em breve nossa
+          equipe irá aprová-lo e você poderá acessar nossa plataforma
         </p>
 
         <Link
@@ -24,7 +24,7 @@ function AlreadyOnboarded() {
           href="/"
         >
           <House />
-          Retornar a página principal
+          Ir à página principal
         </Link>
       </div>
 

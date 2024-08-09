@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm"
+import { and, asc, desc, eq, gte, sql } from "drizzle-orm"
 import { z } from "zod"
 import { events, user } from "../../supabase/migrations/schema"
 import {
@@ -11,9 +11,81 @@ import { db } from "@/db"
 
 export const appRouter = router({
   getUsers: authenticatedProcedure.query(async () => {
-    const users = await db.select().from(user)
+    const users = await db
+      .select()
+      .from(user)
+      .where(eq(user.is_recruited, true))
     return users
   }),
+  getUsersForRecruitment: authenticatedProcedure.query(async () => {
+    const users = await db
+      .select()
+      .from(user)
+      .where(and(eq(user.is_recruited, false), eq(user.is_boarded, true)))
+    return users
+  }),
+  getPlayersByClass: authenticatedProcedure.query(async () => {
+    const users = await db
+      .select({
+        class: user.class,
+        count: sql<number>`cast(count(${user.id}) as int)`,
+      })
+      .from(user)
+      .where(eq(user.is_recruited, true))
+      .groupBy(user.class)
+
+    return users
+  }),
+  getRecentPlayers: authenticatedProcedure.query(async () => {
+    const users = await db
+      .select()
+      .from(user)
+      .where(eq(user.is_recruited, true))
+      .orderBy(desc(user.joined_at))
+      .limit(5)
+
+    return users
+  }),
+  getPlayersPointsRanking: authenticatedProcedure.query(async () => {
+    const users = await db
+      .select()
+      .from(user)
+      .where(eq(user.is_recruited, true))
+      .orderBy(desc(user.points))
+      .limit(5)
+
+    return users
+  }),
+  acceptRecruit: adminProcedure
+    .input(
+      z.object({
+        ID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input, ctx } = opts
+      const currentUser = ctx.session?.user
+
+      await db
+        .update(user)
+        .set({
+          joined_at: new Date().toISOString(),
+          invited_by: currentUser?.id,
+          is_recruited: true,
+        })
+        .where(eq(user.id, input.ID))
+    }),
+  rejectRecruit: adminProcedure
+    .input(
+      z.object({
+        ID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      await db.delete(user).where(eq(user.id, input.ID))
+    }),
   updateUserRole: adminProcedure
     .input(
       z.object({
@@ -31,7 +103,7 @@ export const appRouter = router({
       const [targetUser] = await db
         .select()
         .from(user)
-        .where(eq(user.id, input.userID))
+        .where(and(eq(user.id, input.userID), eq(user.is_recruited, true)))
         .limit(1)
 
       if (targetUser.role === "ADMIN")
@@ -49,7 +121,7 @@ export const appRouter = router({
       z.object({
         userID: z.string().nullish(),
         class: z.enum(["DPS", "RANGED_DPS", "TANK", "SUPPORT"]),
-        displayName: z.string(),
+        display_name: z.string(),
       })
     )
     .mutation(async (opts) => {
@@ -62,7 +134,7 @@ export const appRouter = router({
         .set({
           is_boarded: true,
           class: input.class,
-          display_name: input.displayName,
+          display_name: input.display_name,
         })
         .where(eq(user.id, input.userID))
         .returning({ updatedID: user.id })
@@ -83,6 +155,16 @@ export const appRouter = router({
     }),
   getEvents: authenticatedProcedure.query(async () => {
     const eventsData = await db.select().from(events)
+    return eventsData
+  }),
+  getNextEvents: authenticatedProcedure.query(async () => {
+    const eventsData = await db
+      .select()
+      .from(events)
+      .where(gte(events.start_time, new Date().toDateString()))
+      .orderBy(asc(events.start_time))
+      .limit(5)
+
     return eventsData
   }),
   createEvent: adminProcedure

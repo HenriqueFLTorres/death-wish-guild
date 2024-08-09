@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { trpc } from "@/trpc-client/client"
@@ -57,29 +56,27 @@ function Events() {
         ))}
       </ol>
 
-      <TooltipProvider>
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <Button className="cursor-default" variant="secondary">
-              <BellRing size={16} />
-              Sistema de Notificações
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent
-            className="flex max-w-96 flex-col gap-2 pb-4"
-            sideOffset={16}
-          >
-            <h2 className="text-lg font-semibold">Notificações</h2>
-            <p className="text-sm">
-              Você receberá uma notificação 5 minutos antes do início de cada
-              evento.
-            </p>
-            <p className="text-sm">
-              Permita que o seu navegador envie notificações para receber
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <Button className="cursor-default" variant="secondary">
+            <BellRing size={16} />
+            Sistema de Notificações
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent
+          className="flex max-w-96 flex-col gap-2 pb-4"
+          sideOffset={16}
+        >
+          <h2 className="text-lg font-semibold">Notificações</h2>
+          <p className="text-sm">
+            Você receberá uma notificação 5 minutos antes do início de cada
+            evento.
+          </p>
+          <p className="text-sm">
+            Permita que o seu navegador envie notificações para receber
+          </p>
+        </TooltipContent>
+      </Tooltip>
 
       <CreateEvent />
     </section>

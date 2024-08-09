@@ -12,7 +12,6 @@ if (process.env.DISCORD_CLIENT_SECRET == null)
 
 export const nextAuthConfig: NextAuthConfig = {
   pages: {
-    signIn: "/auth/signin",
     error: "/auth/error",
     newUser: "/auth/onboarding",
   },

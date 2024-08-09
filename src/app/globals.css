@@ -49,11 +49,15 @@
       from(rgba(0, 0, 0, 100)),
       to(rgba(0, 0, 0, 0))
     );
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 100), rgba(0, 0, 0, 0));
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 100),
+      rgba(0, 0, 0, 0)
+    );
   }
 
-  .scrollbar::-webkit-scrollbar {
-    width: 14px !important;
+  /* .scrollbar::-webkit-scrollbar {
+    width: 8px !important;
     height: 14px;
   }
 
@@ -63,17 +67,17 @@
   }
 
   .scrollbar::-webkit-scrollbar-thumb {
-    background: #2F2F2F;
+    background: #262626;
     border: 3px solid #00000000;
     border-radius: 12px;
   }
 
   .scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #181818;
+    background: #404040;
   }
 
   .scrollbar::-webkit-scrollbar-thumb:active {
-    background: #181818;
+    background: #404040;
   }
 
   .scrollbar::-webkit-scrollbar-track {
@@ -92,5 +96,5 @@
 
   .scrollbar::-webkit-scrollbar-corner {
     background: transparent;
-  }
+  } */
 }

@@ -5,9 +5,10 @@ declare module "next-auth" {
     user: {
       name: string
       email: string
-      isBoarded: boolean
+      is_recruited: boolean
+      is_boarded: boolean
       role: "ADMIN" | "MODERATOR" | "MEMBER"
-      displayName: string
+      display_name: string
       class: "DPS" | "RANGED_DPS" | "TANK" | "SUPPORT"
     } & DefaultSession["user"]
   }

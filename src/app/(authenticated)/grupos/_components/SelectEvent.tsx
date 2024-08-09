@@ -25,7 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+import { cn, toKebabCase } from "@/lib/utils"
 
 interface SelectEventProps {
   control: Control<z.infer<typeof eventSchema>>
@@ -60,7 +60,7 @@ function SelectEvent(props: SelectEventProps) {
                       <Image
                         alt=""
                         height={24}
-                        src={`/event-icon/${formatName(field.value)}.png`}
+                        src={`/event-icon/${toKebabCase(field.value)}.png`}
                         width={24}
                       />
                     ) : (
@@ -92,7 +92,7 @@ function SelectEvent(props: SelectEventProps) {
                           <Image
                             alt=""
                             height={24}
-                            src={`/event-icon/${formatName(option)}.png`}
+                            src={`/event-icon/${toKebabCase(option)}.png`}
                             width={24}
                           />
                           {option}
@@ -109,7 +109,7 @@ function SelectEvent(props: SelectEventProps) {
                           <Image
                             alt=""
                             height={24}
-                            src={`/event-icon/${formatName(option)}.png`}
+                            src={`/event-icon/${toKebabCase(option)}.png`}
                             width={24}
                           />
                           {option}
@@ -126,7 +126,7 @@ function SelectEvent(props: SelectEventProps) {
                           <Image
                             alt=""
                             height={24}
-                            src={`/event-icon/${formatName(option)}.png`}
+                            src={`/event-icon/${toKebabCase(option)}.png`}
                             width={24}
                           />
                           {option}
@@ -143,7 +143,7 @@ function SelectEvent(props: SelectEventProps) {
                           <Image
                             alt=""
                             height={24}
-                            src={`/event-icon/${formatName(option)}.png`}
+                            src={`/event-icon/${toKebabCase(option)}.png`}
                             width={24}
                           />
                           {option}
@@ -206,10 +206,3 @@ export const ALL_POSSIBLE_OPTIONS = [
   ...FIELD_BOSS_EVENTS,
   ...SPECIAL_EVENTS,
 ]
-
-function formatName(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/\s/g, "-")
-    .replace(/[^a-zA-Z0-9-]/g, "")
-}
