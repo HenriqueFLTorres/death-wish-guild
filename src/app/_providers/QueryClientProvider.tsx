@@ -13,7 +13,8 @@ import { trpc } from "@/trpc-client/client"
 import "moment/locale/es"
 import "moment/locale/pt-br"
 
-const browserLanguage = navigator.language
+const browserLanguage =
+  typeof navigator === "undefined" ? "en" : navigator?.language
 
 const ALLOWED_VARIANTS = ["pt-BR", "es"]
 

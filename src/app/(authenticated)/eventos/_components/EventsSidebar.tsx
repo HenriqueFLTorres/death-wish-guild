@@ -2,8 +2,9 @@
 
 import { BellRing, CalendarDays } from "lucide-react"
 import moment from "moment"
+import { useParams } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { CreateEvent } from "./CreateEvent"
 import { EventCard } from "./EventCard"
 import { EventsCalendar } from "./EventsCalendar"
@@ -15,6 +16,7 @@ import { trpc } from "@/trpc-client/client"
 
 function EventsSidebar() {
   const [selectedDay, setSelectedDay] = useState(new Date())
+  const pathname = useParams<{ id: string }>()
 
   const { data: session } = useSession()
 
@@ -22,6 +24,14 @@ function EventsSidebar() {
     startOfDay: moment(new Date()).startOf("day").subtract(1, "days").toDate(),
     endOfDay: moment(new Date()).endOf("day").add(6, "days").toDate(),
   })
+
+  const { data: event, isSuccess } = trpc.getEvent.useQuery({
+    id: Number(pathname.id),
+  })
+
+  useEffect(() => {
+    if (isSuccess) setSelectedDay(new Date(event.start_time))
+  }, [isSuccess])
 
   const weekDays = getWeekRange(new Date())
 
