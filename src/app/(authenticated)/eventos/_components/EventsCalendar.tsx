@@ -1,6 +1,6 @@
 "use client"
 
-import { add, format, isEqual, isToday } from "date-fns"
+import moment from "moment"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useRef } from "react"
@@ -25,7 +25,7 @@ function EventsCalendar(props: EventsCalendarProps) {
 
   const today = new Date()
 
-  const timezoneOffset = format(today, "z")
+  const timezoneOffset = moment(today).format("Z")
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const weekDays = getWeekRange(today)
@@ -47,17 +47,19 @@ function EventsCalendar(props: EventsCalendarProps) {
   return (
     <section className="flex flex-col divide-y divide-neutral-800 overflow-auto">
       <ol className="flex py-4">
-        <li className="flex w-20 shrink-0 items-end px-2 text-neutral-400">
+        <li className="flex w-20 shrink-0 items-end text-neutral-400">
           <Tooltip>
             <TooltipTrigger>
-              <small>{timezoneOffset}</small>
+              <small className="text-xs">GMT {timezoneOffset}</small>
             </TooltipTrigger>
             <TooltipContent>{timezone}</TooltipContent>
           </Tooltip>
         </li>
         {weekDays.map((date) => (
           <li className="w-full px-2" key={date.toISOString()}>
-            <h3 className="text-sm text-neutral-400">{format(date, "EEEE")}</h3>
+            <h3 className="text-sm text-neutral-400">
+              {moment(date).format("ddd")}
+            </h3>
             <b className="text-2xl font-semibold">{date.getDate()}</b>
           </li>
         ))}
@@ -95,7 +97,10 @@ function CalendarRow(props: CalendarRowProps) {
     ? true
     : weekDays.some((dayOfWeek) =>
         events.some((event) =>
-          isEqual(new Date(event.start_time), add(dayOfWeek, { hours: index }))
+          moment(new Date(event.start_time)).isSame(
+            moment(dayOfWeek).add(index, "hours").toDate(),
+            "day"
+          )
         )
       )
 
@@ -110,13 +115,14 @@ function CalendarRow(props: CalendarRowProps) {
         <p className="py-3">{index.toString().padStart(2, "0")}:00</p>
       </div>
       {weekDays.map((date) => {
-        const rowHour = add(date, { hours: index }).getHours()
-        const isCurrentTime = isToday(date) && rowHour === new Date().getHours()
+        const rowHour = moment(date).add(index, "hours").toDate().getHours()
+        const isToday = moment(date).isSame(new Date(), "day")
+        const isCurrentTime = isToday && rowHour === new Date().getHours()
 
         return (
           <div
             className={cn("w-full p-1.5", {
-              "bg-primary-600/20": isToday(date),
+              "bg-primary-600/20": isToday,
               "bg-primary-400/50": isCurrentTime,
             })}
             id={isCurrentTime ? "calendar-curent-time" : undefined}
@@ -144,7 +150,10 @@ function CalendarRowDay(props: CalendarRowDayProps) {
   const { events, date, index } = props
 
   const eventsToday = events?.filter((event) =>
-    isEqual(new Date(event.start_time), add(date, { hours: index }))
+    moment(new Date(event.start_time)).isSame(
+      moment(date).add(index, "hours"),
+      "hour"
+    )
   )
 
   return eventsToday?.map((event) => (
@@ -164,7 +173,7 @@ function CalendarRowDay(props: CalendarRowDayProps) {
           {event.name}
         </p>
       </span>
-      <p>{format(new Date(event.start_time), "HH:mm")}</p>
+      <p>{moment(new Date(event.start_time)).format("HH:mm")}</p>
     </Link>
   ))
 }

@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SelectItemText } from "@radix-ui/react-select"
-import { format, startOfDay } from "date-fns"
 import { createInsertSchema } from "drizzle-zod"
 import { CalendarDays, CalendarIcon, Dices, User, Users } from "lucide-react"
 import moment from "moment"
@@ -72,7 +71,7 @@ function CreateEvent() {
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      start_date: startOfDay(new Date()),
+      start_date: moment(new Date()).startOf("day").toDate(),
       confirmation_type: "PER_GROUP",
       event_type: "GUILD",
     },
@@ -221,7 +220,7 @@ function CreateEvent() {
                     <Popover>
                       <PopoverTrigger className="rounded-md border-secondary bg-secondary-600">
                         {field.value instanceof Date ? (
-                          format(field.value, "PPP")
+                          moment(field.value).format("MMMM Do, YYYY")
                         ) : (
                           <span>Selecione uma data</span>
                         )}
@@ -229,7 +228,9 @@ function CreateEvent() {
                       </PopoverTrigger>
                       <PopoverContent align="start" className="w-auto p-0">
                         <Calendar
-                          disabled={(date) => date < startOfDay(new Date())}
+                          disabled={(date) =>
+                            date < moment(new Date()).startOf("day").toDate()
+                          }
                           mode="single"
                           selected={field.value}
                           initialFocus

@@ -1,7 +1,7 @@
 "use client"
 
-import { add, endOfDay, format, isSameDay, startOfDay, sub } from "date-fns"
 import { BellRing, CalendarDays } from "lucide-react"
+import moment from "moment"
 import { useSession } from "next-auth/react"
 import { useState } from "react"
 import { CreateEvent } from "./CreateEvent"
@@ -19,14 +19,14 @@ function EventsSidebar() {
   const { data: session } = useSession()
 
   const { data: events = [] } = trpc.getEventsByDay.useQuery({
-    startOfDay: sub(startOfDay(new Date()), { days: 1 }),
-    endOfDay: add(endOfDay(new Date()), { days: 6 }),
+    startOfDay: moment(new Date()).startOf("day").subtract(1, "days").toDate(),
+    endOfDay: moment(new Date()).endOf("day").add(6, "days").toDate(),
   })
 
   const weekDays = getWeekRange(new Date())
 
   const eventsToday = events.filter((event) =>
-    isSameDay(new Date(event.start_time), selectedDay)
+    moment(selectedDay).isSame(new Date(event.start_time), "day")
   )
 
   return (
@@ -47,8 +47,8 @@ function EventsSidebar() {
             className="flex h-full max-h-[80vh] max-w-screen-xl flex-col overflow-auto"
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
-            <h2 className="text-xl font-semibold">
-              {format(selectedDay, "MMMM yyyy")}
+            <h2 className="text-xl font-semibold capitalize">
+              {moment(selectedDay).format("MMMM yyyy")}
             </h2>
             <EventsCalendar events={events} />
           </DialogContent>
@@ -106,7 +106,9 @@ function WeekDay(props: WeekDayProps) {
         variant={isSelected ? "primary-flat" : "secondary-flat"}
         onClick={() => setDate(date)}
       >
-        <small className="text-xs font-normal">{format(date, "EEE")}</small>
+        <small className="text-xs font-normal">
+          {moment(date).format("ddd")}
+        </small>
         {date.getDate()}
       </Button>
     </li>

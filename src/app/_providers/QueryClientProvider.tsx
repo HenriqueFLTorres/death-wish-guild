@@ -5,9 +5,21 @@ import {
   QueryClient,
 } from "@tanstack/react-query"
 import { httpBatchLink } from "@trpc/client"
+import moment from "moment"
 import type { ReactNode } from "react"
 import superjson from "superjson"
+
 import { trpc } from "@/trpc-client/client"
+import "moment/locale/es"
+import "moment/locale/pt-br"
+
+const browserLanguage = navigator.language
+
+const ALLOWED_VARIANTS = ["pt-BR", "es"]
+
+moment.locale(
+  ALLOWED_VARIANTS.includes(browserLanguage) ? browserLanguage : "en"
+)
 
 const url =
   process.env.NODE_ENV === "production"

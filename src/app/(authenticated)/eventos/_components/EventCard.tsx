@@ -17,9 +17,6 @@ function EventCard(props: SelectEvent) {
     moment().startOf("day").add(18, "hours")
   )
 
-  const weekday = moment(start_time).format("dddd")
-  const formattedDate = moment(start_time).format("LL")
-
   const previewImage = getPreviewImage(name)
 
   return (
@@ -35,10 +32,6 @@ function EventCard(props: SelectEvent) {
         <div className="absolute inset-0 bg-gradient-to-b from-primary-700 to-primary-500 opacity-0 transition-opacity group-hover:opacity-40" />
 
         <div className="z-10 flex w-full flex-col p-2 text-left shadow">
-          {/* <small className="text-xs font-light text-primary-200">
-            {location}
-          </small> */}
-
           <h2 className="flex from-white to-neutral-300 text-xl font-semibold drop-shadow-[0_0_2px_#ffffff50]">
             {name}
           </h2>
@@ -53,23 +46,17 @@ function EventCard(props: SelectEvent) {
             {event_type}
           </p>
 
-          <footer className="flex w-full items-end justify-between gap-4">
-            <p className="mt-2 text-sm">
-              <b>{weekday}</b> {formattedDate}
-            </p>
-
-            <div className="flex items-center gap-2">
-              <div className="grid h-5 w-5 place-items-center rounded-sm border border-primary bg-primary-600">
-                {isNight ? (
-                  <Moon className="fill-white" size={12} />
-                ) : (
-                  <Sun className="fill-white" size={12} />
-                )}
-              </div>
-              <p className="shrink-0 font-semibold">
-                {moment(start_time).format("LT")}
-              </p>
+          <footer className="ml-auto flex items-center justify-between gap-2">
+            <div className="grid h-5 w-5 place-items-center rounded-sm border border-primary bg-primary-600">
+              {isNight ? (
+                <Moon className="fill-white" size={12} />
+              ) : (
+                <Sun className="fill-white" size={12} />
+              )}
             </div>
+            <p className="shrink-0 font-semibold">
+              {moment(start_time).format("LT")}
+            </p>
           </footer>
         </div>
 

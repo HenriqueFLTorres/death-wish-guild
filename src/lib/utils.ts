@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from "clsx"
-import { addDays, startOfDay, sub } from "date-fns"
+import moment from "moment"
 import { twMerge } from "tailwind-merge"
 import { SelectUser } from "@/db/schema"
 
@@ -30,12 +30,12 @@ export function translateGameClass(gameClass: SelectUser["class"]) {
 }
 
 export function getWeekRange(date: Date) {
-  const startOfRange = sub(startOfDay(date), { days: 1 })
+  const startOfRange = moment(date).startOf("day").subtract(1, "days")
 
   const days = []
 
   for (let i = 0; i < 7; i++) {
-    const day = addDays(startOfRange, i)
+    const day = moment(startOfRange).add(i, "day").toDate()
     days.push(day)
   }
 
