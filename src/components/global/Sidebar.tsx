@@ -3,6 +3,7 @@
 import {
   Backpack,
   BookLock,
+  CalendarDays,
   CalendarRange,
   Crown,
   LayoutDashboard,
@@ -37,9 +38,9 @@ const links: NavegationLink[] = [
     path: "/",
   },
   {
-    icon: Users,
-    label: "Grupos",
-    path: "/grupos",
+    icon: CalendarDays,
+    label: "Eventos",
+    path: "/eventos",
   },
   {
     icon: Users,
@@ -230,7 +231,7 @@ function NavLink(props: NavLinkProps) {
       <Link
         className={cn(
           buttonVariants({
-            variant: isInPath ? "default" : "secondary",
+            variant: isInPath ? "primary" : "secondary",
             className:
               "h-9 w-full justify-start overflow-hidden p-0 px-1.5 duration-300",
           }),

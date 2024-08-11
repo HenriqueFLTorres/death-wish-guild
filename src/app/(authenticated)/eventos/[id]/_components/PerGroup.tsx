@@ -120,7 +120,7 @@ function PerGroup(props: PerGroupProps) {
       onDragEnd={handleDragEnd}
       onDragStart={handleDragStart}
     >
-      <section className="relative flex w-full flex-col items-center overflow-hidden rounded-xl px-4 py-3">
+      <section className="relative flex h-full w-full flex-col items-center overflow-hidden rounded-xl border border-neutral-700 bg-gradient-to-b from-neutral-900 to-neutral-900/50 px-4 py-3 pb-24 shadow-xl">
         <Image
           alt=""
           className="absolute object-cover"

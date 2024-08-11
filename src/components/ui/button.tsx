@@ -9,8 +9,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-primary primary-button",
+        primary: "border-primary primary-button",
+        "primary-flat": "border-primary-400 bg-primary-600",
         secondary: "border-secondary secondary-button",
+        "secondary-flat": "bg-neutral-800 border-neutral-700 border",
         outline: "border-secondary",
         ghost: "border-none",
         destructive:
@@ -18,11 +20,11 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-3 py-2",
-        icon: "h-10 w-10",
+        icon: "h-8 w-8 rounded",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "primary",
       size: "default",
     },
   }

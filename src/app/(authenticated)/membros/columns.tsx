@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { Ellipsis } from "lucide-react"
 import moment from "moment"
-import { getIconByClass } from "../grupos/[id]/_components/PlayerListItem"
+import { getIconByClass } from "../eventos/[id]/_components/PlayerListItem"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"

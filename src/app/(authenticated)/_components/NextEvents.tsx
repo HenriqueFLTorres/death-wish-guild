@@ -1,7 +1,7 @@
 import { CalendarClock } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
-import { getEventTypeImagePath } from "../grupos/_components/EventCard"
+import { getEventTypeImagePath } from "../eventos/_components/EventCard"
 import { DashboardCard } from "./DashboardCard"
 import { toKebabCase } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"

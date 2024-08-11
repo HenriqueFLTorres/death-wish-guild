@@ -91,7 +91,10 @@ function CreateEvent() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary">Criar um evento</Button>
+        <Button variant="secondary-flat">
+          <CalendarDays size={16} />
+          Criar um evento
+        </Button>
       </DialogTrigger>
       <DialogContent className="gap-6">
         <DialogTitle>

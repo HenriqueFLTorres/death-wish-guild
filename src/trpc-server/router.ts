@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, sql } from "drizzle-orm"
+import { and, asc, between, desc, eq, gte, sql } from "drizzle-orm"
 import { z } from "zod"
 import { events, user } from "../../supabase/migrations/schema"
 import {
@@ -157,6 +157,25 @@ export const appRouter = router({
     const eventsData = await db.select().from(events)
     return eventsData
   }),
+  getEventsByDay: authenticatedProcedure
+    .input(z.object({ startOfDay: z.date(), endOfDay: z.date() }))
+    .query(async (opts) => {
+      const { input } = opts
+
+      const eventsData = await db
+        .select()
+        .from(events)
+        .where(
+          between(
+            events.start_time,
+            input.startOfDay.toISOString(),
+            input.endOfDay.toISOString()
+          )
+        )
+        .orderBy(asc(events.start_time))
+
+      return eventsData
+    }),
   getNextEvents: authenticatedProcedure.query(async () => {
     const eventsData = await db
       .select()

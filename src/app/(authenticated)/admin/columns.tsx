@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 import {
   getClassColor,
   getIconByClass,
-} from "../grupos/[id]/_components/PlayerListItem"
+} from "../eventos/[id]/_components/PlayerListItem"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -67,7 +67,7 @@ export const columns = (
               <DropdownMenuTrigger>
                 <Badge
                   className="h-max w-max px-2 py-1 capitalize leading-none"
-                  variant={user.role === "MEMBER" ? "default" : "primary"}
+                  variant={user.role === "MEMBER" ? "neutral" : "primary"}
                 >
                   {user.role.toLowerCase()}
                 </Badge>

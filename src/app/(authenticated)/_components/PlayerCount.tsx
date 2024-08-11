@@ -1,5 +1,5 @@
 import { Users } from "lucide-react"
-import { getIconByClass } from "../grupos/[id]/_components/PlayerListItem"
+import { getIconByClass } from "../eventos/[id]/_components/PlayerListItem"
 import { DashboardCard } from "./DashboardCard"
 import { translateGameClass } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
