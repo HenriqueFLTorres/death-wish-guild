@@ -12,7 +12,7 @@ function RecentDrops() {
             className="flex items-center gap-2 px-0.5 py-2.5 text-sm first-of-type:pt-0 last-of-type:pb-0"
             key={index}
           >
-            <div className="relative grid h-10 w-10 shrink-0 place-items-center">
+            <div className="relative grid h-10 w-10 shrink-0 place-items-center rounded">
               <Image
                 alt=""
                 height={40}
