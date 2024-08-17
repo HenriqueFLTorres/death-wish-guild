@@ -73,6 +73,28 @@ export const appRouter = router({
 
     return users
   }),
+  getPositionMember: authenticatedProcedure
+    .input(
+      z.object({
+        userID: z.string(),
+      })
+    )
+    .query(async (opts) => {
+      const { input } = opts
+      const [targetUser] = await db.execute(sql`SELECT
+  rank
+FROM (
+  SELECT
+    id,
+    RANK() OVER (ORDER BY points DESC) AS rank
+  FROM
+    public.user
+) ranked_users
+WHERE
+   id = ${input.userID};`)
+
+      return targetUser as { rank: string }
+    }),
   acceptRecruit: adminProcedure
     .input(
       z.object({

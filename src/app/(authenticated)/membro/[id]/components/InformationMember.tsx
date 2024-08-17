@@ -20,7 +20,7 @@ function InformationMember({
   const Icon = getIconByClass(user.class)
   return (
     <>
-      <div className="flex justify-between">
+      <div className="relative z-10 flex justify-between">
         {/*header do membro*/}
         <div className="flex gap-4">
           {" "}
@@ -66,7 +66,7 @@ function InformationMember({
         </div>
       </div>
       {/*fechamento do header*/}
-      <div className="mt-14 space-y-6">
+      <div className="relative z-10 mt-14 space-y-6">
         <div>
           <div className="grid grid-cols-2 gap-8">
             <div>
