@@ -10,6 +10,23 @@ import {
 import { db } from "@/db"
 
 export const appRouter = router({
+  getUser: authenticatedProcedure
+    .input(
+      z.object({
+        userID: z.string(),
+      })
+    )
+    .query(async (opts) => {
+      const { input } = opts
+
+      const [targetUser] = await db
+        .select()
+        .from(user)
+        .where(and(eq(user.id, input.userID), eq(user.is_recruited, true)))
+        .limit(1)
+
+      return targetUser
+    }),
   getUsers: authenticatedProcedure.query(async () => {
     const users = await db
       .select()
@@ -56,6 +73,28 @@ export const appRouter = router({
 
     return users
   }),
+  getPositionMember: authenticatedProcedure
+    .input(
+      z.object({
+        userID: z.string(),
+      })
+    )
+    .query(async (opts) => {
+      const { input } = opts
+      const [targetUser] = await db.execute(sql`SELECT
+  rank
+FROM (
+  SELECT
+    id,
+    RANK() OVER (ORDER BY points DESC) AS rank
+  FROM
+    public.user
+) ranked_users
+WHERE
+   id = ${input.userID};`)
+
+      return targetUser as { rank: string }
+    }),
   acceptRecruit: adminProcedure
     .input(
       z.object({
