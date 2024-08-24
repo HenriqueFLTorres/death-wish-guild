@@ -23,6 +23,7 @@ const Avatar = forwardRef<
       "relative flex shrink-0 overflow-hidden rounded-full",
       className
     )}
+    key={src}
     ref={ref}
     style={{ width: size, height: size, ...style }}
   >

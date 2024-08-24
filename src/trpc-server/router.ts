@@ -10,6 +10,47 @@ import {
 import { db } from "@/db"
 
 export const appRouter = router({
+  getUser: authenticatedProcedure
+    .input(
+      z.object({
+        userID: z.string(),
+      })
+    )
+    .query(async (opts) => {
+      const { input } = opts
+
+      const [targetUser] = await db
+        .select()
+        .from(user)
+        .where(and(eq(user.id, input.userID), eq(user.is_recruited, true)))
+        .limit(1)
+
+      return targetUser
+    }),
+  updateUserInfo: authenticatedProcedure
+    .input(
+      z.object({
+        display_name: z.string(),
+        image: z.string().nullish(),
+        class: z.enum(["DPS", "RANGED_DPS", "TANK", "SUPPORT"]),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input, ctx } = opts
+
+      const currentUser = ctx.session?.user
+
+      if (currentUser?.id == null) throw new Error("User not found")
+
+      await db
+        .update(user)
+        .set({
+          display_name: input.display_name,
+          image: input.image,
+          class: input.class,
+        })
+        .where(eq(user.id, currentUser.id))
+    }),
   getUsers: authenticatedProcedure.query(async () => {
     const users = await db
       .select()
