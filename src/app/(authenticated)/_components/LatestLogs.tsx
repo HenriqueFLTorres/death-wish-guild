@@ -5,7 +5,7 @@ import { translateGameClass } from "@/lib/utils"
 import { RouterOutput, trpc } from "@/trpc-client/client"
 import { parseHTML } from "@/utils/parseHTML"
 
-type LogType = RouterOutput["getLatestLogs"][number]
+export type LogType = RouterOutput["getLatestLogs"][number]
 
 function LatestLogs() {
   const { data: logs = [] } = trpc.getLatestLogs.useQuery()
@@ -17,27 +17,33 @@ function LatestLogs() {
       title="Últimos Log’s"
     >
       <ul className="flex flex-col divide-y divide-neutral-800 px-2 py-3">
-        {logs.map((log) => {
-          const { Icon, title, message } = createLogObject(log)
-
-          return (
-            <li
-              className="flex flex-col gap-2 px-1 py-2.5 text-left text-xs first-of-type:pt-0 last-of-type:pb-0"
-              key={log.id}
-            >
-              <h3 className="inline-flex items-center gap-2 font-semibold">
-                <Icon size={16} /> {title}
-              </h3>
-              <p className="[&>b]:font-semibold">{parseHTML(message)}</p>
-            </li>
-          )
-        })}
+        {logs.map((log) => (
+          <LogFragment key={log.id} log={log} />
+        ))}
       </ul>
     </DashboardCard>
   )
 }
+interface LogFragmentProps {
+  log: LogType
+}
 
-export { LatestLogs }
+function LogFragment(props: LogFragmentProps) {
+  const { log } = props
+
+  const { Icon, title, message } = createLogObject(log)
+
+  return (
+    <li className="flex flex-col gap-2 px-1 py-2.5 text-left text-xs first-of-type:pt-0 last-of-type:pb-0">
+      <h3 className="inline-flex items-center gap-2 font-semibold">
+        <Icon size={16} /> {title}
+      </h3>
+      <p className="[&>b]:font-semibold">{parseHTML(message)}</p>
+    </li>
+  )
+}
+
+export { LatestLogs, LogFragment }
 
 function createLogObject(log: LogType) {
   return {

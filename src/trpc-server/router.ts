@@ -1,4 +1,4 @@
-import { and, asc, between, desc, eq, gte, sql } from "drizzle-orm"
+import { and, asc, between, desc, eq, gte, or, sql } from "drizzle-orm"
 import { z } from "zod"
 import { events, logs, user } from "../../supabase/migrations/schema"
 import { createLog } from "./utils"
@@ -9,6 +9,7 @@ import {
   router,
 } from "./index"
 import { db } from "@/db"
+import { SelectUser } from "@/db/schema"
 
 export const appRouter = router({
   getUser: authenticatedProcedure
@@ -134,6 +135,40 @@ export const appRouter = router({
 
     return users
   }),
+  getPositionMember: authenticatedProcedure
+    .input(
+      z.object({
+        userID: z.string().nullish(),
+      })
+    )
+    .query(async (opts) => {
+      const { input } = opts
+
+      const [targetUser] = await db.execute(sql`
+          SELECT
+            id,
+            name,
+            image,
+            points,
+            class,
+            rank
+          FROM (
+            SELECT
+              id,
+              name,
+              image,
+              points,
+              class,
+              RANK() OVER (ORDER BY points DESC) AS rank
+            FROM
+              public.user
+          ) ranked_users
+          WHERE
+            id = ${input.userID};
+        `)
+
+      return targetUser as SelectUser & { rank: string }
+    }),
   acceptRecruit: adminProcedure
     .input(
       z.object({
@@ -345,7 +380,7 @@ export const appRouter = router({
           .select()
           .from(user)
           .where(eq(user.id, log.triggered_by))
-          .limit(20)
+          .limit(1)
 
         return {
           ...log,
@@ -356,6 +391,42 @@ export const appRouter = router({
 
     return logsWithUser
   }),
+  getLatestPlayerLogs: authenticatedProcedure
+    .input(z.object({ userID: z.string().nullish() }))
+    .query(async (opts) => {
+      const { input } = opts
+
+      if (input.userID == null) return []
+
+      const logsData = await db
+        .select()
+        .from(logs)
+        .where(
+          or(
+            eq(logs.triggered_by, input.userID),
+            eq(logs.target_id, input.userID)
+          )
+        )
+        .orderBy(desc(logs.created_at))
+        .limit(5)
+
+      const logsWithUser = Promise.all(
+        logsData.map(async (log) => {
+          const [triggerUser] = await db
+            .select()
+            .from(user)
+            .where(eq(user.id, log.triggered_by))
+            .limit(1)
+
+          return {
+            ...log,
+            triggerUser,
+          }
+        })
+      )
+
+      return logsWithUser
+    }),
 })
 
 export type AppRouter = typeof appRouter
