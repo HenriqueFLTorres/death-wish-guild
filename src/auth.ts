@@ -27,8 +27,29 @@ export const nextAuthConfig: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    async signIn({ user: signInUser, profile }) {
+      if (signInUser.id == null) return false
+
+      const [targetUser] = await db
+        .select()
+        .from(user)
+        .where(eq(user.id, signInUser.id))
+        .limit(1)
+
+      if (targetUser?.discord_id == null) {
+        await db
+          .update(user)
+          .set({
+            username: String(profile?.username),
+            discord_id: profile?.id,
+          })
+          .where(eq(user.id, signInUser.id))
+      }
+      return true
+    },
     async session({ session }) {
       if (session == null) return session
+      // console.log(session)
 
       const [myUser] = await db
         .select()
@@ -41,7 +62,7 @@ export const nextAuthConfig: NextAuthConfig = {
         user: {
           ...session.user,
           ...myUser,
-          name: myUser.display_name ?? session.user.name,
+          name: myUser.name ?? session.user.name,
           originalName: session.user.name,
         },
       }

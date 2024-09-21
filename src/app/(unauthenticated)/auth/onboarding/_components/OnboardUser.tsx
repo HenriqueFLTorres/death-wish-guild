@@ -25,7 +25,7 @@ import { trpc } from "@/trpc-client/client"
 
 const onboardingSchema = z.object({
   class: z.enum(["DPS", "RANGED_DPS", "TANK", "SUPPORT"]),
-  display_name: z.string(),
+  name: z.string(),
 })
 
 function OnboardUser() {
@@ -41,7 +41,7 @@ function OnboardUser() {
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
       class: session?.user.class ?? "DPS",
-      display_name: session?.user.name,
+      name: session?.user.name,
     },
   })
 
@@ -59,15 +59,15 @@ function OnboardUser() {
 
       <div className="relative z-10 flex flex-col gap-4">
         <p className="text-left">
-          Olá Treffy, falta muito pouco para você acessar a nossa plataforma,
-          para isso, precisamos saber um pouco mais sobre você.
+          Olá {session?.user.name}, falta muito pouco para você acessar a nossa
+          plataforma, para isso, precisamos saber um pouco mais sobre você.
         </p>
 
         <Form {...form}>
           <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
-              name="display_name"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nome em jogo</FormLabel>

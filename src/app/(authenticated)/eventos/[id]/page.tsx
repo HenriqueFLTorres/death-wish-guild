@@ -133,7 +133,7 @@ function EventPage(props: EventPageProps) {
                   id={userId}
                   image={user.image}
                   key={userId}
-                  name={user.display_name}
+                  name={user.name}
                 />
               )
             })}

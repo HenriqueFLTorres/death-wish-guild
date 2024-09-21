@@ -1,6 +1,7 @@
 import { and, asc, between, desc, eq, gte, sql } from "drizzle-orm"
 import { z } from "zod"
-import { events, user } from "../../supabase/migrations/schema"
+import { events, logs, user } from "../../supabase/migrations/schema"
+import { createLog } from "./utils"
 import {
   adminProcedure,
   authenticatedProcedure,
@@ -25,12 +26,18 @@ export const appRouter = router({
         .where(and(eq(user.id, input.userID), eq(user.is_recruited, true)))
         .limit(1)
 
-      return targetUser
+      const [invitedBy] = await db
+        .select()
+        .from(user)
+        .where(eq(user.id, targetUser.invited_by as string))
+        .limit(1)
+
+      return { ...targetUser, invitedBy }
     }),
   updateUserInfo: authenticatedProcedure
     .input(
       z.object({
-        display_name: z.string(),
+        name: z.string(),
         image: z.string().nullish(),
         class: z.enum(["DPS", "RANGED_DPS", "TANK", "SUPPORT"]),
       })
@@ -42,14 +49,44 @@ export const appRouter = router({
 
       if (currentUser?.id == null) throw new Error("User not found")
 
-      await db
+      const [updatedUser] = await db
         .update(user)
         .set({
-          display_name: input.display_name,
+          name: input.name,
           image: input.image,
           class: input.class,
         })
         .where(eq(user.id, currentUser.id))
+        .returning({
+          id: user.id,
+          name: user.name,
+          image: user.image,
+          class: user.class,
+        })
+
+      const logObject = {
+        action: "UPDATE",
+        triggered_by: updatedUser.id,
+        category: "USER",
+      } as const
+
+      const hasNameChanged = updatedUser.name !== currentUser.name
+      if (hasNameChanged)
+        await createLog({
+          type: "USER_NAME",
+          from: currentUser.name,
+          to: updatedUser.name,
+          ...logObject,
+        })
+
+      const hasClassChanged = updatedUser.class !== currentUser.class
+      if (hasClassChanged)
+        await createLog({
+          type: "USER_CLASS",
+          from: currentUser.class,
+          to: updatedUser.class,
+          ...logObject,
+        })
     }),
   getUsers: authenticatedProcedure.query(async () => {
     const users = await db
@@ -162,7 +199,7 @@ export const appRouter = router({
       z.object({
         userID: z.string().nullish(),
         class: z.enum(["DPS", "RANGED_DPS", "TANK", "SUPPORT"]),
-        display_name: z.string(),
+        name: z.string(),
       })
     )
     .mutation(async (opts) => {
@@ -175,7 +212,7 @@ export const appRouter = router({
         .set({
           is_boarded: true,
           class: input.class,
-          display_name: input.display_name,
+          name: input.name,
         })
         .where(eq(user.id, input.userID))
         .returning({ updatedID: user.id })
@@ -295,6 +332,30 @@ export const appRouter = router({
 
       return updatedID
     }),
+  getLatestLogs: authenticatedProcedure.query(async () => {
+    const logsData = await db
+      .select()
+      .from(logs)
+      .orderBy(desc(logs.created_at))
+      .limit(20)
+
+    const logsWithUser = Promise.all(
+      logsData.map(async (log) => {
+        const [triggerUser] = await db
+          .select()
+          .from(user)
+          .where(eq(user.id, log.triggered_by))
+          .limit(20)
+
+        return {
+          ...log,
+          triggerUser,
+        }
+      })
+    )
+
+    return logsWithUser
+  }),
 })
 
 export type AppRouter = typeof appRouter

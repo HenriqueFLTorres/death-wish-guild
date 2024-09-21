@@ -38,7 +38,7 @@ function Membro() {
       onSuccess: (data) =>
         reset({
           class: data.class,
-          display_name: data.display_name ?? "",
+          name: data.name ?? "",
           image: data.image,
         }),
     }
@@ -57,12 +57,12 @@ function Membro() {
       <div className="relative z-10 flex w-full gap-4">
         <Avatar
           className="[&>span]:text-xl"
-          fallbackText={user.display_name}
+          fallbackText={user.name}
           size={92}
           src={user.image}
         />
         <div className="flex flex-col gap-1">
-          <h1 className="text-xl">{user?.display_name}</h1>
+          <h1 className="text-xl">{user?.name}</h1>
           <Badge className="w-max">{user?.role}</Badge>
 
           <span className="flex items-center gap-2 text-sm">
@@ -84,8 +84,8 @@ function Membro() {
           <dl className="flex flex-col items-end gap-2 text-end">
             <dt className="text-sm text-neutral-400">convidado por</dt>
             <dt className="flex items-center gap-2 font-bold">
-              <Avatar fallbackText="" size={24} src="/avatar/variant-1.png" />
-              Snow
+              <Avatar fallbackText="" size={24} src={user.invitedBy.image} />
+              {user.invitedBy.name}
             </dt>
           </dl>
         </div>
@@ -108,7 +108,7 @@ function Membro() {
             description="Este nome será usado em rankings, organização de eventos, lances e logs. Use o mesmo do jogo."
             title="Nome de Exibição"
           >
-            <Input {...register("display_name")} />
+            <Input {...register("name")} />
           </EditProfileField>
           <EditProfileField
             description="Você pode atualizar essa imagem com a sua atual imagem do discord ou pode fazer upload da imagem do seu personagem do jogo."
@@ -158,7 +158,7 @@ function Membro() {
 export default Membro
 
 const editProfileSchema = z.object({
-  display_name: z.string(),
+  name: z.string(),
   image: z.string().url().nullish(),
   class: z.enum(["DPS", "RANGED_DPS", "SUPPORT", "TANK"]),
 })

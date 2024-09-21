@@ -132,7 +132,7 @@ function GroupCard(props: GroupCardProps) {
             containerId={containerId}
             id={leaderId}
             image={leaderUser?.image ?? null}
-            name={leaderUser?.name ?? null}
+            name={leaderUser?.name ?? ""}
           />
         </Droppable>
 

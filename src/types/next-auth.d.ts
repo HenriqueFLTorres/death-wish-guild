@@ -8,7 +8,7 @@ declare module "next-auth" {
       is_recruited: boolean
       is_boarded: boolean
       role: "ADMIN" | "MODERATOR" | "MEMBER"
-      display_name: string
+      username: string
       class: "DPS" | "RANGED_DPS" | "TANK" | "SUPPORT"
     } & DefaultSession["user"]
   }

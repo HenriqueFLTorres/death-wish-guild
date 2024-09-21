@@ -1,7 +1,15 @@
 import { ScrollText, User } from "lucide-react"
 import { DashboardCard } from "./DashboardCard"
+import { SelectUser } from "@/db/schema"
+import { translateGameClass } from "@/lib/utils"
+import { RouterOutput, trpc } from "@/trpc-client/client"
+import { parseHTML } from "@/utils/parseHTML"
+
+type LogType = RouterOutput["getLatestLogs"][number]
 
 function LatestLogs() {
+  const { data: logs = [] } = trpc.getLatestLogs.useQuery()
+
   return (
     <DashboardCard
       className="row-span-2"
@@ -9,23 +17,66 @@ function LatestLogs() {
       title="Últimos Log’s"
     >
       <ul className="flex flex-col divide-y divide-neutral-800 px-2 py-3">
-        {Array.from(Array(5).keys()).map((index) => (
-          <li
-            className="flex flex-col gap-2 px-1 py-2.5 text-left text-xs first-of-type:pt-0 last-of-type:pb-0"
-            key={index}
-          >
-            <h3 className="inline-flex items-center gap-2 font-semibold">
-              <User size={16} /> Usuário
-            </h3>
-            <p className="[&>b]:font-semibold">
-              <b>Treffy</b> alterou sua arma secundária de <b>Tome</b> para{" "}
-              <b>Dagger</b>.
-            </p>
-          </li>
-        ))}
+        {logs.map((log) => {
+          const { Icon, title, message } = createLogObject(log)
+
+          return (
+            <li
+              className="flex flex-col gap-2 px-1 py-2.5 text-left text-xs first-of-type:pt-0 last-of-type:pb-0"
+              key={log.id}
+            >
+              <h3 className="inline-flex items-center gap-2 font-semibold">
+                <Icon size={16} /> {title}
+              </h3>
+              <p className="[&>b]:font-semibold">{parseHTML(message)}</p>
+            </li>
+          )
+        })}
       </ul>
     </DashboardCard>
   )
 }
 
 export { LatestLogs }
+
+function createLogObject(log: LogType) {
+  return {
+    Icon: User,
+    title: getLogTitle(log.category),
+    message: generateLogMessage(log),
+  }
+}
+
+function getLogTitle(category: LogType["category"]) {
+  switch (category) {
+    case "AUCTION":
+      return "Lance"
+    case "EVENTS":
+      return "Evento"
+    case "USER":
+      return "Usuário"
+    default:
+      throw new Error("Unknown log category")
+  }
+}
+
+function generateLogMessage(log: LogType) {
+  const { type } = log
+
+  switch (type) {
+    case "USER_CLASS":
+      return `<b>${log.triggerUser.name}</b> alterou sua classe de <b>${translateGameClass(log.from as SelectUser["class"])}</b> para <b>${translateGameClass(log.to as SelectUser["class"])}</b>.`
+    case "USER_NAME":
+      return `<b>${log.triggerUser.name}</b> alterou seu nome de <b>${log.from}</b> para <b>${log.to}</b>.`
+    case "PRIMARY_WEAPON":
+      return `<b>${log.triggerUser.name}</b> alterou sua arma primaria de <b>${log.from}</b> para <b>${log.to}</b>.`
+    case "SECONDARY_WEAPON":
+      return `<b>${log.triggerUser.name}</b> alterou sua arma secundária de <b>${log.from}</b> para <b>${log.to}</b>.`
+    case "POINTS":
+      return `<b>${log.triggerUser.name}</b> alterou a quantia de DKPoints de <b>${log.target_id}</b> de <b>$${log.from}</b> para <b>$${log.to}</b>.`
+    case "GUILD_JOIN":
+      return `<b>${log.target_id}</b> entrou na guilda pelo convite de <b>${log.triggerUser.name}</b>.`
+    default:
+      throw new Error("Unknown log type")
+  }
+}

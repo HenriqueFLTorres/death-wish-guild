@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   foreignKey,
   integer,
@@ -9,6 +10,8 @@ import {
   serial,
   text,
   timestamp,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core"
 
 export const aal_level = pgEnum("aal_level", ["aal1", "aal2", "aal3"])
@@ -17,7 +20,7 @@ export const code_challenge_method = pgEnum("code_challenge_method", [
   "plain",
 ])
 export const factor_status = pgEnum("factor_status", ["unverified", "verified"])
-export const factor_type = pgEnum("factor_type", ["totp", "webauthn"])
+export const factor_type = pgEnum("factor_type", ["totp", "webauthn", "phone"])
 export const one_time_token_type = pgEnum("one_time_token_type", [
   "confirmation_token",
   "reauthentication_token",
@@ -56,6 +59,28 @@ export const confirmation_type = pgEnum("confirmation_type", [
   "PER_GROUP",
 ])
 export const event_type = pgEnum("event_type", ["PVP", "PVE", "GUILD", "OTHER"])
+export const log_action = pgEnum("log_action", [
+  "CREATE",
+  "UPDATE",
+  "DELETE",
+  "FINISH",
+])
+export const log_category = pgEnum("log_category", [
+  "USER",
+  "AUCTION",
+  "EVENTS",
+])
+export const log_type = pgEnum("log_type", [
+  "USER_NAME",
+  "PRIMARY_WEAPON",
+  "SECONDARY_WEAPON",
+  "POINTS",
+  "AUCTION",
+  "BID",
+  "GUILD_JOIN",
+  "EVENT",
+  "USER_CLASS",
+])
 export const role_type = pgEnum("role_type", ["ADMIN", "MODERATOR", "MEMBER"])
 export const action = pgEnum("action", [
   "INSERT",
@@ -74,44 +99,12 @@ export const equality_op = pgEnum("equality_op", [
   "in",
 ])
 
-export const session = pgTable("session", {
-  sessionToken: text("sessionToken").primaryKey().notNull(),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "string" }).notNull(),
+export const config = pgTable("config", {
+  id: uuid("id").primaryKey().notNull(),
+  guild_id: varchar("guild_id").notNull(),
+  event_channel_id: varchar("event_channel_id").notNull(),
+  event_message_id: varchar("event_message_id").notNull(),
 })
-
-export const user = pgTable(
-  "user",
-  {
-    id: text("id").primaryKey().notNull(),
-    name: text("name"),
-    email: text("email").notNull(),
-    emailVerified: timestamp("emailVerified", { mode: "string" }),
-    image: text("image"),
-    is_recruited: boolean("is_recruited").default(false).notNull(),
-    role: role_type("role").default("MEMBER").notNull(),
-    display_name: text("display_name"),
-    class: class_type("class").default("DPS").notNull(),
-    finished_events_count: integer("finished_events_count")
-      .default(0)
-      .notNull(),
-    joined_at: timestamp("joined_at", { mode: "string" }),
-    points: integer("points").default(0).notNull(),
-    invited_by: text("invited_by"),
-    is_boarded: boolean("is_boarded").default(false).notNull(),
-  },
-  (table) => {
-    return {
-      user_invited_by_fkey: foreignKey({
-        columns: [table.invited_by],
-        foreignColumns: [table.id],
-        name: "user_invited_by_fkey",
-      }),
-    }
-  }
-)
 
 export const events = pgTable("events", {
   id: serial("id").primaryKey().notNull(),
@@ -125,6 +118,64 @@ export const events = pgTable("events", {
   groups: jsonb("groups").default({}),
   confirmed_players: text("confirmed_players").array(),
 })
+
+export const logs = pgTable("logs", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  category: log_category("category").notNull(),
+  type: log_type("type").notNull(),
+  action: log_action("action").notNull(),
+  target_id: text("target_id"),
+  from: text("from"),
+  to: text("to"),
+  triggered_by: text("triggered_by").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .defaultNow()
+    .notNull(),
+})
+
+export const seaql_migrations = pgTable("seaql_migrations", {
+  version: varchar("version").primaryKey().notNull(),
+  // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+  applied_at: bigint("applied_at", { mode: "number" }).notNull(),
+})
+
+export const session = pgTable("session", {
+  sessionToken: text("sessionToken").primaryKey().notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "string" }).notNull(),
+})
+
+export const user = pgTable(
+  "user",
+  {
+    id: text("id").primaryKey().notNull(),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    image: text("image"),
+    is_recruited: boolean("is_recruited").default(false).notNull(),
+    role: role_type("role").default("MEMBER").notNull(),
+    username: text("username"),
+    class: class_type("class").default("DPS").notNull(),
+    joined_at: timestamp("joined_at", { mode: "string" }),
+    points: integer("points").default(0).notNull(),
+    invited_by: text("invited_by"),
+    is_boarded: boolean("is_boarded").default(false).notNull(),
+    user_logs: uuid("user_logs").array(),
+    discord_id: text("discord_id"),
+    emailVerified: timestamp("emailVerified", { mode: "string" }),
+  },
+  (table) => {
+    return {
+      user_invited_by_fkey: foreignKey({
+        columns: [table.invited_by],
+        foreignColumns: [table.id],
+        name: "user_invited_by_fkey",
+      }),
+    }
+  }
+)
 
 export const user_events = pgTable(
   "user_events",
@@ -141,6 +192,26 @@ export const user_events = pgTable(
       user_events_pkey: primaryKey({
         columns: [table.user_id, table.event_id],
         name: "user_events_pkey",
+      }),
+    }
+  }
+)
+
+export const user_logs = pgTable(
+  "user_logs",
+  {
+    user_id: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    log_id: uuid("log_id")
+      .notNull()
+      .references(() => logs.id),
+  },
+  (table) => {
+    return {
+      user_logs_pkey: primaryKey({
+        columns: [table.user_id, table.log_id],
+        name: "user_logs_pkey",
       }),
     }
   }

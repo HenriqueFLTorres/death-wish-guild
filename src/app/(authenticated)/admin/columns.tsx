@@ -53,16 +53,16 @@ export const columns = (
     enableHiding: false,
   },
   {
-    accessorKey: "display_name",
+    accessorKey: "name",
     header: "Usuário",
     cell: ({ row }) => {
       const user = row.original
 
       return (
         <div className="flex items-center gap-2">
-          <Avatar fallbackText={user.display_name} src={user.image} />
+          <Avatar fallbackText={user.name} src={user.image} />
           <div className="flex flex-col gap-1">
-            <strong>{user.display_name}</strong>
+            <strong>{user.name}</strong>
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Badge

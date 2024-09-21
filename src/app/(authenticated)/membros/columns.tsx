@@ -23,16 +23,16 @@ import { translateGameClass } from "@/lib/utils"
 
 export const columns: ColumnDef<SelectUser>[] = [
   {
-    accessorKey: "display_name",
+    accessorKey: "name",
     header: () => <span className="mr-auto flex">Usuário</span>,
     cell: ({ row }) => {
       const user = row.original
 
       return (
         <div className="flex items-center gap-2">
-          <Avatar fallbackText={user.display_name} src={user.image} />
+          <Avatar fallbackText={user.name} src={user.image} />
           <div className="flex flex-col gap-1">
-            <strong className="text-left">{user.display_name}</strong>
+            <strong className="text-left">{user.name}</strong>
             <Badge
               className="h-max w-max px-2 py-1 capitalize leading-none"
               variant={user.role === "MEMBER" ? "neutral" : "primary"}
@@ -101,16 +101,16 @@ export const recruitmentColumns = ({
   rejectRecruit: ({ ID }: { ID: string }) => void
 }): ColumnDef<SelectUser>[] => [
   {
-    accessorKey: "display_name",
+    accessorKey: "name",
     header: () => <span className="mr-auto flex">Usuário</span>,
     cell: ({ row }) => {
       const user = row.original
 
       return (
         <div className="flex items-center gap-2">
-          <Avatar fallbackText={user.display_name} src={user.image} />
+          <Avatar fallbackText={user.name} src={user.image} />
           <div className="flex flex-col gap-1">
-            <strong className="text-left">{user.display_name}</strong>
+            <strong className="text-left">{user.name}</strong>
             <Badge
               className="h-max w-max px-2 py-1 capitalize leading-none"
               variant={user.role === "MEMBER" ? "neutral" : "primary"}

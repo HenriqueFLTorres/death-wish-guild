@@ -15,10 +15,7 @@ function PointsRanking() {
     >
       <ul className="flex flex-col divide-y divide-neutral-800 px-3 py-4">
         {playersByPoints.map(
-          (
-            { id, class: gameClass, display_name: name, points, image },
-            index
-          ) => (
+          ({ id, class: gameClass, name, points, image }, index) => (
             <li
               className="flex items-center gap-2 px-0.5 py-2.5 text-sm first-of-type:pt-0 last-of-type:pb-0"
               key={id}

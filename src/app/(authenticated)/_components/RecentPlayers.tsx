@@ -17,7 +17,7 @@ function RecentPlayers() {
     <DashboardCard icon={UserPlus} title="Membros Recentes">
       <ul className="flex flex-col divide-y divide-neutral-800 px-3 py-4">
         {recentPlayers.map(
-          ({ id, class: gameClass, display_name: name, joined_at, image }) => (
+          ({ id, class: gameClass, name, joined_at, image }) => (
             <li
               className="flex items-center gap-2 px-0.5 py-2.5 text-sm first-of-type:pt-0 last-of-type:pb-0"
               key={id}
