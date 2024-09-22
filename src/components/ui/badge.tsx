@@ -12,6 +12,7 @@ const badgeVariants = cva(
         neutral: "bg-neutral-600/20 border-neutral-600/40",
         success: "bg-green-600/20 border-green-600/40",
         error: "bg-red-600/20 border-red-600/40",
+        warning: "bg-amber-600/20 border-amber-600/40",
         sky: "bg-sky-600/20 border-sky-600/40",
       },
     },

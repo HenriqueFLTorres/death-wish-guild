@@ -25,13 +25,13 @@ function RankingFragment(props: RankingFragmentProps) {
       </p>
 
       <Avatar fallbackText={name} src={image} />
-      <div className="flex flex-col gap-2 leading-none">
+      <div className="flex flex-col gap-1 leading-none">
         <Link
           className={cn("hover:underline focus-visible:underline")}
           href={PATHS.MEMBRO.ID({ UUID: id })}
           target="_blank"
         >
-          <h3 className="text-base font-semibold">{name}</h3>
+          <h3 className="text-base font-semibold leading-none">{name}</h3>
         </Link>
         <p className="flex items-center gap-2">
           {translateGameClass(gameClass)}

@@ -43,7 +43,7 @@ function LogFragment(props: LogFragmentProps) {
   )
 }
 
-export { LatestLogs, LogFragment }
+export { LatestLogs, LogFragment, createLogObject }
 
 function createLogObject(log: LogType) {
   return {
