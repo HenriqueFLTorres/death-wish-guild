@@ -1,7 +1,7 @@
 import { TextSearch } from "lucide-react"
 import moment from "moment"
 import Link from "next/link"
-import { LogType, createLogObject } from "../_components/LatestLogs"
+import { LogType, createLogObject } from "../../_components/LatestLogs"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge, BadgeProps } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"

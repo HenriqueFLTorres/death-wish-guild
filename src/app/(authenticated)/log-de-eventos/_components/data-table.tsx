@@ -2,15 +2,11 @@
 
 import {
   type ColumnDef,
+  Table as TableType,
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
 } from "@tanstack/react-table"
 
-import { LogType } from "../_components/LatestLogs"
+import { LogType } from "../../_components/LatestLogs"
 import {
   Table,
   TableBody,
@@ -22,20 +18,10 @@ import {
 
 interface DataTableProps {
   columns: ColumnDef<LogType>[]
-  data: LogType[]
+  table: TableType<LogType>
 }
 
-export function DataTable({ columns, data }: DataTableProps) {
-  const table = useReactTable<LogType>({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getRowId: (row) => row.id,
-  })
-
+export function DataTable({ columns, table }: DataTableProps) {
   return (
     <div className="flex w-full flex-col gap-4 px-3 pb-4">
       <Table>

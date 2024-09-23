@@ -2,7 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table"
 import moment from "moment"
-import { LogType, createLogObject } from "../_components/LatestLogs"
+import { LogType, createLogObject } from "../../_components/LatestLogs"
 import { LogModal, getActionInfoByType } from "./LogModal"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -16,6 +16,7 @@ export const columns: ColumnDef<LogType>[] = [
   {
     accessorKey: "name",
     header: () => <span className="mr-auto flex">Categoria</span>,
+    enableHiding: false,
     cell: ({ row }) => {
       const log = row.original
       const { Icon, title } = createLogObject(log)
@@ -68,7 +69,8 @@ export const columns: ColumnDef<LogType>[] = [
   },
   {
     accessorKey: "details",
-    header: "",
+    header: "Detalhes",
+    enableHiding: false,
     cell: ({ row }) => {
       const log = row.original
 

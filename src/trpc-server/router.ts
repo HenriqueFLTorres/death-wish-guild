@@ -1,6 +1,12 @@
-import { and, asc, between, desc, eq, gte, or, sql } from "drizzle-orm"
+import { and, asc, between, desc, eq, gte, inArray, or, sql } from "drizzle-orm"
 import { z } from "zod"
-import { events, logs, user } from "../../supabase/migrations/schema"
+import {
+  events,
+  log_action,
+  log_category,
+  logs,
+  user,
+} from "../../supabase/migrations/schema"
 import { createLog } from "./utils"
 import {
   adminProcedure,
@@ -367,30 +373,54 @@ export const appRouter = router({
 
       return updatedID
     }),
-  getLatestLogs: authenticatedProcedure.query(async () => {
-    const logsData = await db
-      .select()
-      .from(logs)
-      .orderBy(desc(logs.created_at))
-      .limit(20)
-
-    const logsWithUser = Promise.all(
-      logsData.map(async (log) => {
-        const [triggerUser] = await db
-          .select()
-          .from(user)
-          .where(eq(user.id, log.triggered_by))
-          .limit(1)
-
-        return {
-          ...log,
-          triggerUser,
-        }
-      })
+  getLatestLogs: authenticatedProcedure
+    .input(
+      z
+        .object({
+          category: z.enum(log_category.enumValues).array(),
+          action: z.enum(log_action.enumValues).array(),
+        })
+        .optional()
     )
+    .query(async (opts) => {
+      const { input } = opts
 
-    return logsWithUser
-  }),
+      const categoryFilter = input?.category ?? []
+      const actionFilter = input?.action ?? []
+
+      const logsQuery = db
+        .select()
+        .from(logs)
+        .where(
+          or(
+            categoryFilter.length > 0
+              ? inArray(logs.category, categoryFilter)
+              : undefined,
+            actionFilter.length > 0
+              ? inArray(logs.action, actionFilter)
+              : undefined
+          )
+        )
+
+      const logsData = await logsQuery.orderBy(desc(logs.created_at)).limit(20)
+
+      const logsWithUser = Promise.all(
+        logsData.map(async (log) => {
+          const [triggerUser] = await db
+            .select()
+            .from(user)
+            .where(eq(user.id, log.triggered_by))
+            .limit(1)
+
+          return {
+            ...log,
+            triggerUser,
+          }
+        })
+      )
+
+      return logsWithUser
+    }),
   getLatestPlayerLogs: authenticatedProcedure
     .input(z.object({ userID: z.string().nullish() }))
     .query(async (opts) => {
