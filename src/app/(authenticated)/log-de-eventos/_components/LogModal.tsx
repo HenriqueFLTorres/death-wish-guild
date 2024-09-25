@@ -79,7 +79,9 @@ function LogModal(props: LogModalProps) {
           </div>
           <div>
             <dt>Data e Hora</dt>
-            <dd>{moment(log.created_at).format("MMMM Do YYYY, h:mm:ss a")}</dd>
+            <dd>
+              {moment.utc(log.created_at).format("MMMM Do YYYY, h:mm:ss a")}
+            </dd>
           </div>
           <div className="col-span-2">
             <dt>Mensagem</dt>

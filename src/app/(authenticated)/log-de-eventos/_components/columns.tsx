@@ -59,10 +59,18 @@ export const columns: ColumnDef<LogType>[] = [
     cell: ({ getValue }) => (
       <Tooltip>
         <TooltipTrigger>
-          <p>{moment(getValue() as number).format("LTS")}</p>
+          <p>
+            {moment
+              .utc(getValue() as number)
+              .local()
+              .format("LTS")}
+          </p>
         </TooltipTrigger>
         <TooltipContent>
-          {moment(getValue() as number).format("MMMM Do YYYY, h:mm:ss a")}
+          {moment
+            .utc(getValue() as number)
+            .local()
+            .format("MMMM Do YYYY, h:mm:ss a")}
         </TooltipContent>
       </Tooltip>
     ),

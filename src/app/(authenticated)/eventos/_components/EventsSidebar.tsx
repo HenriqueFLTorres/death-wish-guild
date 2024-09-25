@@ -36,7 +36,7 @@ function EventsSidebar() {
   const weekDays = getWeekRange(new Date())
 
   const eventsToday = events.filter((event) =>
-    moment(selectedDay).isSame(new Date(event.start_time), "day")
+    moment.utc(selectedDay).isSame(new Date(event.start_time), "day")
   )
 
   return (
@@ -58,7 +58,7 @@ function EventsSidebar() {
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
             <h2 className="text-xl font-semibold capitalize">
-              {moment(selectedDay).format("MMMM yyyy")}
+              {moment.utc(selectedDay).local().format("MMMM yyyy")}
             </h2>
             <EventsCalendar events={events} />
           </DialogContent>
@@ -117,7 +117,7 @@ function WeekDay(props: WeekDayProps) {
         onClick={() => setDate(date)}
       >
         <small className="text-xs font-normal">
-          {moment(date).format("ddd")}
+          {moment.utc(date).local().format("ddd")}
         </small>
         {date.getDate()}
       </Button>

@@ -82,10 +82,12 @@ export const columns: ColumnDef<SelectUser>[] = [
       return (
         <Tooltip>
           <TooltipTrigger>
-            <span>{moment(value).fromNow()}</span>
+            <span>{moment.utc(value).fromNow()}</span>
           </TooltipTrigger>
           <TooltipContent>
-            <span>{moment(value).format("MMMM Do YYYY, h:mm:ss a")}</span>
+            <span>
+              {moment.utc(value).local().format("MMMM Do YYYY, h:mm:ss a")}
+            </span>
           </TooltipContent>
         </Tooltip>
       )

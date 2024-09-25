@@ -35,10 +35,13 @@ function RecentPlayers() {
 
                 <Tooltip>
                   <TooltipTrigger>
-                    <p>{moment(joined_at).fromNow()}</p>
+                    <p>{moment.utc(joined_at).fromNow()}</p>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {moment(joined_at).format("MMMM Do YYYY, h:mm:ss a")}
+                    {moment
+                      .utc(joined_at)
+                      .local()
+                      .format("MMMM Do YYYY, h:mm:ss a")}
                   </TooltipContent>
                 </Tooltip>
               </div>

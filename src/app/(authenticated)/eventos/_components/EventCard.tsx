@@ -55,7 +55,7 @@ function EventCard(props: SelectEvent) {
               )}
             </div>
             <p className="shrink-0 font-semibold">
-              {moment(start_time).format("LT")}
+              {moment.utc(start_time).local().format("LT")}
             </p>
           </footer>
         </div>

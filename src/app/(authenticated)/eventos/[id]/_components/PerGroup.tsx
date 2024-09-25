@@ -139,8 +139,8 @@ function PerGroup(props: PerGroupProps) {
                 </div>
 
                 <p className="font-semibold drop-shadow">
-                  {moment(start_time).format("LT")} -{" "}
-                  {moment(start_time).fromNow()}
+                  {moment.utc(start_time).local().format("LT")} -{" "}
+                  {moment.utc(start_time).fromNow()}
                 </p>
               </div>
             </div>

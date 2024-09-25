@@ -97,10 +97,9 @@ function CalendarRow(props: CalendarRowProps) {
     ? true
     : weekDays.some((dayOfWeek) =>
         events.some((event) =>
-          moment(new Date(event.start_time)).isSame(
-            moment(dayOfWeek).add(index, "hours").toDate(),
-            "day"
-          )
+          moment
+            .utc(new Date(event.start_time))
+            .isSame(moment(dayOfWeek).add(index, "hours").toDate(), "day")
         )
       )
 
@@ -150,10 +149,9 @@ function CalendarRowDay(props: CalendarRowDayProps) {
   const { events, date, index } = props
 
   const eventsToday = events?.filter((event) =>
-    moment(new Date(event.start_time)).isSame(
-      moment(date).add(index, "hours"),
-      "hour"
-    )
+    moment
+      .utc(new Date(event.start_time))
+      .isSame(moment(date).add(index, "hours"), "hour")
   )
 
   return eventsToday?.map((event) => (
@@ -173,7 +171,7 @@ function CalendarRowDay(props: CalendarRowDayProps) {
           {event.name}
         </p>
       </span>
-      <p>{moment(new Date(event.start_time)).format("HH:mm")}</p>
+      <p>{moment.utc(new Date(event.start_time)).local().format("HH:mm")}</p>
     </Link>
   ))
 }

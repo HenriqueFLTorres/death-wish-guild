@@ -44,7 +44,7 @@ function NextEvents() {
 
             <div className="ml-auto flex flex-col gap-2 text-end leading-none">
               <p className="text-xs text-neutral-400">início em</p>
-              <p>{moment(start_time).fromNow()}</p>
+              <p>{moment.utc(start_time).fromNow()}</p>
             </div>
           </li>
         ))}
