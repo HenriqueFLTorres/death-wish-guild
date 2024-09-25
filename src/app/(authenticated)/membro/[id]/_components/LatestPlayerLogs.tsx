@@ -7,7 +7,9 @@ import { trpc } from "@/trpc-client/client"
 function LatestPlayerLogs() {
   const { id } = useParams<{ id: string }>()
 
-  const { data: logs = [] } = trpc.getLatestPlayerLogs.useQuery({ userID: id })
+  const { data: logs = [] } = trpc.logs.getLatestPlayerLogs.useQuery({
+    userID: id,
+  })
 
   return (
     <DashboardCard className="flex-1" icon={ScrollText} title="Últimos Log’s">

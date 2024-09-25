@@ -13,7 +13,7 @@ import {
 import { trpc } from "@/trpc-client/client"
 
 function Events() {
-  const { data: events = [] } = trpc.getEvents.useQuery()
+  const { data: events = [] } = trpc.events.getEvents.useQuery()
 
   const eventsSortedByDate = events.sort(
     (a, b) => Number(new Date(b.start_time)) - Number(new Date(a.start_time))

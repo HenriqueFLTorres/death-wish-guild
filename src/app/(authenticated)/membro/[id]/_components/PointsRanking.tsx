@@ -7,8 +7,9 @@ import { trpc } from "@/trpc-client/client"
 function PointsRanking() {
   const { id } = useParams<{ id: string }>()
 
-  const { data: playersByPoints = [] } = trpc.getPlayersPointsRanking.useQuery()
-  const { data: playerRank } = trpc.getPositionMember.useQuery(
+  const { data: playersByPoints = [] } =
+    trpc.user.getPlayersPointsRanking.useQuery()
+  const { data: playerRank } = trpc.user.getPositionMember.useQuery(
     {
       userID: id,
     },

@@ -7,7 +7,7 @@ import { toKebabCase } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
 
 function NextEvents() {
-  const { data: nextEvents = [] } = trpc.getNextEvents.useQuery()
+  const { data: nextEvents = [] } = trpc.events.getNextEvents.useQuery()
 
   return (
     <DashboardCard

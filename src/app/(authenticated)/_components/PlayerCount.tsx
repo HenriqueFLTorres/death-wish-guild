@@ -5,7 +5,7 @@ import { translateGameClass } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
 
 function PlayerCount() {
-  const { data: usersByClass = [] } = trpc.getPlayersByClass.useQuery()
+  const { data: usersByClass = [] } = trpc.user.getPlayersByClass.useQuery()
 
   return (
     <DashboardCard icon={Users} title="Contagem de Jogadores Ativos">

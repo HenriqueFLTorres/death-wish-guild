@@ -22,7 +22,7 @@ function EventPage(props: EventPageProps) {
   const { params } = props
   const { data: session } = useSession()
 
-  const { data: users = [] } = trpc.getUsers.useQuery()
+  const { data: users = [] } = trpc.user.getUsers.useQuery()
 
   const id = params.id
 
@@ -30,16 +30,17 @@ function EventPage(props: EventPageProps) {
     data: event,
     isLoading,
     isSuccess,
-  } = trpc.getEvent.useQuery({ id: Number(id) })
+  } = trpc.events.getEvent.useQuery({ id: Number(id) })
 
   const utils = trpc.useUtils()
-  const { mutate: confirmPresence } = trpc.confirmEvent.useMutation({
-    onSuccess: () => utils.getEvent.invalidate({ id: Number(id) }),
+  const { mutate: confirmPresence } = trpc.events.confirmEvent.useMutation({
+    onSuccess: () => utils.events.getEvent.invalidate({ id: Number(id) }),
   })
 
-  const { mutate: removePresence } = trpc.removeEventConfirmation.useMutation({
-    onSuccess: () => utils.getEvent.invalidate({ id: Number(id) }),
-  })
+  const { mutate: removePresence } =
+    trpc.events.removeEventConfirmation.useMutation({
+      onSuccess: () => utils.events.getEvent.invalidate({ id: Number(id) }),
+    })
 
   if (Boolean(isLoading) || event == null) return null
 

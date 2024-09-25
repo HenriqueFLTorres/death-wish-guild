@@ -5,11 +5,11 @@ import { DataTable } from "./data-table"
 import { trpc } from "@/trpc-client/client"
 
 function Admin() {
-  const { data: users = [] } = trpc.getUsers.useQuery()
+  const { data: users = [] } = trpc.user.getUsers.useQuery()
 
   const utils = trpc.useUtils()
-  const { mutate: mutateUserRole } = trpc.updateUserRole.useMutation({
-    onSuccess: () => utils.getUsers.invalidate(),
+  const { mutate: mutateUserRole } = trpc.user.updateUserRole.useMutation({
+    onSuccess: () => utils.user.getUsers.invalidate(),
   })
 
   return (

@@ -5,10 +5,10 @@ import { translateGameClass } from "@/lib/utils"
 import { RouterOutput, trpc } from "@/trpc-client/client"
 import { parseHTML } from "@/utils/parseHTML"
 
-export type LogType = RouterOutput["getLatestLogs"][number]
+export type LogType = RouterOutput["logs"]["getLatestLogs"][number]
 
 function LatestLogs() {
-  const { data: logs = [] } = trpc.getLatestLogs.useQuery()
+  const { data: logs = [] } = trpc.logs.getLatestLogs.useQuery()
 
   return (
     <DashboardCard

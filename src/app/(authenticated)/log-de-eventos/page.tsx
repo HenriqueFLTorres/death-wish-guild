@@ -14,7 +14,7 @@ import { LogsHeader } from "./_components/LogsHeader"
 import { trpc } from "@/trpc-client/client"
 
 function EventLogs() {
-  const { data: logs = [] } = trpc.getLatestLogs.useQuery()
+  const { data: logs = [] } = trpc.logs.getLatestLogs.useQuery()
 
   const table = useReactTable<LogType>({
     data: logs,

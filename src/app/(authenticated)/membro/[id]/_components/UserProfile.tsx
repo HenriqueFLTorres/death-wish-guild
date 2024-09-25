@@ -27,7 +27,7 @@ function UserProfile() {
 
   const { reset } = form
 
-  const { data: user } = trpc.getUser.useQuery(
+  const { data: user } = trpc.user.getUser.useQuery(
     { userID: id },
     {
       onSuccess: (data) =>
@@ -39,7 +39,7 @@ function UserProfile() {
     }
   )
 
-  const { mutate: updateUser } = trpc.updateUserInfo.useMutation()
+  const { mutate: updateUser } = trpc.user.updateUserInfo.useMutation()
 
   if (user == null) return null
 

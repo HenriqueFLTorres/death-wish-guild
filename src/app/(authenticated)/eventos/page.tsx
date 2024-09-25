@@ -5,7 +5,7 @@ import { EventsCalendar } from "./_components/EventsCalendar"
 import { trpc } from "@/trpc-client/client"
 
 function Events() {
-  const { data: events = [] } = trpc.getEventsByDay.useQuery({
+  const { data: events = [] } = trpc.events.getEventsByDay.useQuery({
     startOfDay: moment(new Date()).startOf("day").subtract(1, "days").toDate(),
     endOfDay: moment(new Date()).endOf("day").add(6, "days").toDate(),
   })

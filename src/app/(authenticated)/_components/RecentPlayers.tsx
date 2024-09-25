@@ -11,7 +11,7 @@ import { translateGameClass } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
 
 function RecentPlayers() {
-  const { data: recentPlayers = [] } = trpc.getRecentPlayers.useQuery()
+  const { data: recentPlayers = [] } = trpc.user.getRecentPlayers.useQuery()
 
   return (
     <DashboardCard icon={UserPlus} title="Membros Recentes">

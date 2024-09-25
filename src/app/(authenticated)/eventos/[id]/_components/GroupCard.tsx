@@ -57,7 +57,7 @@ interface DraggableProps {
 function Draggable(props: DraggableProps) {
   const { id, containerId, index, className } = props
 
-  const { data: users = [] } = trpc.getUsers.useQuery()
+  const { data: users = [] } = trpc.user.getUsers.useQuery()
   const currentUser = users.find((user) => user.id === id)
 
   if (id == null || currentUser == null) return null
@@ -104,7 +104,7 @@ function GroupCard(props: GroupCardProps) {
   const fullArray = Array.from(Array(6).keys())
   const leaderId = items[0]
 
-  const { data: users = [] } = trpc.getUsers.useQuery()
+  const { data: users = [] } = trpc.user.getUsers.useQuery()
 
   const leaderUser = users.find((user) => user.id === leaderId)
 

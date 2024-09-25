@@ -61,9 +61,9 @@ function CreateEvent() {
   const [isOpen, setIsOpen] = useState(false)
 
   const utils = trpc.useUtils()
-  const { mutate } = trpc.createEvent.useMutation({
+  const { mutate } = trpc.events.createEvent.useMutation({
     onSuccess: () => {
-      utils.getEvents.invalidate()
+      utils.events.getEvents.invalidate()
       setIsOpen(false)
     },
   })

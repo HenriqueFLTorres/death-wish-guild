@@ -7,16 +7,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { trpc } from "@/trpc-client/client"
 
 function Members() {
-  const { data: users = [] } = trpc.getUsers.useQuery()
+  const { data: users = [] } = trpc.user.getUsers.useQuery()
   const { data: usersForRecruitment = [] } =
-    trpc.getUsersForRecruitment.useQuery()
+    trpc.user.getUsersForRecruitment.useQuery()
 
   const utils = trpc.useUtils()
-  const { mutate: acceptRecruit } = trpc.acceptRecruit.useMutation({
-    onSuccess: () => utils.getUsers.invalidate(),
+  const { mutate: acceptRecruit } = trpc.user.acceptRecruit.useMutation({
+    onSuccess: () => utils.user.getUsers.invalidate(),
   })
-  const { mutate: rejectRecruit } = trpc.rejectRecruit.useMutation({
-    onSuccess: () => utils.getUsers.invalidate(),
+  const { mutate: rejectRecruit } = trpc.user.rejectRecruit.useMutation({
+    onSuccess: () => utils.user.getUsers.invalidate(),
   })
 
   return (

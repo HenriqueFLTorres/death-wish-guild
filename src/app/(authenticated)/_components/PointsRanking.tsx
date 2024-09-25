@@ -5,7 +5,8 @@ import { SelectUser } from "@/db/schema"
 import { trpc } from "@/trpc-client/client"
 
 function PointsRanking() {
-  const { data: playersByPoints = [] } = trpc.getPlayersPointsRanking.useQuery()
+  const { data: playersByPoints = [] } =
+    trpc.user.getPlayersPointsRanking.useQuery()
 
   return (
     <DashboardCard

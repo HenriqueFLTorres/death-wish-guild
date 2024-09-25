@@ -31,7 +31,7 @@ const onboardingSchema = z.object({
 function OnboardUser() {
   const { data: session, update } = useSession()
 
-  const { mutate } = trpc.completeOnboarding.useMutation({
+  const { mutate } = trpc.user.completeOnboarding.useMutation({
     onSuccess: async () => {
       await update({ ...session, user: { ...session?.user, is_boarded: true } })
     },

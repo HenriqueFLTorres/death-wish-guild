@@ -41,9 +41,9 @@ function PerGroup(props: PerGroupProps) {
   const { id, event, isLoading, isSuccess } = props
 
   const { data: users = [], isSuccess: isSuccessUsers } =
-    trpc.getUsers.useQuery()
+    trpc.user.getUsers.useQuery()
 
-  const { mutate: updateGroups } = trpc.updateEventGroup.useMutation()
+  const { mutate: updateGroups } = trpc.events.updateEventGroup.useMutation()
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
   const [groupData, setGroupData] = useState<Items>({
