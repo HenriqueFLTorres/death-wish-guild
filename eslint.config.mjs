@@ -1,24 +1,26 @@
-import { default as eslint, default as eslintPlugin } from "@eslint/js"
+import eslintPlugin from "@eslint/js"
 import nextPlugin from "@next/eslint-plugin-next"
 import stylisticPlugin from "@stylistic/eslint-plugin"
 import importPlugin from "eslint-plugin-import"
 import prettierPlugin from "eslint-plugin-prettier"
 import reactPlugin from "eslint-plugin-react"
 import hooksPlugin from "eslint-plugin-react-hooks"
+import unusedImportsPlugin from "eslint-plugin-unused-imports"
 import globals from "globals"
 import tseslint from "typescript-eslint"
 
 const ignores = ["node_modules/*", ".next/*"]
 
 const plugins = {
-  eslint: eslint.configs.recommended,
   react: reactPlugin,
   "react-hooks": hooksPlugin,
+  "unused-imports": unusedImportsPlugin,
   import: importPlugin,
   "@next/next": nextPlugin,
   "@stylistic": stylisticPlugin,
   prettier: prettierPlugin,
 }
+
 const config = tseslint.config(
   ...tseslint.configs.recommended,
   eslintPlugin.configs.recommended,
@@ -40,6 +42,7 @@ const config = tseslint.config(
         {
           allowString: false,
           allowNumber: false,
+          allowNullableBoolean: true,
           allowNullableObject: true,
         },
       ],
@@ -50,6 +53,7 @@ const config = tseslint.config(
         "error",
         { props: "never", children: "never" },
       ],
+      "unused-imports/no-unused-imports": "error",
     },
   },
   {
@@ -75,6 +79,8 @@ const config = tseslint.config(
       ...prettierPlugin.configs.recommended.rules,
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs["core-web-vitals"].rules,
+      "no-duplicate-imports": "error",
+      "import/no-duplicates": "error",
       "sort-imports": ["error", { ignoreDeclarationSort: true }],
       "react/jsx-sort-props": [
         "error",

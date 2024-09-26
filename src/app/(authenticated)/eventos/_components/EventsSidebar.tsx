@@ -11,6 +11,7 @@ import { EventsCalendar } from "./EventsCalendar"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getWeekRange } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
 
@@ -24,6 +25,9 @@ function EventsSidebar() {
     startOfDay: moment(new Date()).startOf("day").subtract(1, "days").toDate(),
     endOfDay: moment(new Date()).endOf("day").add(6, "days").toDate(),
   })
+
+  const { data: unfinishedEvents = [] } =
+    trpc.events.getUnfinishedEvents.useQuery()
 
   const { data: event, isSuccess } = trpc.events.getEvent.useQuery({
     id: Number(pathname.id),
@@ -65,27 +69,54 @@ function EventsSidebar() {
         </Dialog>
       </header>
 
-      <div className="flex h-full flex-col justify-between gap-4 px-2 py-3">
-        <ol className="flex w-full gap-1">
-          {weekDays.map((date) => (
-            <WeekDay
-              date={date}
-              isSelected={date.toDateString() === selectedDay.toDateString()}
-              key={date.toISOString()}
-              setDate={setSelectedDay}
-            />
-          ))}
-        </ol>
+      <div className="flex grow flex-col justify-between gap-4 overflow-auto px-2 py-3">
+        <Tabs className="flex grow flex-col overflow-hidden">
+          <TabsList className="flex">
+            <TabsTrigger value="next-events">Próximos Eventos</TabsTrigger>
+            <TabsTrigger value="to-be-finished">
+              Esperando Finalizar
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent
+            className="flex grow overflow-hidden"
+            value="next-events"
+          >
+            <ol className="flex w-full gap-1">
+              {weekDays.map((date) => (
+                <WeekDay
+                  date={date}
+                  isSelected={
+                    date.toDateString() === selectedDay.toDateString()
+                  }
+                  key={date.toISOString()}
+                  setDate={setSelectedDay}
+                />
+              ))}
+            </ol>
 
-        <ScrollArea className="h-full">
-          <ol className="flex flex-col gap-4">
-            {eventsToday?.map((event) => (
-              <EventCard key={event.id} {...event} />
-            ))}
-          </ol>
-        </ScrollArea>
+            <ScrollArea className="h-full">
+              <ol className="flex flex-col gap-4">
+                {eventsToday?.map((event) => (
+                  <EventCard key={event.id} {...event} />
+                ))}
+              </ol>
+            </ScrollArea>
+          </TabsContent>
+          <TabsContent
+            className="flex grow overflow-hidden"
+            value="to-be-finished"
+          >
+            <ScrollArea className="h-full">
+              <ol className="flex flex-col gap-4">
+                {unfinishedEvents?.map((event) => (
+                  <EventCard key={event.id} {...event} />
+                ))}
+              </ol>
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
 
-        <div className="flex flex-col gap-2.5">
+        <div className="flex grow flex-col justify-end gap-2.5">
           <Button className="cursor-default" variant="secondary-flat">
             <BellRing size={16} />
             Sistema de Notificações

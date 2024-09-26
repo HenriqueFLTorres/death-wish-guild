@@ -18,7 +18,7 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
     return (
       <div
         className={cn(
-          "relative flex h-8 shrink-0 items-center gap-2 overflow-hidden rounded-full border-2 border-black/10 bg-black/20 px-2 py-1",
+          "relative flex h-8 grow items-center gap-2 overflow-hidden rounded-full border-2 border-black/10 bg-black/20 px-2 py-1",
           className
         )}
         ref={ref}
@@ -39,7 +39,7 @@ const PlayerListItemComponent = forwardRef<HTMLDivElement, PlayerListItemProps>(
           width={36}
         />
 
-        <p className="text-with-gradient relative z-10 bg-gradient-to-b from-white to-neutral-300 text-sm font-medium">
+        <p className="text-with-gradient relative z-10 line-clamp-1 text-ellipsis whitespace-nowrap bg-gradient-to-b from-white to-neutral-300 text-sm font-medium">
           {name}
         </p>
 

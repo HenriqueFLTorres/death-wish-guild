@@ -117,6 +117,7 @@ export const events = pgTable("events", {
   event_type: event_type("event_type").notNull(),
   groups: jsonb("groups").default({}),
   confirmed_players: text("confirmed_players").array(),
+  is_finished: boolean("is_finished").default(false).notNull(),
 })
 
 export const logs = pgTable("logs", {
@@ -165,6 +166,9 @@ export const user = pgTable(
     user_logs: uuid("user_logs").array(),
     discord_id: text("discord_id"),
     emailVerified: timestamp("emailVerified", { mode: "string" }),
+    finished_events_count: integer("finished_events_count")
+      .default(0)
+      .notNull(),
   },
   (table) => {
     return {

@@ -1,7 +1,7 @@
-import { asc, between, eq, gte, sql } from "drizzle-orm"
+import { and, asc, between, eq, gte, lte, sql } from "drizzle-orm"
 import { z } from "zod"
 import { adminProcedure, authenticatedProcedure, router } from ".."
-import { events, user } from "../../../supabase/migrations/schema"
+import { events, user, user_events } from "../../../supabase/migrations/schema"
 import { db } from "@/db"
 
 export const eventRouter = router({
@@ -41,6 +41,20 @@ export const eventRouter = router({
 
       return eventsData
     }),
+  getUnfinishedEvents: adminProcedure.query(async () => {
+    const eventsData = await db
+      .select()
+      .from(events)
+      .where(
+        and(
+          lte(events.start_time, new Date().toDateString()),
+          eq(events.is_finished, false)
+        )
+      )
+      .orderBy(asc(events.start_time))
+
+    return eventsData
+  }),
   getNextEvents: authenticatedProcedure.query(async () => {
     const eventsData = await db
       .select()
@@ -116,6 +130,36 @@ export const eventRouter = router({
         })
         .where(eq(events.id, eventID))
         .returning({ updatedID: user.id })
+
+      return updatedID
+    }),
+  finishEvent: adminProcedure
+    .input(z.object({ id: z.number(), confirmedPlayers: z.string().array() }))
+    .mutation(async (opts) => {
+      const { input, ctx } = opts
+
+      if (ctx.session?.user.role !== "ADMIN") throw new Error("Unauthorized")
+
+      const [{ updatedID }] = await db
+        .update(events)
+        .set({ is_finished: true, confirmed_players: input.confirmedPlayers })
+        .where(and(eq(events.id, input.id), eq(events.is_finished, false)))
+        .returning({ updatedID: events.id })
+
+      await Promise.all(
+        input.confirmedPlayers.map(async (playerID) => {
+          await db.insert(user_events).values({
+            user_id: playerID,
+            event_id: updatedID,
+          })
+          await db
+            .update(user)
+            .set({
+              finished_events_count: sql`${user.finished_events_count} + 1`,
+            })
+            .where(eq(user.id, playerID))
+        })
+      )
 
       return updatedID
     }),
