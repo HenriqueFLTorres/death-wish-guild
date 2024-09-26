@@ -14,9 +14,6 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Death Wish - Guilda",
-  icons: {
-    icon: "/favicon.ico",
-  },
 }
 
 export default function RootLayout({
