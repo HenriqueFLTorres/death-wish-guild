@@ -20,6 +20,7 @@ function EventsSidebar() {
   const pathname = useParams<{ id: string }>()
 
   const { data: session } = useSession()
+  const isAdmin = session?.user.role === "ADMIN"
 
   const { data: events = [] } = trpc.events.getEventsByDay.useQuery({
     startOfDay: moment(new Date()).startOf("day").subtract(1, "days").toDate(),
@@ -29,9 +30,12 @@ function EventsSidebar() {
   const { data: unfinishedEvents = [] } =
     trpc.events.getUnfinishedEvents.useQuery()
 
-  const { data: event, isSuccess } = trpc.events.getEvent.useQuery({
-    id: Number(pathname.id),
-  })
+  const { data: event, isSuccess } = trpc.events.getEvent.useQuery(
+    {
+      id: Number(pathname.id),
+    },
+    { enabled: pathname.id != null }
+  )
 
   useEffect(() => {
     if (isSuccess) setSelectedDay(new Date(event.start_time))
@@ -70,15 +74,22 @@ function EventsSidebar() {
       </header>
 
       <div className="flex grow flex-col justify-between gap-4 overflow-auto px-2 py-3">
-        <Tabs className="flex grow flex-col overflow-hidden">
-          <TabsList className="flex">
-            <TabsTrigger value="next-events">Próximos Eventos</TabsTrigger>
-            <TabsTrigger value="to-be-finished">
-              Esperando Finalizar
-            </TabsTrigger>
-          </TabsList>
+        <Tabs
+          className="flex grow flex-col overflow-hidden"
+          defaultValue="next-events"
+        >
+          {isAdmin ? (
+            <TabsList className="flex">
+              <TabsTrigger className="w-full text-xs" value="next-events">
+                Próximos Eventos
+              </TabsTrigger>
+              <TabsTrigger className="w-full text-xs" value="to-be-finished">
+                Esperando Finalizar
+              </TabsTrigger>
+            </TabsList>
+          ) : null}
           <TabsContent
-            className="flex grow overflow-hidden"
+            className="flex grow flex-col gap-4 overflow-hidden"
             value="next-events"
           >
             <ol className="flex w-full gap-1">

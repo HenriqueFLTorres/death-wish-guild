@@ -78,6 +78,14 @@ function UserProfile() {
             </Button>
           </div>
           <InvitedBy invitedBy={user.invitedBy} />
+          <dl className="grid grid-cols-[auto,auto] justify-center gap-2 text-end">
+            <dt className="text-sm text-neutral-400">eventos finalizados</dt>
+            <dt className="flex items-center gap-2 font-bold">
+              {user.finished_events_count}
+            </dt>
+            <dt className="text-sm text-neutral-400">pontos</dt>
+            <dt className="flex items-center gap-2 font-bold">{user.points}</dt>
+          </dl>
         </div>
       </div>
 

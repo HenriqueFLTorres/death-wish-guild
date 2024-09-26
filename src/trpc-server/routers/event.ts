@@ -72,6 +72,7 @@ export const eventRouter = router({
         name: z.string(),
         confirmation_type: z.enum(["PER_PLAYER", "PER_GROUP"]),
         event_type: z.enum(["PVP", "PVE", "GUILD", "OTHER"]),
+        points_for_completion: z.number(),
       })
     )
     .mutation(async (opts) => {
@@ -110,7 +111,12 @@ export const eventRouter = router({
         .set({
           confirmed_players: sql`array_append(confirmed_players, ${userID})`,
         })
-        .where(eq(events.id, eventID))
+        .where(
+          and(
+            eq(events.id, eventID),
+            gte(events.start_time, new Date().toDateString())
+          )
+        )
         .returning({ updatedID: user.id })
 
       return updatedID
@@ -140,11 +146,14 @@ export const eventRouter = router({
 
       if (ctx.session?.user.role !== "ADMIN") throw new Error("Unauthorized")
 
-      const [{ updatedID }] = await db
+      const [{ updatedID, pointsForCompletion }] = await db
         .update(events)
         .set({ is_finished: true, confirmed_players: input.confirmedPlayers })
         .where(and(eq(events.id, input.id), eq(events.is_finished, false)))
-        .returning({ updatedID: events.id })
+        .returning({
+          updatedID: events.id,
+          pointsForCompletion: events.points_for_completion,
+        })
 
       await Promise.all(
         input.confirmedPlayers.map(async (playerID) => {
@@ -156,6 +165,7 @@ export const eventRouter = router({
             .update(user)
             .set({
               finished_events_count: sql`${user.finished_events_count} + 1`,
+              points: sql`${user.points} + ${pointsForCompletion}`,
             })
             .where(eq(user.id, playerID))
         })

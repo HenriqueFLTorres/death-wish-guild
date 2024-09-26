@@ -118,6 +118,7 @@ export const events = pgTable("events", {
   groups: jsonb("groups").default({}),
   confirmed_players: text("confirmed_players").array(),
   is_finished: boolean("is_finished").default(false).notNull(),
+  points_for_completion: integer("points_for_completion").default(0).notNull(),
 })
 
 export const logs = pgTable("logs", {

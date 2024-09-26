@@ -28,6 +28,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
@@ -49,11 +50,13 @@ export const eventSchema = createInsertSchema(events)
     id: true,
     confirmed_players: true,
     groups: true,
+    points_for_completion: true,
   })
   .and(
     z.object({
       start_time: z.object({ hour: z.number(), minute: z.number() }),
       start_date: z.date(),
+      points_for_completion: z.number().int().positive(),
     })
   )
 
@@ -74,6 +77,7 @@ function CreateEvent() {
       start_date: moment(new Date()).startOf("day").toDate(),
       confirmation_type: "PER_GROUP",
       event_type: "GUILD",
+      points_for_completion: 0,
     },
   })
 
@@ -204,6 +208,25 @@ function CreateEvent() {
                       </SelectContent>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="points_for_completion"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pontos por Conclusão</FormLabel>
+
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(e) =>
+                      field.onChange(e.currentTarget.valueAsNumber)
+                    }
+                  />
                   <FormMessage />
                 </FormItem>
               )}
