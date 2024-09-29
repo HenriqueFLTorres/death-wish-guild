@@ -99,13 +99,6 @@ export const equality_op = pgEnum("equality_op", [
   "in",
 ])
 
-export const config = pgTable("config", {
-  id: uuid("id").primaryKey().notNull(),
-  guild_id: varchar("guild_id").notNull(),
-  event_channel_id: varchar("event_channel_id").notNull(),
-  event_message_id: varchar("event_message_id").notNull(),
-})
-
 export const events = pgTable("events", {
   id: serial("id").primaryKey().notNull(),
   start_time: timestamp("start_time", {
@@ -133,12 +126,6 @@ export const logs = pgTable("logs", {
   created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
     .defaultNow()
     .notNull(),
-})
-
-export const seaql_migrations = pgTable("seaql_migrations", {
-  version: varchar("version").primaryKey().notNull(),
-  // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-  applied_at: bigint("applied_at", { mode: "number" }).notNull(),
 })
 
 export const session = pgTable("session", {
@@ -181,6 +168,26 @@ export const user = pgTable(
     }
   }
 )
+
+export const bot_config = pgTable("bot_config", {
+  id: uuid("id").primaryKey().notNull(),
+  guild_id: varchar("guild_id").notNull(),
+  event_channel_id: varchar("event_channel_id").notNull(),
+  event_message_id: varchar("event_message_id").notNull(),
+  staff_roles_id: integer("staff_roles_id").array().notNull(),
+})
+
+export const seaql_migrations = pgTable("seaql_migrations", {
+  version: varchar("version").primaryKey().notNull(),
+  // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+  applied_at: bigint("applied_at", { mode: "number" }).notNull(),
+})
+
+export const guild = pgTable("guild", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  name: text("name").notNull(),
+  message_of_the_day: text("message_of_the_day"),
+})
 
 export const user_events = pgTable(
   "user_events",

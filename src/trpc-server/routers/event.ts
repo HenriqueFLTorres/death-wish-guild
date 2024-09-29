@@ -1,4 +1,5 @@
-import { and, asc, between, eq, gte, lte, sql } from "drizzle-orm"
+import { and, asc, between, count, eq, gte, lte, sql } from "drizzle-orm"
+import moment from "moment"
 import { z } from "zod"
 import { adminProcedure, authenticatedProcedure, router } from ".."
 import { events, user, user_events } from "../../../supabase/migrations/schema"
@@ -64,6 +65,22 @@ export const eventRouter = router({
       .limit(5)
 
     return eventsData
+  }),
+  getTodaysEventsCount: authenticatedProcedure.query(async () => {
+    const [eventsCount] = await db
+      .select({ count: count() })
+      .from(events)
+      .where(
+        and(
+          gte(events.start_time, new Date().toDateString()),
+          lte(
+            events.start_time,
+            moment(new Date()).endOf("day").toDate().toDateString()
+          )
+        )
+      )
+
+    return eventsCount.count
   }),
   createEvent: adminProcedure
     .input(

@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { PATHS } from "@/lib/constants/paths"
-import { cn, translateGameClass } from "@/lib/utils"
+import { translateGameClass } from "@/lib/utils"
 import { parseHTML } from "@/utils/parseHTML"
 
 interface LogModalProps {
@@ -51,7 +51,7 @@ function LogModal(props: LogModalProps) {
               />
               <div className="flex flex-col gap-1 leading-none">
                 <Link
-                  className={cn("hover:underline focus-visible:underline")}
+                  className="hover:underline focus-visible:underline"
                   href={PATHS.MEMBRO.ID({ UUID: log.triggerUser.id })}
                   target="_blank"
                 >

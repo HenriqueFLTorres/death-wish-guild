@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   LogOut,
   type LucideIcon,
-  OctagonAlert,
   ScrollText,
   Users,
 } from "lucide-react"
@@ -16,9 +15,12 @@ import { redirect, usePathname } from "next/navigation"
 
 import { signIn, signOut, useSession } from "next-auth/react"
 import { useState } from "react"
+import { MessageOfTheDay } from "./MessageOfTheDay"
 import { Avatar } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { PATHS } from "@/lib/constants/paths"
+import { cn, translateRole } from "@/lib/utils"
+import { trpc } from "@/trpc-client/client"
 
 type NavegationLink = {
   icon: LucideIcon
@@ -68,6 +70,7 @@ const Sidebar = () => {
   const [isMouseOver, setIsMouseOver] = useState(false)
 
   const { data: session, status } = useSession()
+  const { data: eventsCount = 0 } = trpc.events.getTodaysEventsCount.useQuery()
 
   if (status === "unauthenticated") signIn("discord", { callbackUrl: "/" })
   if (session?.user.is_recruited === false) return redirect("/auth/onboarding")
@@ -81,7 +84,7 @@ const Sidebar = () => {
       onMouseLeave={() => setIsMouseOver(false)}
       onMouseOver={() => setIsMouseOver(true)}
     >
-      <div className="relative flex w-full flex-col items-center overflow-hidden px-2.5 pt-4">
+      <div className="relative flex w-full flex-col items-center overflow-x-clip px-2.5 pt-4">
         <Image
           alt=""
           className={cn(
@@ -123,26 +126,20 @@ const Sidebar = () => {
             className="absolute transition-transform duration-300 data-[isover=true]:translate-y-6"
             data-isover={isMouseOver}
           >
-            +3
+            {eventsCount}
           </span>
           <span
             className="absolute flex -translate-y-6 items-center gap-3 transition-transform duration-300 data-[isover=true]:translate-y-0"
             data-isover={isMouseOver}
           >
-            <CalendarRange size={24} /> 3 Eventos hoje
+            <CalendarRange size={24} /> {eventsCount} Eventos hoje
           </span>
         </Button>
 
-        <div
-          className="flex w-full min-w-[calc(16rem-1.5rem)] -translate-x-full flex-col items-center gap-3 rounded-lg border border-black/60 bg-black/40 p-3 opacity-0 transition-[opacity,_transform] duration-300 hover:z-10 data-[isover=true]:translate-x-0 data-[isover=true]:opacity-100"
-          data-isover={isMouseOver}
-        >
-          <OctagonAlert size={24} />
-          <p className="text-center text-sm font-medium text-neutral-100">
-            Evento Guild vs Guild hoje, peço que todos estejam no guild base 15
-            minutos antes!
-          </p>
-        </div>
+        <MessageOfTheDay
+          isAdmin={session?.user.role === "ADMIN"}
+          isMouseOver={isMouseOver}
+        />
       </div>
 
       <ul className="absolute top-1/2 flex w-full -translate-y-1/3 flex-col gap-3 px-2.5">
@@ -163,8 +160,13 @@ const Sidebar = () => {
                 src={session.user.image}
               />
               <div className="flex flex-col gap-0.5 text-neutral-100">
-                <p className="font-semibold">{session.user.name}</p>
-                <p className="text-xs">{session.user.role}</p>
+                <Link
+                  className="font-semibold hover:underline focus-visible:underline"
+                  href={PATHS.MEMBRO.ID({ UUID: session.user.id })}
+                >
+                  {session.user.name}
+                </Link>
+                <p className="text-xs">{translateRole(session.user.role)}</p>
               </div>
             </div>
 
