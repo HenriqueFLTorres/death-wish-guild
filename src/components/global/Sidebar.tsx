@@ -1,16 +1,12 @@
 "use client"
 
 import {
-  Backpack,
-  BookLock,
   CalendarDays,
   CalendarRange,
-  Crown,
   LayoutDashboard,
   LogOut,
   type LucideIcon,
   OctagonAlert,
-  Scale,
   ScrollText,
   Users,
 } from "lucide-react"
@@ -28,7 +24,6 @@ type NavegationLink = {
   icon: LucideIcon
   label: string
   path: string
-  isAdmin?: boolean
 }
 
 const links: NavegationLink[] = [
@@ -47,31 +42,25 @@ const links: NavegationLink[] = [
     label: "Membros",
     path: "/membros",
   },
-  {
-    icon: Crown,
-    label: "Ranking",
-    path: "/ranking",
-  },
-  {
-    icon: Backpack,
-    label: "Gerenciar Items",
-    path: "/gerenciar-items",
-  },
-  {
-    icon: Scale,
-    label: "Leilão",
-    path: "/leilao",
-  },
+  // {
+  //   icon: Crown,
+  //   label: "Ranking",
+  //   path: "/ranking",
+  // },
+  // {
+  //   icon: Backpack,
+  //   label: "Gerenciar Items",
+  //   path: "/gerenciar-items",
+  // },
+  // {
+  //   icon: Scale,
+  //   label: "Leilão",
+  //   path: "/leilao",
+  // },
   {
     icon: ScrollText,
     label: "Log de Eventos",
     path: "/log-de-eventos",
-  },
-  {
-    icon: BookLock,
-    label: "Admin Dashboard",
-    path: "/admin",
-    isAdmin: true,
   },
 ]
 
@@ -82,8 +71,6 @@ const Sidebar = () => {
 
   if (status === "unauthenticated") signIn("discord", { callbackUrl: "/" })
   if (session?.user.is_recruited === false) return redirect("/auth/onboarding")
-
-  const isUserAdmin = session?.user.role === "ADMIN"
 
   return (
     <aside
@@ -160,12 +147,7 @@ const Sidebar = () => {
 
       <ul className="absolute top-1/2 flex w-full -translate-y-1/3 flex-col gap-3 px-2.5">
         {links.map((props) => (
-          <NavLink
-            isMouseOver={isMouseOver}
-            isUserAdmin={isUserAdmin}
-            key={props.label}
-            {...props}
-          />
+          <NavLink isMouseOver={isMouseOver} key={props.label} {...props} />
         ))}
       </ul>
 
@@ -204,23 +186,13 @@ const Sidebar = () => {
 export { Sidebar }
 
 interface NavLinkProps extends NavegationLink {
-  isUserAdmin: boolean
   isMouseOver: boolean
 }
 
 function NavLink(props: NavLinkProps) {
-  const {
-    icon: Icon,
-    label,
-    path,
-    isAdmin = false,
-    isUserAdmin,
-    isMouseOver,
-  } = props
+  const { icon: Icon, label, path, isMouseOver } = props
 
   const pathname = usePathname()
-
-  if (isAdmin && !isUserAdmin) return null
 
   const isInPath =
     (path === "/" && pathname === "/") ||
