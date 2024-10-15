@@ -3,6 +3,13 @@ import Image from "next/image"
 import { DashboardCard } from "./DashboardCard"
 import { Badge } from "@/components/ui/badge"
 
+export interface ItemsType {
+  name: string | null
+  id: string
+  trait: string | null
+  added_at: string
+}
+
 function RecentDrops() {
   return (
     <DashboardCard icon={Scale} title="Drops Recentes">
