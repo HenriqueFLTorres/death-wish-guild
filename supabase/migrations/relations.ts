@@ -1,13 +1,26 @@
 import { relations } from "drizzle-orm/relations"
 import {
   account,
+  auction,
   events,
+  item,
   logs,
   session,
   user,
   user_events,
   user_logs,
 } from "./schema"
+
+export const auctionRelations = relations(auction, ({ one }) => ({
+  item: one(item, {
+    fields: [auction.item_id],
+    references: [item.id],
+  }),
+}))
+
+export const itemRelations = relations(item, ({ many }) => ({
+  auctions: many(auction),
+}))
 
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {

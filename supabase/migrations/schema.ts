@@ -1,5 +1,4 @@
 import {
-  bigint,
   boolean,
   foreignKey,
   integer,
@@ -11,7 +10,6 @@ import {
   text,
   timestamp,
   uuid,
-  varchar,
 } from "drizzle-orm/pg-core"
 
 export const aal_level = pgEnum("aal_level", ["aal1", "aal2", "aal3"])
@@ -99,11 +97,26 @@ export const equality_op = pgEnum("equality_op", [
   "in",
 ])
 
-export const config = pgTable("config", {
-  id: uuid("id").primaryKey().notNull(),
-  guild_id: varchar("guild_id").notNull(),
-  event_channel_id: varchar("event_channel_id").notNull(),
-  event_message_id: varchar("event_message_id").notNull(),
+export const auction = pgTable("auction", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  current_max_bid: integer("current_max_bid"),
+  class_type: class_type("biddable_classes").array(),
+  start_price: integer("start_price").default(1),
+  start_time: timestamp("start_time", { withTimezone: true, mode: "string" }),
+  end_time: timestamp("end_time", { withTimezone: true, mode: "string" }),
+  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .defaultNow()
+    .notNull(),
+  item_id: uuid("item_id").references(() => item.id),
+})
+
+export const item = pgTable("item", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  name: text("name"),
+  trait: text("trait"),
+  added_at: timestamp("added_at", { withTimezone: true, mode: "string" })
+    .defaultNow()
+    .notNull(),
 })
 
 export const events = pgTable("events", {
@@ -133,12 +146,6 @@ export const logs = pgTable("logs", {
   created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
     .defaultNow()
     .notNull(),
-})
-
-export const seaql_migrations = pgTable("seaql_migrations", {
-  version: varchar("version").primaryKey().notNull(),
-  // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-  applied_at: bigint("applied_at", { mode: "number" }).notNull(),
 })
 
 export const session = pgTable("session", {
@@ -181,6 +188,12 @@ export const user = pgTable(
     }
   }
 )
+
+export const guild = pgTable("guild", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  name: text("name").notNull(),
+  message_of_the_day: text("message_of_the_day"),
+})
 
 export const user_events = pgTable(
   "user_events",
