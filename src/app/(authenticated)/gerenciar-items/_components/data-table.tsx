@@ -6,7 +6,7 @@ import {
   flexRender,
 } from "@tanstack/react-table"
 
-import { ItemsType } from "../../_components/RecentDrops"
+import { ItemType } from "../../_components/RecentDrops"
 import {
   Table,
   TableBody,
@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/table"
 
 interface DataTableProps {
-  columns: ColumnDef<ItemsType>[]
-  table: TableType<ItemsType>
+  columns: ColumnDef<ItemType>[]
+  table: TableType<ItemType>
 }
 
 export function DataTable({ columns, table }: DataTableProps) {

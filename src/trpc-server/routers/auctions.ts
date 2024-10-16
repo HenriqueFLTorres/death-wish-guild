@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { adminProcedure, authenticatedProcedure, router } from ".."
-import { auction } from "../../../supabase/migrations/schema"
+import { auctions } from "../../../supabase/migrations/schema"
 import { db } from "@/db"
 import { classesEnum } from "@/types/classes"
 
@@ -17,17 +17,17 @@ export const auctionRouter = router({
 
       const [targetAuction] = await db
         .select()
-        .from(auction)
-        .where(eq(auction.id, input.auctionID))
+        .from(auctions)
+        .where(eq(auctions.id, input.auctionID))
         .limit(1)
 
       return targetAuction
     }),
 
   getAuctions: authenticatedProcedure.query(async () => {
-    const auctions = await db.select().from(auction)
+    const guildAuctions = await db.select().from(auctions)
 
-    return auctions
+    return guildAuctions
   }),
 
   createAuction: adminProcedure
@@ -43,7 +43,7 @@ export const auctionRouter = router({
     .mutation(async (opts) => {
       const { input } = opts
 
-      const [insertedID] = await db.insert(auction).values(input)
+      const [insertedID] = await db.insert(auctions).values(input)
 
       return insertedID
     }),

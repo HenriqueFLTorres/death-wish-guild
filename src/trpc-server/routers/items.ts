@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { adminProcedure, authenticatedProcedure, router } from ".."
-import { item } from "../../../supabase/migrations/schema"
+import { items, user } from "../../../supabase/migrations/schema"
 import { db } from "@/db"
 import { traitsEnum } from "@/types/traits"
 
@@ -17,28 +17,39 @@ export const itemRouter = router({
 
       const [targetItem] = await db
         .select()
-        .from(item)
-        .where(eq(item.id, input.itemID))
+        .from(items)
+        .where(eq(items.id, input.itemID))
         .limit(1)
 
       return targetItem
     }),
 
   getItems: authenticatedProcedure.query(async () => {
-    const items = await db.select().from(item)
+    const guildItems = await db
+      .select({
+        id: items.id,
+        name: items.name,
+        trait: items.trait,
+        acquired_by: user.name,
+        added_at: items.added_at,
+      })
+      .from(items)
+      .leftJoin(user, eq(items.acquired_by, user.id))
 
-    return items
+    return guildItems
   }),
 
   addItem: adminProcedure
-    .input(z.object({ name: z.string(), trait: traitsEnum }))
+    .input(
+      z.object({ name: z.string(), trait: traitsEnum, acquired_by: z.string() })
+    )
     .mutation(async (opts) => {
       const { input } = opts
 
       const [{ insertedID }] = await db
-        .insert(item)
+        .insert(items)
         .values(input)
-        .returning({ insertedID: item.id })
+        .returning({ insertedID: items.id })
 
       return insertedID
     }),

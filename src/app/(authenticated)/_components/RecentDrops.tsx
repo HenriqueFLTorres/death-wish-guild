@@ -3,7 +3,7 @@ import Image from "next/image"
 import { DashboardCard } from "./DashboardCard"
 import { Badge } from "@/components/ui/badge"
 
-export interface ItemsType {
+export interface ItemType {
   name: string | null
   id: string
   trait: string | null

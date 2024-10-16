@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ItemsType } from "../_components/RecentDrops"
+import { ItemType } from "../_components/RecentDrops"
 import { columns } from "./_components/columns"
 import { DataTable } from "./_components/data-table"
 import { ItemsHeader } from "./_components/ItemsHeader"
@@ -16,7 +16,7 @@ import { trpc } from "@/trpc-client/client"
 export default function Inventory() {
   const { data: items = [] } = trpc.items.getItems.useQuery()
 
-  const table = useReactTable<ItemsType>({
+  const table = useReactTable<ItemType>({
     data: items,
     columns,
     getCoreRowModel: getCoreRowModel(),

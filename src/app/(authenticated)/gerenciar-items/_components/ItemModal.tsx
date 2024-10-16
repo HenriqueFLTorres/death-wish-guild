@@ -1,4 +1,5 @@
 import { Swords } from "lucide-react"
+import { useState } from "react"
 import { ItemForm } from "./ItemForm"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,8 +11,10 @@ import {
 } from "@/components/ui/dialog"
 
 export function ItemModal() {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Adicionar Item</Button>
       </DialogTrigger>
@@ -20,7 +23,7 @@ export function ItemModal() {
           <Swords /> <p>Adicionar Item</p>
         </DialogTitle>
         <dl>
-          <ItemForm />
+          <ItemForm setIsOpen={setIsOpen} />
         </dl>
         <DialogFooter></DialogFooter>
       </DialogContent>

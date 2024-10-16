@@ -1,23 +1,23 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ItemsType } from "../../_components/RecentDrops"
+import { ItemType } from "../../_components/RecentDrops"
 
-export const columns: ColumnDef<ItemsType>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
+export const columns: ColumnDef<ItemType>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Nome",
   },
   {
     accessorKey: "trait",
     header: "Trait",
   },
   {
+    accessorKey: "acquired_by",
+    header: "Adquirido por",
+  },
+  {
     accessorKey: "added_at",
-    header: "Added At",
+    header: "Adicionado Em",
   },
 ]

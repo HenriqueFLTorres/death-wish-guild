@@ -97,7 +97,7 @@ export const equality_op = pgEnum("equality_op", [
   "in",
 ])
 
-export const auction = pgTable("auction", {
+export const auctions = pgTable("auctions", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   current_max_bid: integer("current_max_bid"),
   class_type: class_type("biddable_classes").array(),
@@ -107,16 +107,7 @@ export const auction = pgTable("auction", {
   created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
     .defaultNow()
     .notNull(),
-  item_id: uuid("item_id").references(() => item.id),
-})
-
-export const item = pgTable("item", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  name: text("name"),
-  trait: text("trait"),
-  added_at: timestamp("added_at", { withTimezone: true, mode: "string" })
-    .defaultNow()
-    .notNull(),
+  item_id: uuid("item_id").references(() => items.id),
 })
 
 export const events = pgTable("events", {
@@ -154,6 +145,18 @@ export const session = pgTable("session", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "string" }).notNull(),
+})
+
+export const items = pgTable("items", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  name: text("name"),
+  trait: text("trait"),
+  added_at: timestamp("added_at", { withTimezone: true, mode: "string" })
+    .defaultNow()
+    .notNull(),
+  acquired_by: text("acquired_by")
+    .notNull()
+    .references(() => user.id),
 })
 
 export const user = pgTable(

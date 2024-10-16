@@ -1,4 +1,4 @@
-import { auctionRouter } from "./routers/auction"
+import { auctionRouter } from "./routers/auctions"
 import { eventRouter } from "./routers/event"
 import { itemRouter } from "./routers/items"
 import { logRouter } from "./routers/logs"

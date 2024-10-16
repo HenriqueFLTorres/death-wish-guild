@@ -1,6 +1,6 @@
 import { HeaderContext, Table, flexRender } from "@tanstack/react-table"
 import { Backpack } from "lucide-react"
-import { ItemsType } from "../../_components/RecentDrops"
+import { ItemType } from "../../_components/RecentDrops"
 import { ItemModal } from "./ItemModal"
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 interface ItemsHeaderProps {
-  table: Table<ItemsType>
+  table: Table<ItemType>
 }
 
 function ItemsHeader(props: ItemsHeaderProps) {
@@ -33,7 +33,7 @@ function ItemsHeader(props: ItemsHeaderProps) {
 export { ItemsHeader }
 
 interface ColumnsTogglerProps {
-  table: Table<ItemsType>
+  table: Table<ItemType>
 }
 
 function ColumnsToggler(props: ColumnsTogglerProps) {
@@ -60,7 +60,7 @@ function ColumnsToggler(props: ColumnsTogglerProps) {
               >
                 {flexRender(
                   column.columnDef.header,
-                  undefined as unknown as HeaderContext<ItemsType, unknown>
+                  undefined as unknown as HeaderContext<ItemType, unknown>
                 )}
               </DropdownMenuCheckboxItem>
             ))}
