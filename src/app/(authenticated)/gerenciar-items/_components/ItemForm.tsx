@@ -50,9 +50,9 @@ interface ItemFormProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export function ItemForm({ setIsOpen }: ItemFormProps) {
+export function ItemForm(props: ItemFormProps) {
   const addItem = trpc.items.addItem.useMutation({
-    onSuccess: () => setIsOpen(false),
+    onSuccess: () => props.setIsOpen(false),
   })
   const { data: users } = trpc.user.getUsers.useQuery()
 
@@ -97,7 +97,7 @@ export function ItemForm({ setIsOpen }: ItemFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {traitsEnum.options.map((trait) => (
+                  {traitsEnum.options.sort().map((trait) => (
                     <SelectItem key={trait} label={trait} value={trait} />
                   ))}
                 </SelectContent>
@@ -133,7 +133,7 @@ export function ItemForm({ setIsOpen }: ItemFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit" variant="outline">
+        <Button type="submit" variant="primary">
           Adicionar Item
         </Button>
       </form>
