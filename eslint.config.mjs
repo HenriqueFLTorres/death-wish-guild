@@ -9,8 +9,16 @@ import unusedImportsPlugin from "eslint-plugin-unused-imports"
 import globals from "globals"
 import tseslint from "typescript-eslint"
 
-const ignores = ["node_modules/*", ".next/*"]
+// Global ignores for eslint
+const ignores = [
+  "node_modules/*",
+  ".next/*",
+  "!.storybook",
+  "storybook-static",
+  "**/*.md",
+]
 
+// Plugins used in the flat config
 const plugins = {
   react: reactPlugin,
   "react-hooks": hooksPlugin,

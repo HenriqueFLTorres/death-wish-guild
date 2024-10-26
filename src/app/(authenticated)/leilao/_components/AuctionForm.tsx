@@ -1,5 +1,12 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
+import { createInsertSchema } from "drizzle-zod"
+import { CalendarIcon } from "lucide-react"
+import moment from "moment"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { auctions } from "../../../../../supabase/migrations/schema"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -27,13 +34,6 @@ import {} from "@/components/ui/select"
 import DateTimePicker from "@/components/ui/timer-picker"
 import { trpc } from "@/trpc-client/client"
 import { classesEnum } from "@/types/classes"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { createInsertSchema } from "drizzle-zod"
-import { CalendarIcon } from "lucide-react"
-import moment from "moment"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { auctions } from "../../../../../supabase/migrations/schema"
 
 const auctionSchema = createInsertSchema(auctions)
   .omit({
@@ -161,7 +161,7 @@ export function AuctionForm(props: AuctionFormProps) {
 
                 <Popover>
                   <PopoverTrigger className="rounded-md border-secondary bg-secondary-600">
-                    {field.value ? (
+                    {field.value instanceof Date ? (
                       moment(field.value).format("MMMM Do, YYYY")
                     ) : (
                       <span>Selecione uma data</span>
@@ -188,19 +188,10 @@ export function AuctionForm(props: AuctionFormProps) {
             control={form.control}
             name="start_time"
             render={({ field }) => (
-              <FormField
-                control={form.control}
-                name="start_time"
-                render={({ field }) => (
-                  <FormItem>
-                    <DateTimePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <DateTimePicker value={field.value} onChange={field.onChange} />
+                <FormMessage />
+              </FormItem>
             )}
           />
         </div>
@@ -214,7 +205,7 @@ export function AuctionForm(props: AuctionFormProps) {
 
                 <Popover>
                   <PopoverTrigger className="rounded-md border-secondary bg-secondary-600">
-                    {field.value ? (
+                    {field.value instanceof Date ? (
                       moment(field.value).format("MMMM Do, YYYY")
                     ) : (
                       <span>Selecione uma data</span>
@@ -241,19 +232,10 @@ export function AuctionForm(props: AuctionFormProps) {
             control={form.control}
             name="end_time"
             render={({ field }) => (
-              <FormField
-                control={form.control}
-                name="end_time"
-                render={({ field }) => (
-                  <FormItem>
-                    <DateTimePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <DateTimePicker value={field.value} onChange={field.onChange} />
+                <FormMessage />
+              </FormItem>
             )}
           />
         </div>

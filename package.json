@@ -61,7 +61,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.3",
     "@next/eslint-plugin-next": "^14.2.13",
     "@stylistic/eslint-plugin": "^2.2.2",
     "@types/dompurify": "^3.0.5",

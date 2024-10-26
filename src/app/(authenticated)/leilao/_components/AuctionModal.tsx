@@ -1,7 +1,7 @@
 import { Scale } from "lucide-react"
 import { ItemType } from "../../_components/RecentDrops"
 import { AuctionForm } from "./AuctionForm"
-import { buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,7 @@ function NewAuctionModal(props: AuctionProps) {
   )
 }
 
-function AuctionDetails(props: AuctionProps) {
+function AuctionDetails() {
   return (
     <DialogTitle>
       <Scale /> <p>Deatlahes do Leilão</p>
@@ -36,21 +36,18 @@ function AuctionDetails(props: AuctionProps) {
 export function AuctionModalTrigger(props: AuctionProps) {
   return (
     <Dialog>
-      <DialogTrigger
-        className={buttonVariants({
-          variant: "secondary-flat",
-          size: "icon",
-        })}
-      >
-        <Scale size={16} />
+      <DialogTrigger asChild>
+        <Button size="icon" variant="secondary-flat">
+          <Scale size={16} />
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
-        {props.item.auction_id ? (
+        {props.item.auction_id == null ? (
+          <AuctionDetails />
+        ) : (
           <dl>
             <NewAuctionModal item={props.item} />
           </dl>
-        ) : (
-          <AuctionDetails item={props.item} />
         )}
         <DialogFooter></DialogFooter>
       </DialogContent>
