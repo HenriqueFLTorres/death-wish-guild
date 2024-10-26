@@ -1,13 +1,41 @@
 import { relations } from "drizzle-orm/relations"
 import {
   account,
+  auctions,
   events,
+  items,
   logs,
   session,
   user,
   user_events,
   user_logs,
 } from "./schema"
+
+export const auctionsRelations = relations(auctions, ({ one, many }) => ({
+  item: one(items, {
+    fields: [auctions.item_id],
+    references: [items.id],
+    relationName: "auctions_item_id_items_id",
+  }),
+  items: many(items, {
+    relationName: "items_auction_id_auctions_id",
+  }),
+}))
+
+export const itemsRelations = relations(items, ({ one, many }) => ({
+  auctions: many(auctions, {
+    relationName: "auctions_item_id_items_id",
+  }),
+  user: one(user, {
+    fields: [items.acquired_by],
+    references: [user.id],
+  }),
+  auction: one(auctions, {
+    fields: [items.auction_id],
+    references: [auctions.id],
+    relationName: "items_auction_id_auctions_id",
+  }),
+}))
 
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
@@ -18,6 +46,7 @@ export const sessionRelations = relations(session, ({ one }) => ({
 
 export const userRelations = relations(user, ({ one, many }) => ({
   sessions: many(session),
+  items: many(items),
   user: one(user, {
     fields: [user.invited_by],
     references: [user.id],
