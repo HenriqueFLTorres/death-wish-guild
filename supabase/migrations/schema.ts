@@ -1,4 +1,5 @@
 import {
+  type AnyPgColumn,
   boolean,
   foreignKey,
   integer,
@@ -101,13 +102,14 @@ export const auctions = pgTable("auctions", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   current_max_bid: integer("current_max_bid"),
   class_type: class_type("biddable_classes").array(),
-  start_price: integer("start_price").default(1),
   start_time: timestamp("start_time", { withTimezone: true, mode: "string" }),
   end_time: timestamp("end_time", { withTimezone: true, mode: "string" }),
   created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
     .defaultNow()
     .notNull(),
-  item_id: uuid("item_id").references(() => items.id),
+  item_id: uuid("item_id").references((): AnyPgColumn => items.id),
+  initial_bid: integer("initial_bid").default(0).notNull(),
+  bid_history: jsonb("bid_history").default({ bid_history: [] }),
 })
 
 export const events = pgTable("events", {
@@ -149,14 +151,15 @@ export const session = pgTable("session", {
 
 export const items = pgTable("items", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  name: text("name"),
-  trait: text("trait"),
+  name: text("name").notNull(),
+  trait: text("trait").notNull(),
   added_at: timestamp("added_at", { withTimezone: true, mode: "string" })
     .defaultNow()
     .notNull(),
   acquired_by: text("acquired_by")
     .notNull()
     .references(() => user.id),
+  auction_id: uuid("auction_id").references((): AnyPgColumn => auctions.id),
 })
 
 export const user = pgTable(

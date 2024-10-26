@@ -11,18 +11,29 @@ import {
   user_logs,
 } from "./schema"
 
-export const auctionsRelations = relations(auctions, ({ one }) => ({
+export const auctionsRelations = relations(auctions, ({ one, many }) => ({
   item: one(items, {
     fields: [auctions.item_id],
     references: [items.id],
+    relationName: "auctions_item_id_items_id",
+  }),
+  items: many(items, {
+    relationName: "items_auction_id_auctions_id",
   }),
 }))
 
 export const itemsRelations = relations(items, ({ one, many }) => ({
-  auctions: many(auctions),
+  auctions: many(auctions, {
+    relationName: "auctions_item_id_items_id",
+  }),
   user: one(user, {
     fields: [items.acquired_by],
     references: [user.id],
+  }),
+  auction: one(auctions, {
+    fields: [items.auction_id],
+    references: [auctions.id],
+    relationName: "items_auction_id_auctions_id",
   }),
 }))
 

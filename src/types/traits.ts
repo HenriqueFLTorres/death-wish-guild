@@ -17,7 +17,8 @@ export const traitsEnum = z.enum([
   "Melee Evasion",
   "Ranged Evasion",
   "Magic Evasion",
-  //
+  "Heavy Attack Chance",
+  "Damage Reduction",
   "Boss Melee Critical Hit Chance",
   "Boss Ranged Critical Hit Chance",
   "Boss Magic Critical Hit Chance",
@@ -36,7 +37,6 @@ export const traitsEnum = z.enum([
   "Boss Melee Evasion",
   "Boss Ranged Evasion",
   "Boss Magic Evasion",
-  //
   "PvP Melee Critical Hit Chance",
   "PvP Ranged Critical Hit Chance",
   "PvP Magic Critical Hit Chance",
@@ -55,12 +55,10 @@ export const traitsEnum = z.enum([
   "PvP Melee Evasion",
   "PvP Ranged Evasion",
   "PvP Magic Evasion",
-  //
   "Skill Damage Boost",
   "Skill Damage Resistance",
   "Buff Duration",
   "Debuff Duration",
-  //
   "Humanoid Damage Reduction",
   "Humanoid Boost Damage",
   "Demon Damage Reduction",
@@ -71,7 +69,6 @@ export const traitsEnum = z.enum([
   "Construct Boost Damage",
   "Wildkin Damage Reduction",
   "Wildkin Boost Damage",
-  //
   "Weaken Chance",
   "Weaken Resistance",
   "Stun Chance",
@@ -86,15 +83,12 @@ export const traitsEnum = z.enum([
   "Bind Resistance",
   "Fear Chance",
   "Fear Resistance",
-  //
   "Amitoi Healing",
   "Evasion",
   "Endurance",
-  //
   "Melee Defense",
   "Ranged Defense",
   "Magic Defense",
-  //
   "Critical Hit Chance",
   "Melee Critical Hit Chance",
   "Ranged Critical Hit Chance",
@@ -102,11 +96,8 @@ export const traitsEnum = z.enum([
   "Melee Heavy Attack Chance",
   "Ranged Heavy Attack Chance",
   "Magic Heavy Attack Chance",
-  //
   "Hit Chance",
   "Melee Hit Chance",
   "Ranged Hit Chance",
   "Magic Hit Chance",
-  //
-  "Sem Trait",
 ])
