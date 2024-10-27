@@ -21,6 +21,7 @@ import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { NumberInput } from "@/components/ui/number-input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SelectUser } from "@/db/schema"
+import { useToast } from "@/hooks/useToast"
 import { cn } from "@/lib/utils"
 import { RouterOutput, trpc } from "@/trpc-client/client"
 
@@ -79,6 +80,8 @@ function AuctionContent(props: AuctionContentProps) {
 
   const auctionID = auction.id
 
+  const { toast } = useToast()
+
   const currentAmount = useWatch({ control: form.control, name: "amount" })
 
   const { data: bidHistory = [], refetch } =
@@ -124,12 +127,23 @@ function AuctionContent(props: AuctionContentProps) {
     },
     onSettled: async () => await utils.auctions.getBidHistory.invalidate(),
     onSuccess: () => form.reset({ amount: undefined }),
-    onError: async (_, __, context) => {
+    onError: async (error, __, context) => {
       utils.auctions.getBidHistory.setData(
         { auctionID },
         context?.previousBidHistory
       )
+
       await utils.auctions.getAuction.invalidate({ auctionID })
+
+      const errorMessage = errorsToMessage[error.message]
+      toast({
+        title: "Erro ao colocar lance",
+        description:
+          errorMessage == null
+            ? "Ocorreu um erro ao colocar o lance, tente novamente"
+            : errorMessage,
+        variant: "destructive",
+      })
     },
   })
 
@@ -219,7 +233,7 @@ function AuctionContent(props: AuctionContentProps) {
                     disabled={
                       !form.formState.isValid ||
                       form.formState.isSubmitting ||
-                      currentAmount < (auction.current_max_bid ?? 0)
+                      currentAmount <= (auction.current_max_bid ?? 0)
                     }
                     type="submit"
                     variant="primary-flat"
@@ -300,4 +314,13 @@ const statusToVariant: Record<AuctionType["status"], BadgeProps["variant"]> = {
   OPEN: "success",
   FINISHED: "primary",
   CANCELED: "error",
+}
+
+const errorsToMessage: Record<string, string> = {
+  INSUFFICIENT_POINTS:
+    "Você não possui pontos suficientes para colocar o lance",
+  NOT_ALLOWED_CLASS:
+    "Você não possui permissão para colocar lance nesse leilão",
+  INVALID_BID_AMOUNT:
+    "Ooops, parece que alguém já colocou um lance maior que o seu",
 }

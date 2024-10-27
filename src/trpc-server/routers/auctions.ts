@@ -114,8 +114,8 @@ export const auctionRouter = router({
 
       const user = ctx.session?.user
 
-      if (user == null) throw new Error("User not authenticated")
-      if (user.points < input.amount) throw new Error("Insufficient points")
+      if (user == null) throw new Error("USER_NOT_AUTHENTICATED")
+      if (user.points < input.amount) throw new Error("INSUFFICIENT_POINTS")
 
       const [auction] = await db
         .select()
@@ -123,19 +123,19 @@ export const auctionRouter = router({
         .where(eq(auctions.id, input.auctionID))
         .limit(1)
 
-      if (auction == null) throw new Error("Auction not found")
+      if (auction == null) throw new Error("AUCTION_NOT_FOUND")
       if (
         auction.class_type != null &&
         !auction.class_type.includes(user.class)
       )
-        throw new Error("You are not allowed to bid on this auction")
+        throw new Error("NOT_ALLOWED_CLASS")
 
       const minBidAmount =
         auction.current_max_bid == null
           ? auction.initial_bid
           : auction.current_max_bid + 5
 
-      if (input.amount < minBidAmount) throw new Error("Invalid bid amount")
+      if (input.amount < minBidAmount) throw new Error("INVALID_BID_AMOUNT")
 
       const [{ updatedID }] = await db
         .update(auctions)
