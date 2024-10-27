@@ -47,6 +47,11 @@ export const key_type = pgEnum("key_type", [
   "secretstream",
   "stream_xchacha20",
 ])
+export const auction_status_type = pgEnum("auction_status_type", [
+  "OPEN",
+  "FINISHED",
+  "CANCELED",
+])
 export const class_type = pgEnum("class_type", [
   "DPS",
   "RANGED_DPS",
@@ -102,14 +107,27 @@ export const auctions = pgTable("auctions", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   current_max_bid: integer("current_max_bid"),
   class_type: class_type("biddable_classes").array(),
-  start_time: timestamp("start_time", { withTimezone: true, mode: "string" }),
-  end_time: timestamp("end_time", { withTimezone: true, mode: "string" }),
+  start_time: timestamp("start_time", {
+    withTimezone: true,
+    mode: "string",
+  }).notNull(),
+  end_time: timestamp("end_time", {
+    withTimezone: true,
+    mode: "string",
+  }).notNull(),
   created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
     .defaultNow()
     .notNull(),
-  item_id: uuid("item_id").references((): AnyPgColumn => items.id),
+  item_id: uuid("item_id")
+    .notNull()
+    .references((): AnyPgColumn => items.id, { onDelete: "set null" }),
   initial_bid: integer("initial_bid").default(0).notNull(),
-  bid_history: jsonb("bid_history").default({ bid_history: [] }),
+  bid_history: jsonb("bid_history")
+    .$type<{
+      bid_history: { amount: number; user_id: string; bidded_at: string }[]
+    }>()
+    .default({ bid_history: [] }),
+  status: auction_status_type("status").default("OPEN").notNull(),
 })
 
 export const events = pgTable("events", {
@@ -127,26 +145,10 @@ export const events = pgTable("events", {
   points_for_completion: integer("points_for_completion").default(0).notNull(),
 })
 
-export const logs = pgTable("logs", {
+export const guild = pgTable("guild", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  category: log_category("category").notNull(),
-  type: log_type("type").notNull(),
-  action: log_action("action").notNull(),
-  target_id: text("target_id"),
-  from: text("from"),
-  to: text("to"),
-  triggered_by: text("triggered_by").notNull(),
-  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
-    .defaultNow()
-    .notNull(),
-})
-
-export const session = pgTable("session", {
-  sessionToken: text("sessionToken").primaryKey().notNull(),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "string" }).notNull(),
+  name: text("name").notNull(),
+  message_of_the_day: text("message_of_the_day"),
 })
 
 export const items = pgTable("items", {
@@ -195,10 +197,26 @@ export const user = pgTable(
   }
 )
 
-export const guild = pgTable("guild", {
+export const logs = pgTable("logs", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  name: text("name").notNull(),
-  message_of_the_day: text("message_of_the_day"),
+  category: log_category("category").notNull(),
+  type: log_type("type").notNull(),
+  action: log_action("action").notNull(),
+  target_id: text("target_id"),
+  from: text("from"),
+  to: text("to"),
+  triggered_by: text("triggered_by").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .defaultNow()
+    .notNull(),
+})
+
+export const session = pgTable("session", {
+  sessionToken: text("sessionToken").primaryKey().notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "string" }).notNull(),
 })
 
 export const user_events = pgTable(

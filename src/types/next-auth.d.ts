@@ -10,6 +10,7 @@ declare module "next-auth" {
       role: "ADMIN" | "MODERATOR" | "MEMBER"
       username: string
       class: "DPS" | "RANGED_DPS" | "TANK" | "SUPPORT"
+      points: number
     } & DefaultSession["user"]
   }
 }

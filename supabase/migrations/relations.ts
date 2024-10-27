@@ -37,15 +37,7 @@ export const itemsRelations = relations(items, ({ one, many }) => ({
   }),
 }))
 
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}))
-
 export const userRelations = relations(user, ({ one, many }) => ({
-  sessions: many(session),
   items: many(items),
   user: one(user, {
     fields: [user.invited_by],
@@ -55,9 +47,17 @@ export const userRelations = relations(user, ({ one, many }) => ({
   users: many(user, {
     relationName: "user_invited_by_user_id",
   }),
+  sessions: many(session),
   user_events: many(user_events),
   user_logs: many(user_logs),
   accounts: many(account),
+}))
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
 }))
 
 export const user_eventsRelations = relations(user_events, ({ one }) => ({

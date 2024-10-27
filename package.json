@@ -46,6 +46,7 @@
     "drizzle-zod": "^0.5.1",
     "html-react-parser": "^5.1.16",
     "lucide-react": "^0.396.0",
+    "millify": "^6.1.0",
     "moment": "^2.30.1",
     "next": "14.2.4",
     "next-auth": "^5.0.0-beta.19",

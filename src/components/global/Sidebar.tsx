@@ -1,11 +1,13 @@
 "use client"
 
 import {
+  Backpack,
   CalendarDays,
   CalendarRange,
   LayoutDashboard,
   LogOut,
   type LucideIcon,
+  Scale,
   ScrollText,
   Users,
 } from "lucide-react"
@@ -49,16 +51,16 @@ const links: NavegationLink[] = [
   //   label: "Ranking",
   //   path: "/ranking",
   // },
-  // {
-  //   icon: Backpack,
-  //   label: "Gerenciar Items",
-  //   path: "/gerenciar-items",
-  // },
-  // {
-  //   icon: Scale,
-  //   label: "Leilão",
-  //   path: "/leilao",
-  // },
+  {
+    icon: Backpack,
+    label: "Gerenciar Items",
+    path: "/gerenciar-items",
+  },
+  {
+    icon: Scale,
+    label: "Leilão",
+    path: "/leilao",
+  },
   {
     icon: ScrollText,
     label: "Log de Eventos",
