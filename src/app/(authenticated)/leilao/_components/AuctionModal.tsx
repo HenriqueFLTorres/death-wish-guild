@@ -96,6 +96,9 @@ function AuctionContent(props: AuctionContentProps) {
   const userDKP = session?.user?.points
 
   const utils = trpc.useUtils()
+  const forceAuction = trpc.auctions.forceAuction.useMutation({
+    onSettled: async () => await utils.auctions.getAuctions.invalidate(),
+  })
   const { mutate: placeBid } = trpc.auctions.placeBid.useMutation({
     onMutate: async (newBid) => {
       await utils.guild.getMessageOfTheDay.cancel()
@@ -173,6 +176,15 @@ function AuctionContent(props: AuctionContentProps) {
           </DialogTitle>
           <p className="text-neutral-400">{auction.item.trait}</p>
         </div>
+        {auction.start_time < new Date().toISOString() && (
+          <div>
+            <Button
+              onClick={() => forceAuction.mutate({ auctionID: auction.id })}
+            >
+              Start Now
+            </Button>
+          </div>
+        )}
       </header>
 
       <dl className="grid grid-cols-2 gap-4 border-b pb-5 [&>div]:flex [&>div]:flex-col [&>div]:gap-2 [&_dt]:text-sm [&_dt]:text-neutral-500">
