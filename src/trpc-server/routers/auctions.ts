@@ -68,6 +68,36 @@ export const auctionRouter = router({
 
       return { insertedID, updatedID }
     }),
+  deleteAuction: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .query(async (opts) => {
+      const { input } = opts
+      const [deletedAuction] = await db
+        .delete(auctions)
+        .where(eq(auctions.id, input.auctionID))
+
+      return deletedAuction
+    }),
+  forceAuction: authenticatedProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+      const now = new Date(Date.now()).toISOString()
+      const [forceAuction] = await db
+        .update(auctions)
+        .set({ start_time: now })
+        .where(eq(auctions.id, input.auctionID))
+
+      return forceAuction
+    }),
   getBidHistory: authenticatedProcedure
     .input(
       z.object({
