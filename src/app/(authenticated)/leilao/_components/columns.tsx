@@ -1,6 +1,5 @@
 "use client"
 
-import {} from "@/components/ui/tooltip"
 import { ColumnDef } from "@tanstack/react-table"
 import moment from "moment"
 import Image from "next/image"
@@ -48,7 +47,7 @@ export const columns: ColumnDef<AuctionType>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const { variant, translation } = getAuctionVariant(row.original.status)
+      const { variant, translation } = getAuctionVariant(row.original)
 
       return <Badge variant={variant}>{translation}</Badge>
     },

@@ -1,5 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Gavel, Plus, RefreshCw, TextSearch } from "lucide-react"
+import {
+  EllipsisVertical,
+  Gavel,
+  Plus,
+  RefreshCw,
+  TextSearch,
+} from "lucide-react"
 import { millify } from "millify"
 import moment from "moment"
 import Image from "next/image"
@@ -9,7 +15,7 @@ import { UseFormReturn, useForm, useWatch } from "react-hook-form"
 import * as z from "zod"
 import { AuctionType } from "../page"
 import { Avatar } from "@/components/ui/avatar"
-import { BadgeProps } from "@/components/ui/badge"
+import { Badge, BadgeProps } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
@@ -17,6 +23,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { NumberInput } from "@/components/ui/number-input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -95,9 +106,14 @@ function AuctionContent(props: AuctionContentProps) {
   const { data: session } = useSession()
   const userDKP = session?.user?.points
 
+  const { variant, translation } = getAuctionStatusVariant(auction)
+
   const utils = trpc.useUtils()
   const forceAuction = trpc.auctions.forceAuction.useMutation({
-    onSettled: async () => await utils.auctions.getAuctions.invalidate(),
+    onSettled: async () => await utils.auctions.invalidate(),
+  })
+  const deleteAuction = trpc.auctions.deleteAuction.useMutation({
+    onSettled: async () => await utils.auctions.invalidate(),
   })
   const { mutate: placeBid } = trpc.auctions.placeBid.useMutation({
     onMutate: async (newBid) => {
@@ -176,18 +192,45 @@ function AuctionContent(props: AuctionContentProps) {
           </DialogTitle>
           <p className="text-neutral-400">{auction.item.trait}</p>
         </div>
-        {auction.start_time < new Date().toISOString() && (
-          <div>
-            <Button
-              onClick={() => forceAuction.mutate({ auctionID: auction.id })}
-            >
-              Start Now
-            </Button>
-          </div>
-        )}
+        <div className="flex flex-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="h-8 w-8">
+              <EllipsisVertical size={16} />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+              <div className="divide-y divide-zinc-800 p-1">
+                <p className="p-1">Ações</p>
+                <div>
+                  {auction.start_time > new Date().toISOString() ? (
+                    <div
+                      className="flex cursor-pointer p-1"
+                      onClick={() =>
+                        forceAuction.mutate({ auctionID: auction.id })
+                      }
+                    >
+                      <p>Abrir Leilão</p>
+                    </div>
+                  ) : (
+                    <p className="p-1 text-zinc-600">Abrir Leilão</p>
+                  )}
+                  <p className="p-1 text-zinc-600">Re-abrir Leilão</p>
+                  <div
+                    className="flex cursor-pointer p-1"
+                    onClick={() =>
+                      deleteAuction.mutate({ auctionID: auction.id })
+                    }
+                  >
+                    Deletar
+                  </div>
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </header>
 
-      <dl className="grid grid-cols-2 gap-4 border-b pb-5 [&>div]:flex [&>div]:flex-col [&>div]:gap-2 [&_dt]:text-sm [&_dt]:text-neutral-500">
+      <dl className="grid grid-cols-3 items-center justify-items-center gap-4 border-b pb-5 [&>div]:flex [&>div]:flex-col [&>div]:gap-2 [&_dt]:text-sm [&_dt]:text-neutral-500">
         <div>
           <dt>Início do leilão</dt>
           <dd className="flex gap-2">
@@ -198,6 +241,11 @@ function AuctionContent(props: AuctionContentProps) {
           <dt>Termino do leilão</dt>
           <dd className="flex items-center gap-2">
             {moment.utc(auction.end_time).fromNow()}
+          </dd>
+        </div>
+        <div>
+          <dd>
+            <Badge variant={variant}>{translation}</Badge>
           </dd>
         </div>
       </dl>
@@ -309,24 +357,51 @@ function BidHistoryTable(props: BidHistoryTableProps) {
   )
 }
 
-const getAuctionStatusVariant = (status: AuctionType["status"]) => {
+const getAuctionStatusVariant = (auction: AuctionType) => {
+  const status = getStatus(auction)
   return {
     variant: statusToVariant[status],
     translation: statusToText[status],
   }
 }
+const getStatus = (auction: AuctionType) => {
+  const localTime = new Date(Date.now()).toISOString()
 
-const statusToText: Record<AuctionType["status"], string> = {
+  if (auction.status === "OPEN") {
+    if (auction.start_time > localTime) {
+      return "PENDING"
+    }
+    if (auction.end_time > localTime) {
+      return "OPEN"
+    }
+    if (localTime > auction.end_time) {
+      return "AWAITING"
+    }
+  } else if (auction.status === "FINISHED") {
+    return auction.status
+  }
+  return "CANCELED"
+}
+interface auctionStatus {
+  status: "PENDING" | "OPEN" | "AWAITING" | "FINISHED" | "CANCELED"
+}
+
+const statusToText: Record<auctionStatus["status"], string> = {
   OPEN: "Aberto",
+  PENDING: "Pendente",
+  AWAITING: "Aguardando",
   FINISHED: "Finalizado",
   CANCELED: "Cancelado",
 }
 
-const statusToVariant: Record<AuctionType["status"], BadgeProps["variant"]> = {
-  OPEN: "success",
-  FINISHED: "primary",
-  CANCELED: "error",
-}
+const statusToVariant: Record<auctionStatus["status"], BadgeProps["variant"]> =
+  {
+    OPEN: "success",
+    PENDING: "warning",
+    AWAITING: "sky",
+    FINISHED: "primary",
+    CANCELED: "error",
+  }
 
 const errorsToMessage: Record<string, string> = {
   INSUFFICIENT_POINTS:
