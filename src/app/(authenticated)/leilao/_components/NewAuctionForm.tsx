@@ -4,9 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { createInsertSchema } from "drizzle-zod"
 import { CalendarIcon } from "lucide-react"
 import moment from "moment"
+import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { auctions } from "../../../../../supabase/migrations/schema"
+import { ItemType } from "../../_components/RecentDrops"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -30,7 +32,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import {} from "@/components/ui/select"
 import DateTimePicker from "@/components/ui/timer-picker"
 import { trpc } from "@/trpc-client/client"
 import { classesEnum } from "@/types/classes"
@@ -60,17 +61,24 @@ const auctionSchema = createInsertSchema(auctions)
 
 type newAuctionFormData = z.infer<typeof auctionSchema>
 
-interface AuctionFormProps {
-  item_id: string
-}
+export function AuctionForm() {
+  const utils = trpc.useUtils()
+  const { mutate: newAuction } = trpc.auctions.createAuction.useMutation({
+    onSettled: async () => await utils.auctions.invalidate(),
+    onSuccess: () =>
+      form.reset({
+        initial_bid: undefined,
+        start_time: undefined,
+        end_time: undefined,
+      }),
+  })
 
-export function AuctionForm(props: AuctionFormProps) {
-  const newAuction = trpc.auctions.createAuction.useMutation()
+  const { data: items = [] } = trpc.items.getItems.useQuery()
 
   const form = useForm<newAuctionFormData>({
     resolver: zodResolver(auctionSchema),
     defaultValues: {
-      item_id: props.item_id,
+      item_id: "",
       class_type: ["DPS"],
     },
   })
@@ -80,7 +88,7 @@ export function AuctionForm(props: AuctionFormProps) {
     const summedStartTime = moment(start_date).add(start_time).toISOString()
     const summedEndTime = moment(end_date).add(end_time).toISOString()
 
-    newAuction.mutate({
+    newAuction({
       ...restEvent,
       start_time: summedStartTime,
       end_time: summedEndTime,
@@ -109,6 +117,7 @@ export function AuctionForm(props: AuctionFormProps) {
                 >
                   Selecionar classes
                 </DropdownMenuTrigger>
+                <FormMessage />
 
                 <DropdownMenuContent align="center">
                   {classesEnum.options.map((class_type) => (
@@ -127,6 +136,46 @@ export function AuctionForm(props: AuctionFormProps) {
                         onSelect={(event) => event.preventDefault()}
                       >
                         {class_type}
+                      </DropdownMenuCheckboxItem>
+                    </FormControl>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="item_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex flex-row text-left">
+                Selecionar Item
+              </FormLabel>
+              <FormDescription>
+                {field.value === "" ? "" : <ItemDisplay {...items[0]} />}
+              </FormDescription>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={buttonVariants({ variant: "outline" })}
+                >
+                  Selecionar item
+                </DropdownMenuTrigger>
+                <FormMessage />
+
+                <DropdownMenuContent align="center">
+                  {items.map((item) => (
+                    <FormControl key={item.id}>
+                      <DropdownMenuCheckboxItem
+                        checked={field.value.includes(item.id)}
+                        onCheckedChange={(checked) => {
+                          return checked
+                            ? field.onChange((field.value = item.id))
+                            : field.onChange((field.value = ""))
+                        }}
+                        onSelect={(event) => event.preventDefault()}
+                      >
+                        <ItemDisplay {...item} />
                       </DropdownMenuCheckboxItem>
                     </FormControl>
                   ))}
@@ -240,9 +289,26 @@ export function AuctionForm(props: AuctionFormProps) {
           />
         </div>
         <Button type="submit" variant="primary">
-          Adicionar Item
+          Adicionar Lance
         </Button>
       </form>
     </Form>
+  )
+}
+function ItemDisplay(item: ItemType) {
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <div className="relative grid h-8 w-8 shrink-0 place-items-center">
+        <Image alt="" height={96} src="/item-frame.svg" width={96} />
+        <Image
+          alt=""
+          className="absolute"
+          height={90}
+          src="/crossbow.webp"
+          width={90}
+        />
+      </div>
+      {item.name}
+    </div>
   )
 }
