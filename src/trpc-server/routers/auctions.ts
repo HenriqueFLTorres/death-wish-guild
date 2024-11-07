@@ -74,7 +74,7 @@ export const auctionRouter = router({
         auctionID: z.string(),
       })
     )
-    .query(async (opts) => {
+    .mutation(async (opts) => {
       const { input } = opts
       const [deletedAuction] = await db
         .delete(auctions)
