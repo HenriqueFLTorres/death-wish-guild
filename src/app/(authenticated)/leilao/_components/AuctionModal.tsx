@@ -364,17 +364,17 @@ const getAuctionStatusVariant = (auction: AuctionType) => {
     translation: statusToText[status],
   }
 }
-const getStatus = (auction: AuctionType) => {
+export const getStatus = (auction: AuctionType) => {
   const localTime = new Date(Date.now()).toISOString()
 
   if (auction.status === "OPEN") {
-    if (auction.start_time > localTime) {
+    if (auction.start_time > localTime && auction.end_time > localTime) {
       return "PENDING"
     }
-    if (auction.end_time > localTime) {
+    if (auction.start_time < localTime && auction.end_time > localTime) {
       return "OPEN"
     }
-    if (localTime > auction.end_time) {
+    if (auction.start_time < localTime && auction.end_time < localTime) {
       return "AWAITING"
     }
   } else if (auction.status === "FINISHED") {

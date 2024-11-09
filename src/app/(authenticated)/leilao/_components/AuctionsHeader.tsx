@@ -1,7 +1,7 @@
 import { HeaderContext, Table, flexRender } from "@tanstack/react-table"
 import { Scale } from "lucide-react"
 import { AuctionType } from "../page"
-import { NewAuction } from "./NewAuction"
+import { CreateAuction } from "./CreateAuction"
 import { buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -36,26 +36,36 @@ interface ColumnsTogglerProps {
 
 function ColumnsToggler(props: ColumnsTogglerProps) {
   const { table } = props
+  const values = [
+    { name: "Aberto", key: "OPEN" },
+    { name: "Pendente", key: "OPEN" },
+    { name: "Aguardando", key: "OPEN" },
+    { name: "Finalizado", key: "FINISHED" },
+    { name: "Cancelado", key: "CANCELED" },
+  ]
   return (
     <>
-      <NewAuction />
+      <CreateAuction />
       <DropdownMenu>
         <DropdownMenuTrigger className={buttonVariants({ variant: "outline" })}>
-          Ações
+          Status
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {table.getAllColumns().map((column) => (
+          {values.map((status) => (
             <DropdownMenuCheckboxItem
-              checked={column.getIsVisible()}
+              checked={
+                table.getColumn("status")?.getFilterValue() === status.key
+              }
               className="capitalize"
-              key={column.id}
-              onCheckedChange={(value) => column.toggleVisibility(!!value)}
-              onSelect={(event) => event.preventDefault()}
+              key={status.key}
+              onSelect={() =>
+                (table.getColumn("status")?.getFilterValue() as string) ===
+                status.key
+                  ? table.getColumn("status")?.setFilterValue("")
+                  : table.getColumn("status")?.setFilterValue(status.key)
+              }
             >
-              {flexRender(
-                column.columnDef.header,
-                undefined as unknown as HeaderContext<AuctionType, unknown>
-              )}
+              {status.name}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
