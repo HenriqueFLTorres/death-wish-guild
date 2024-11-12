@@ -5,6 +5,7 @@ import moment from "moment"
 import Image from "next/image"
 import { AuctionType } from "../page"
 import { AuctionModal, getAuctionVariant } from "./AuctionModal"
+import { ClassDisplay } from "./CreateAuction"
 import { Badge } from "@/components/ui/badge"
 
 export type statusTypes = {
@@ -43,6 +44,21 @@ export const columns: ColumnDef<statusTypes>[] = [
     ),
   },
   {
+    accessorKey: "class_type",
+    header: "Classe",
+    cell: ({ row }) =>
+      row.original.class_type !== null &&
+      row.original.class_type?.length !== 0 ? (
+        <div className="flex justify-center gap-2">
+          {row.original.class_type.map((icon) => (
+            <ClassDisplay onlyIcon={true} userClass={icon} />
+          ))}
+        </div>
+      ) : (
+        <div>-</div>
+      ),
+  },
+  {
     accessorKey: "current_max_bid",
     header: "Lance Máximo",
     cell: ({ row }) => <p>{row.original.current_max_bid ?? "-"}</p>,
@@ -52,7 +68,6 @@ export const columns: ColumnDef<statusTypes>[] = [
     header: "Status",
     cell: ({ row }) => {
       const { variant, translation } = getAuctionVariant(row.original)
-
       return <Badge variant={variant}>{translation}</Badge>
     },
   },

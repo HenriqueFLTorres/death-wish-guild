@@ -200,7 +200,7 @@ function AuctionContent(props: AuctionContentProps) {
             <h2 className="text-xl">{auction.item.name}</h2>
           </DialogTitle>
           <p className="text-neutral-400">{auction.item.trait}</p>
-          <div className="flex gap-1 pt-1 text-zinc-300">
+          <div className="flex gap-1 pt-1">
             {auction.class_type?.map((classes) => (
               <ClassDisplay onlyIcon={true} userClass={classes} />
             ))}
