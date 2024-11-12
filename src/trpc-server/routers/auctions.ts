@@ -98,6 +98,38 @@ export const auctionRouter = router({
 
       return forceAuction
     }),
+  cancelAuction: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const [cancelAuction] = await db
+        .update(auctions)
+        .set({ status: "CANCELED" })
+        .where(eq(auctions.id, input.auctionID))
+
+      return cancelAuction
+    }),
+  endAuction: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const [endAuction] = await db
+        .update(auctions)
+        .set({ status: "FINISHED" })
+        .where(eq(auctions.id, input.auctionID))
+
+      return endAuction
+    }),
   getBidHistory: authenticatedProcedure
     .input(
       z.object({
@@ -178,7 +210,8 @@ export const auctionRouter = router({
               jsonb_build_object(
                 'amount', ${input.amount}::numeric,
                 'user_id', ${user.id}::text,
-                'bidded_at', ${new Date().toISOString()}::timestamp
+                'bidded_at', ${new Date().toISOString()}::timestamp,
+                'id', ${crypto.randomUUID()}::uuid
               )::jsonb
             )
           )`,
@@ -187,5 +220,28 @@ export const auctionRouter = router({
         .returning({ updatedID: auctions.id })
 
       return updatedID
+    }),
+  deleteBid: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+        bidId: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const [auction] = await db
+        .select()
+        .from(auctions)
+        .where(eq(auctions.id, input.auctionID))
+        .limit(1)
+
+      const filtered = auction.bid_history?.bid_history.filter(
+        (x) => x.id !== input.bidId
+      )
+      if (filtered === undefined) return
+
+      return []
     }),
 })

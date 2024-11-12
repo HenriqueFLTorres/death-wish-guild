@@ -7,7 +7,11 @@ import { AuctionType } from "../page"
 import { AuctionModal, getAuctionVariant } from "./AuctionModal"
 import { Badge } from "@/components/ui/badge"
 
-export const columns: ColumnDef<AuctionType>[] = [
+export type statusTypes = {
+  status: "OPEN" | "PENDING" | "AWAITING" | "CANCELED" | "FINISHED"
+} & AuctionType
+
+export const columns: ColumnDef<statusTypes>[] = [
   {
     accessorKey: "item_id",
     header: "Item",

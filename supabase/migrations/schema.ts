@@ -1,3 +1,4 @@
+import { UUID } from "crypto"
 import {
   type AnyPgColumn,
   boolean,
@@ -124,7 +125,12 @@ export const auctions = pgTable("auctions", {
   initial_bid: integer("initial_bid").default(0).notNull(),
   bid_history: jsonb("bid_history")
     .$type<{
-      bid_history: { amount: number; user_id: string; bidded_at: string }[]
+      bid_history: {
+        amount: number
+        user_id: string
+        bidded_at: string
+        id: UUID
+      }[]
     }>()
     .default({ bid_history: [] }),
   status: auction_status_type("status").default("OPEN").notNull(),

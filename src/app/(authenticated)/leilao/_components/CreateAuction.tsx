@@ -100,7 +100,6 @@ export function CreateAuction() {
     defaultValues: {
       item_id: "",
       class_type: ["DPS"],
-      initial_bid: 0,
     },
   })
 
@@ -221,6 +220,7 @@ export function CreateAuction() {
                   <FormLabel>Lance inicial</FormLabel>
 
                   <Input
+                    placeholder="10"
                     type="number"
                     {...field}
                     onChange={(e) =>
@@ -338,9 +338,10 @@ interface classProps {
   userClass: "DPS" | "RANGED_DPS" | "TANK" | "SUPPORT"
   Icon?: LucideIcon
   user?: string
+  onlyIcon?: boolean
 }
 
-function ClassDisplay({ userClass }: classProps) {
+export function ClassDisplay({ userClass, onlyIcon }: classProps) {
   const ClassToIcon: Record<classProps["userClass"], LucideIcon> = {
     DPS: Sword,
     RANGED_DPS: ArrowBigDown,
@@ -363,7 +364,7 @@ function ClassDisplay({ userClass }: classProps) {
       ) : (
         <Icon className="fill-current" size={20} />
       )}
-      <p>{user}</p>
+      {!onlyIcon && <p>{user}</p>}
     </div>
   )
 }

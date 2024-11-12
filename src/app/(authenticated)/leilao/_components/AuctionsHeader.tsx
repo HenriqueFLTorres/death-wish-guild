@@ -51,13 +51,13 @@ function ColumnsToggler(props: ColumnsTogglerProps) {
           Status
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {values.map((status) => (
+          {values.map((status, index) => (
             <DropdownMenuCheckboxItem
               checked={
                 table.getColumn("status")?.getFilterValue() === status.key
               }
               className="capitalize"
-              key={status.key}
+              key={index}
               onSelect={() =>
                 (table.getColumn("status")?.getFilterValue() as string) ===
                 status.key
