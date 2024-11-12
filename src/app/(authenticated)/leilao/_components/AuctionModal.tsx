@@ -1,13 +1,6 @@
 import { UUID } from "crypto"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  EllipsisVertical,
-  Gavel,
-  Plus,
-  RefreshCw,
-  TextSearch,
-  X,
-} from "lucide-react"
+import { Gavel, Menu, Plus, RefreshCw, TextSearch, X } from "lucide-react"
 import { millify } from "millify"
 import moment from "moment"
 import Image from "next/image"
@@ -116,6 +109,9 @@ function AuctionContent(props: AuctionContentProps) {
   const forceAuction = trpc.auctions.forceAuction.useMutation({
     onSettled: async () => await utils.auctions.invalidate(),
   })
+  const reOpenAuction = trpc.auctions.reOpenAuction.useMutation({
+    onSettled: async () => await utils.auctions.invalidate(),
+  })
   const cancelAuction = trpc.auctions.cancelAuction.useMutation({
     onSettled: async () => await utils.auctions.invalidate(),
   })
@@ -214,7 +210,9 @@ function AuctionContent(props: AuctionContentProps) {
           <div className="flex flex-1">
             <DropdownMenu>
               <DropdownMenuTrigger className="h-8 w-8">
-                <EllipsisVertical size={16} />
+                <Button size="icon" variant="secondary-flat">
+                  <Menu size={16} />
+                </Button>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end">
@@ -233,7 +231,20 @@ function AuctionContent(props: AuctionContentProps) {
                     ) : (
                       <p className="p-1 text-zinc-500">Abrir Leilão</p>
                     )}
-                    <p className="p-1 text-zinc-500">Re-abrir Leilão</p>
+                    {auction.status === "OPEN" &&
+                    auction.end_time < moment().toISOString() ? (
+                      <div
+                        className="flex cursor-pointer p-1"
+                        onClick={() =>
+                          reOpenAuction.mutate({ auctionID: auction.id })
+                        }
+                      >
+                        <p>Re-abrir Leilão</p>
+                      </div>
+                    ) : (
+                      <p className="p-1 text-zinc-500">Re-abrir Leilão</p>
+                    )}
+
                     {auction.status === "OPEN" ? (
                       <div
                         className="flex cursor-pointer p-1"
@@ -298,78 +309,87 @@ function AuctionContent(props: AuctionContentProps) {
       </dl>
 
       <div>
-        {auction.status === "OPEN" && (
-          <div className="flex flex-col gap-4">
-            <header className="flex justify-between gap-2">
-              <h3 className="flex items-center gap-2 text-lg font-semibold">
-                <Gavel size={24} />
-                Lances recentes ({bidHistory.length})
-              </h3>
+        {auction.status === "OPEN" &&
+          auction.start_time > moment().toISOString() && (
+            <div className="flex justify-center gap-2">
+              <h3>O Leilão ainda não começou</h3>
+            </div>
+          )}
+        {auction.status === "OPEN" &&
+          auction.start_time < moment().toISOString() && (
+            <div className="flex flex-col gap-4">
+              <header className="flex justify-between gap-2">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
+                  <Gavel size={24} />
+                  Lances recentes ({bidHistory.length})
+                </h3>
 
-              <div className="flex flex-col gap-2">
-                <p className="text-end text-xs text-neutral-300">
-                  Meu DKP Disponível: {millify(userDKP ?? 0)}
-                </p>
+                <div className="flex flex-col gap-2">
+                  <p className="text-end text-xs text-neutral-300">
+                    Meu DKP Disponível: {millify(userDKP ?? 0)}
+                  </p>
 
-                <div className="ml-auto flex items-end gap-3">
-                  <Form {...form}>
-                    <form
-                      className="flex gap-3"
-                      onSubmit={form.handleSubmit(onSubmit)}
-                    >
-                      <FormField
-                        control={form.control}
-                        name="amount"
-                        render={({ field }) => (
-                          <FormItem>
-                            <NumberInput
-                              className={cn(
-                                "w-36",
-                                form.formState.errors.amount &&
-                                  "border-red-500 bg-red-500/20"
-                              )}
-                              defaultValue={
-                                auction.current_max_bid !== null
-                                  ? auction.current_max_bid + 5
-                                  : 0
-                              }
-                              maxValue={userDKP}
-                              minValue={auction.initial_bid}
-                              step={5}
-                              {...field}
-                            />
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button
-                        className="h-8"
-                        disabled={
-                          !form.formState.isValid ||
-                          form.formState.isSubmitting ||
-                          currentAmount <= (auction.current_max_bid ?? 0)
-                        }
-                        type="submit"
-                        variant="primary-flat"
+                  <div className="ml-auto flex items-end gap-3">
+                    <Form {...form}>
+                      <form
+                        className="flex gap-3"
+                        onSubmit={form.handleSubmit(onSubmit)}
                       >
-                        <Plus size={16} /> Colocar Lance
-                      </Button>
-                    </form>
-                  </Form>
-                  <Button
-                    size="icon"
-                    variant="secondary-flat"
-                    onClick={() => refetch()}
-                  >
-                    <RefreshCw size={16} />
-                  </Button>
+                        <FormField
+                          control={form.control}
+                          name="amount"
+                          render={({ field }) => (
+                            <FormItem>
+                              <NumberInput
+                                className={cn(
+                                  "w-36",
+                                  form.formState.errors.amount &&
+                                    "border-red-500 bg-red-500/20"
+                                )}
+                                defaultValue={
+                                  auction.current_max_bid !== null
+                                    ? auction.current_max_bid + 5
+                                    : 0
+                                }
+                                maxValue={userDKP}
+                                minValue={auction.initial_bid}
+                                step={5}
+                                {...field}
+                              />
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button
+                          className="h-8"
+                          disabled={
+                            !form.formState.isValid ||
+                            form.formState.isSubmitting ||
+                            auction.start_time > moment().toISOString() ||
+                            auction.end_time < moment().toISOString() ||
+                            currentAmount <= (auction.current_max_bid ?? 0)
+                          }
+                          type="submit"
+                          variant="primary-flat"
+                        >
+                          <Plus size={16} /> Colocar Lance
+                        </Button>
+                      </form>
+                    </Form>
+                    <Button
+                      size="icon"
+                      variant="secondary-flat"
+                      onClick={() => refetch()}
+                    >
+                      <RefreshCw size={16} />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </header>
+              </header>
 
-            <BidHistoryTable auctionId={auction.id} bidHistory={bidHistory} />
-          </div>
-        )}
+              <BidHistoryTable auctionId={auction.id} bidHistory={bidHistory} />
+            </div>
+          )}
         {auction.status === "CANCELED" && (
           <div className="flex justify-center gap-2">
             <h3>Leilão Cancelado</h3>

@@ -1,4 +1,5 @@
 import { eq, sql } from "drizzle-orm"
+import moment from "moment"
 import { z } from "zod"
 import { adminProcedure, authenticatedProcedure, router } from ".."
 import { auctions, items, user } from "../../../supabase/migrations/schema"
@@ -90,7 +91,17 @@ export const auctionRouter = router({
     )
     .mutation(async (opts) => {
       const { input } = opts
-      const now = new Date(Date.now()).toISOString()
+
+      const now = moment().toISOString()
+
+      const [auction] = await db
+        .select()
+        .from(auctions)
+        .where(eq(auctions.id, input.auctionID))
+        .limit(1)
+
+      if (auction.status !== "OPEN") throw new Error("AUCTION IS NOT AVAILABLE")
+
       const [forceAuction] = await db
         .update(auctions)
         .set({ start_time: now })
@@ -98,6 +109,34 @@ export const auctionRouter = router({
 
       return forceAuction
     }),
+  reOpenAuction: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const now = moment().toISOString()
+      const tomorrow = moment().add(1, "d").toISOString()
+
+      const [auction] = await db
+        .select()
+        .from(auctions)
+        .where(eq(auctions.id, input.auctionID))
+        .limit(1)
+
+      if (auction.status !== "OPEN") throw new Error("AUCTION IS NOT AVAILABLE")
+
+      const [reOpenAuction] = await db
+        .update(auctions)
+        .set({ start_time: now, end_time: tomorrow })
+        .where(eq(auctions.id, input.auctionID))
+
+      return reOpenAuction
+    }),
+
   cancelAuction: adminProcedure
     .input(
       z.object({
