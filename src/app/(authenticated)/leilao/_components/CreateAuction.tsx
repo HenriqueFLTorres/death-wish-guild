@@ -69,6 +69,7 @@ const auctionSchema = createInsertSchema(auctions)
     start_time: true,
     end_time: true,
     created_at: true,
+    bid_history: true,
   })
   .and(
     z.object({

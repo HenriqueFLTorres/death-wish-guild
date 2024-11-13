@@ -1,12 +1,14 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import { ArrowDownUp } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
 import { AuctionType } from "../page"
 import { AuctionModal, getAuctionVariant } from "./AuctionModal"
 import { ClassDisplay } from "./CreateAuction"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 export type statusTypes = {
   status: "OPEN" | "PENDING" | "AWAITING" | "CANCELED" | "FINISHED"
@@ -15,7 +17,18 @@ export type statusTypes = {
 export const columns: ColumnDef<statusTypes>[] = [
   {
     accessorKey: "item_id",
-    header: "Item",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="gap-0"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Item
+          <ArrowDownUp className="ml-1 h-4 w-4" />
+        </Button>
+      )
+    },
     enableHiding: false,
     cell: ({ row }) => (
       <li className="flex items-center gap-2 px-0.5 py-2.5 text-sm first-of-type:pt-0 last-of-type:pb-0">
@@ -45,7 +58,18 @@ export const columns: ColumnDef<statusTypes>[] = [
   },
   {
     accessorKey: "class_type",
-    header: "Classe",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="gap-0"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Classe
+          <ArrowDownUp className="ml-1 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) =>
       row.original.class_type !== null &&
       row.original.class_type?.length !== 0 ? (
@@ -60,7 +84,18 @@ export const columns: ColumnDef<statusTypes>[] = [
   },
   {
     accessorKey: "current_max_bid",
-    header: "Lance Máximo",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="gap-0"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Lance Máximo
+          <ArrowDownUp className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => <p>{row.original.current_max_bid ?? "-"}</p>,
   },
   {

@@ -1,8 +1,13 @@
-import { eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import moment from "moment"
 import { z } from "zod"
 import { adminProcedure, authenticatedProcedure, router } from ".."
-import { auctions, items, user } from "../../../supabase/migrations/schema"
+import {
+  auctions,
+  bid_history,
+  items,
+  user,
+} from "../../../supabase/migrations/schema"
 import { db } from "@/db"
 import { classesEnum } from "@/types/classes"
 
@@ -178,16 +183,13 @@ export const auctionRouter = router({
     .query(async (opts) => {
       const { input } = opts
 
-      const [auction] = await db
+      const bids = await db
         .select()
-        .from(auctions)
-        .where(eq(auctions.id, input.auctionID))
-        .limit(1)
-
-      const bidHistory = auction.bid_history?.bid_history ?? []
+        .from(bid_history)
+        .where(eq(bid_history.auction_id, input.auctionID))
 
       const parsedBidHistory = await Promise.all(
-        bidHistory.map(async (bid) => {
+        bids.map(async (bid) => {
           const [bidder] = await db
             .select()
             .from(user)
@@ -237,28 +239,18 @@ export const auctionRouter = router({
           : auction.current_max_bid + 5
 
       if (input.amount < minBidAmount) throw new Error("INVALID_BID_AMOUNT")
+      if (ctx.session?.user.id == undefined) return
 
-      const [{ updatedID }] = await db
-        .update(auctions)
-        .set({
-          current_max_bid: input.amount,
-          bid_history: sql`jsonb_set(
-            COALESCE(${auctions.bid_history}, '{"bid_history":[]}'::jsonb),
-            '{bid_history}',
-            (COALESCE(${auctions.bid_history}->>'bid_history', '[]')::jsonb || 
-              jsonb_build_object(
-                'amount', ${input.amount}::numeric,
-                'user_id', ${user.id}::text,
-                'bidded_at', ${new Date().toISOString()}::timestamp,
-                'id', ${crypto.randomUUID()}::uuid
-              )::jsonb
-            )
-          )`,
+      const [{ bidID }] = await db
+        .insert(bid_history)
+        .values({
+          amount: input.amount,
+          auction_id: input.auctionID,
+          user_id: ctx.session.user.id,
         })
-        .where(eq(auctions.id, input.auctionID))
-        .returning({ updatedID: auctions.id })
+        .returning({ bidID: bid_history.id })
 
-      return updatedID
+      return bidID
     }),
   deleteBid: adminProcedure
     .input(
@@ -270,17 +262,10 @@ export const auctionRouter = router({
     .mutation(async (opts) => {
       const { input } = opts
 
-      const [auction] = await db
-        .select()
-        .from(auctions)
-        .where(eq(auctions.id, input.auctionID))
-        .limit(1)
+      const [bids] = await db
+        .delete(bid_history)
+        .where(eq(bid_history.id, input.bidId))
 
-      const filtered = auction.bid_history?.bid_history.filter(
-        (x) => x.id !== input.bidId
-      )
-      if (filtered === undefined) return
-
-      return []
+      return bids
     }),
 })

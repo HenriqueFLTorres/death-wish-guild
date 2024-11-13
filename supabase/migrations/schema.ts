@@ -1,4 +1,3 @@
-import { UUID } from "crypto"
 import {
   type AnyPgColumn,
   boolean,
@@ -104,6 +103,23 @@ export const equality_op = pgEnum("equality_op", [
   "in",
 ])
 
+export const bid_history = pgTable("bid_history", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  user_id: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "set null" }),
+  auction_id: uuid("auction_id")
+    .notNull()
+    .references(() => auctions.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  amount: integer("amount").notNull(),
+  bidded_at: timestamp("bidded_at", { withTimezone: true, mode: "string" })
+    .defaultNow()
+    .notNull(),
+})
+
 export const auctions = pgTable("auctions", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   current_max_bid: integer("current_max_bid"),
@@ -123,17 +139,8 @@ export const auctions = pgTable("auctions", {
     .notNull()
     .references((): AnyPgColumn => items.id, { onDelete: "set null" }),
   initial_bid: integer("initial_bid").default(0).notNull(),
-  bid_history: jsonb("bid_history")
-    .$type<{
-      bid_history: {
-        amount: number
-        user_id: string
-        bidded_at: string
-        id: UUID
-      }[]
-    }>()
-    .default({ bid_history: [] }),
   status: auction_status_type("status").default("OPEN").notNull(),
+  bid_history: uuid("bid_history").array(),
 })
 
 export const events = pgTable("events", {
@@ -167,7 +174,9 @@ export const items = pgTable("items", {
   acquired_by: text("acquired_by")
     .notNull()
     .references(() => user.id),
-  auction_id: uuid("auction_id").references((): AnyPgColumn => auctions.id),
+  auction_id: uuid("auction_id").references((): AnyPgColumn => auctions.id, {
+    onDelete: "set null",
+  }),
 })
 
 export const user = pgTable(

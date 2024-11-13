@@ -1,4 +1,3 @@
-import { UUID } from "crypto"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Gavel, Menu, Plus, RefreshCw, TextSearch, X } from "lucide-react"
 import { millify } from "millify"
@@ -28,7 +27,6 @@ import {
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { NumberInput } from "@/components/ui/number-input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { SelectUser } from "@/db/schema"
 import { useToast } from "@/hooks/useToast"
 import { cn } from "@/lib/utils"
 import { RouterOutput, trpc } from "@/trpc-client/client"
@@ -133,16 +131,7 @@ function AuctionContent(props: AuctionContentProps) {
 
       const user = session?.user
       if (user == null || user.id == null) return
-      utils.auctions.getBidHistory.setData({ auctionID }, (prev = []) => [
-        {
-          user: user as SelectUser,
-          amount: newBid.amount,
-          user_id: user.id as string,
-          bidded_at: new Date().toISOString(),
-          id: crypto.randomUUID() as UUID,
-        },
-        ...prev,
-      ])
+
       utils.auctions.getAuctions.setData(undefined, (prev = []) =>
         prev.map((auction) =>
           auction.id === auctionID
@@ -470,13 +459,19 @@ function BidHistoryTable(props: BidHistoryTableProps) {
               {moment.utc(bid.bidded_at).local().fromNow()}
             </p>
             {hover && index === indexn && (
-              <X
-                className="absolute right-7 text-zinc-400"
-                size={14}
-                onClick={() =>
-                  deleteBid.mutate({ auctionID: auctionId, bidId: bid.id })
-                }
-              />
+              <Button
+                className="absolute right-2"
+                size="icon"
+                variant="secondary-flat"
+              >
+                <X
+                  className="text-zinc-400"
+                  size={14}
+                  onClick={() =>
+                    deleteBid.mutate({ auctionID: auctionId, bidId: bid.id })
+                  }
+                />
+              </Button>
             )}
           </li>
         ))}
