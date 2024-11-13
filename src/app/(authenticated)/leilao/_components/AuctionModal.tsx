@@ -190,8 +190,8 @@ function AuctionContent(props: AuctionContentProps) {
           </DialogTitle>
           <p className="text-neutral-400">{auction.item.trait}</p>
           <div className="flex gap-1 pt-1">
-            {auction.class_type?.map((classes) => (
-              <ClassDisplay onlyIcon={true} userClass={classes} />
+            {auction.class_type?.map((classes, index) => (
+              <ClassDisplay key={index} onlyIcon={true} userClass={classes} />
             ))}
           </div>
         </div>

@@ -1,14 +1,12 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowDownUp } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
 import { AuctionType } from "../page"
 import { AuctionModal, getAuctionVariant } from "./AuctionModal"
 import { ClassDisplay } from "./CreateAuction"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 
 export type statusTypes = {
   status: "OPEN" | "PENDING" | "AWAITING" | "CANCELED" | "FINISHED"
@@ -18,16 +16,7 @@ export const columns: ColumnDef<statusTypes>[] = [
   {
     accessorKey: "item_id",
     header: ({ column }) => {
-      return (
-        <Button
-          className="gap-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Item
-          <ArrowDownUp className="ml-1 h-4 w-4" />
-        </Button>
-      )
+      return <HeaderName column={column} name="Item" />
     },
     enableHiding: false,
     cell: ({ row }) => (
@@ -59,23 +48,14 @@ export const columns: ColumnDef<statusTypes>[] = [
   {
     accessorKey: "class_type",
     header: ({ column }) => {
-      return (
-        <Button
-          className="gap-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Classe
-          <ArrowDownUp className="ml-1 h-4 w-4" />
-        </Button>
-      )
+      return <HeaderName column={column} name="Classe" />
     },
     cell: ({ row }) =>
       row.original.class_type !== null &&
       row.original.class_type?.length !== 0 ? (
         <div className="flex justify-center gap-2">
-          {row.original.class_type.map((icon) => (
-            <ClassDisplay onlyIcon={true} userClass={icon} />
+          {row.original.class_type.map((icon, index) => (
+            <ClassDisplay key={index} onlyIcon={true} userClass={icon} />
           ))}
         </div>
       ) : (
@@ -85,16 +65,7 @@ export const columns: ColumnDef<statusTypes>[] = [
   {
     accessorKey: "current_max_bid",
     header: ({ column }) => {
-      return (
-        <Button
-          className="gap-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Lance Máximo
-          <ArrowDownUp className="ml-2 h-4 w-4" />
-        </Button>
-      )
+      return <HeaderName column={column} name="Lance Máximo" />
     },
     cell: ({ row }) => <p>{row.original.current_max_bid ?? "-"}</p>,
   },
@@ -118,3 +89,16 @@ export const columns: ColumnDef<statusTypes>[] = [
     cell: ({ row }) => <AuctionModal auctionID={row.original.id} />,
   },
 ]
+
+function HeaderName({ name, column }: { name: string; column: any }) {
+  return (
+    <div
+      className="cursor-pointer"
+      onClick={() =>
+        column && column.toggleSorting(column.getIsSorted() === "asc")
+      }
+    >
+      {name}
+    </div>
+  )
+}

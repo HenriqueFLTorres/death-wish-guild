@@ -146,8 +146,8 @@ export function CreateAuction() {
                         "Nenhum"
                       ) : (
                         <div className="flex gap-4">
-                          {field.value.map((userClass) => (
-                            <ClassDisplay userClass={userClass} />
+                          {field.value.map((userClass, index) => (
+                            <ClassDisplay key={index} userClass={userClass} />
                           ))}
                         </div>
                       )}
@@ -158,8 +158,8 @@ export function CreateAuction() {
                       align="center"
                       className="flex flex-col"
                     >
-                      {classesEnum.options.map((class_type) => (
-                        <FormControl key={class_type}>
+                      {classesEnum.options.map((class_type, index) => (
+                        <FormControl key={index}>
                           <DropdownMenuCheckboxItem
                             checked={field.value?.includes(class_type)}
                             onCheckedChange={(checked) => {
@@ -201,7 +201,7 @@ export function CreateAuction() {
                     </FormControl>
                     <SelectContent>
                       {items.map((item) => (
-                        <SelectItem value={item.id}>
+                        <SelectItem key={item.id} value={item.id}>
                           <ItemDisplay {...item} />
                           <SelectItemText></SelectItemText>
                         </SelectItem>
@@ -377,7 +377,7 @@ function ItemDisplay({ id }: { id: ItemType["id"] }) {
   const { data } = trpc.items.getItem.useQuery({ itemID: id })
   if (data)
     return (
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2" key={id}>
         <div className="relative grid h-6 w-6 shrink-0 place-items-center">
           <Image alt="" height={40} src="/item-frame.svg" width={40} />
           <Image
