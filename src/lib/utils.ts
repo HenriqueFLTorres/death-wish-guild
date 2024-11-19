@@ -42,7 +42,7 @@ export function getWeekRange(date: Date) {
   return days
 }
 
-export function translateRole(role: SelectUser["role"]) {
+export function translateRole(role: unknown) {
   switch (role) {
     case "ADMIN":
       return "Administrador"

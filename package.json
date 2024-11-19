@@ -14,6 +14,8 @@
   "dependencies": {
     "@auth/drizzle-adapter": "^1.4.1",
     "@auth/supabase-adapter": "^1.4.1",
+    "@clerk/nextjs": "^6.3.4",
+    "@clerk/themes": "^2.1.45",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^3.6.0",

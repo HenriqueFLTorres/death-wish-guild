@@ -3,7 +3,7 @@ import { Gavel, Plus, RefreshCw, TextSearch } from "lucide-react"
 import { millify } from "millify"
 import moment from "moment"
 import Image from "next/image"
-import { useSession } from "next-auth/react"
+import { useSession } from "@clerk/nextjs"
 import { useState } from "react"
 import { UseFormReturn, useForm, useWatch } from "react-hook-form"
 import * as z from "zod"
@@ -92,7 +92,7 @@ function AuctionContent(props: AuctionContentProps) {
       { enabled: isOpen }
     )
 
-  const { data: session } = useSession()
+  const { session } = useSession()
   const userDKP = session?.user?.points
 
   const utils = trpc.useUtils()

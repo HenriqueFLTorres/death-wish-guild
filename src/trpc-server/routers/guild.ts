@@ -5,7 +5,9 @@ import { guild } from "../../../supabase/migrations/schema"
 import { db } from "@/db"
 
 export const guildRouter = router({
-  getMessageOfTheDay: authenticatedProcedure.query(async () => {
+  getMessageOfTheDay: authenticatedProcedure.query(async (opts) => {
+    console.log({ opts })
+
     const [guildResult] = await db
       .select()
       .from(guild)

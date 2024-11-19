@@ -1,9 +1,11 @@
-import { auth } from "@/auth"
+import { useOrganization, useSession } from "@clerk/nextjs"
 
 export const createContext = async () => {
-  const session = await auth()
+  const { session } = useSession()
+  const { membership } = useOrganization()
 
   return {
     session,
+    membership,
   }
 }

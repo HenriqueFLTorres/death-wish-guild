@@ -1,11 +1,14 @@
+import { ClerkProvider } from "@clerk/nextjs"
+import { dark } from "@clerk/themes"
 import type { Metadata } from "next"
 import { Poppins } from "next/font/google"
 
-import NextAuthProvider from "./_providers/NextAuthProvider"
 import QueryClientProvider from "./_providers/QueryClientProvider"
 import { Toaster } from "@/components/ui/toaster"
 import { TooltipProvider } from "@/components/ui/tooltip"
+
 import { cn } from "@/lib/utils"
+
 import "./globals.css"
 
 const poppins = Poppins({
@@ -19,9 +22,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
       <body
@@ -30,12 +33,12 @@ export default function RootLayout({
           "h-screen overflow-hidden bg-primary-800"
         )}
       >
-        <NextAuthProvider>
+        <ClerkProvider appearance={{ baseTheme: dark }}>
           <TooltipProvider>
             <QueryClientProvider>{children}</QueryClientProvider>
             <Toaster />
           </TooltipProvider>
-        </NextAuthProvider>
+        </ClerkProvider>
       </body>
     </html>
   )

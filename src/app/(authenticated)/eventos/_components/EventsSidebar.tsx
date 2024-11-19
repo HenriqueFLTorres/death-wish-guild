@@ -1,9 +1,9 @@
 "use client"
 
+import { useSession } from "@clerk/nextjs"
 import { BellRing, CalendarDays } from "lucide-react"
 import moment from "moment"
 import { useParams } from "next/navigation"
-import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { CreateEvent } from "./CreateEvent"
 import { EventCard } from "./EventCard"
@@ -19,7 +19,7 @@ function EventsSidebar() {
   const [selectedDay, setSelectedDay] = useState(new Date())
   const pathname = useParams<{ id: string }>()
 
-  const { data: session } = useSession()
+  const { session } = useSession()
   const isAdmin = session?.user.role === "ADMIN"
 
   const { data: events = [] } = trpc.events.getEventsByDay.useQuery({

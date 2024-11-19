@@ -1,8 +1,8 @@
 "use client"
 
+import { SignIn } from "@clerk/nextjs"
 import { RotateCcw } from "lucide-react"
 import Image from "next/image"
-import { signIn } from "next-auth/react"
 import { AccessDeniedMessage } from "./_components/AccessDenied"
 import { LoginErrorMessage } from "./_components/LoginError"
 import { Button } from "@/components/ui/button"
@@ -25,13 +25,11 @@ function ErrorPage(props: ErrorPageProps) {
           <LoginErrorMessage error={error} />
         )}
 
-        <Button
-          className="relative z-10 w-full"
-          onClick={() => signIn("discord", { callbackUrl: "/" })}
-        >
+        {/* <Button className="relative z-10 w-full" onClick={() => SignIn()}>
           <RotateCcw />
           Tentar novamente
-        </Button>
+        </Button> */}
+        <SignIn />
 
         <Image
           alt=""

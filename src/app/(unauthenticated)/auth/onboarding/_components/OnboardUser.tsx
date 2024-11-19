@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PartyPopperIcon, Rocket } from "lucide-react"
 import Image from "next/image"
-import { useSession } from "next-auth/react"
+import { useSession } from "@clerk/nextjs"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"

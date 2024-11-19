@@ -1,11 +1,19 @@
 "use client"
 
 import {
+  OrganizationSwitcher,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+  useOrganization,
+  useSession,
+} from "@clerk/nextjs"
+import {
   Backpack,
   CalendarDays,
   CalendarRange,
   LayoutDashboard,
-  LogOut,
   type LucideIcon,
   Scale,
   ScrollText,
@@ -13,15 +21,12 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { redirect, usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 
-import { signIn, signOut, useSession } from "next-auth/react"
 import { useState } from "react"
 import { MessageOfTheDay } from "./MessageOfTheDay"
-import { Avatar } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { PATHS } from "@/lib/constants/paths"
-import { cn, translateRole } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { trpc } from "@/trpc-client/client"
 
 type NavegationLink = {
@@ -71,11 +76,8 @@ const links: NavegationLink[] = [
 const Sidebar = () => {
   const [isMouseOver, setIsMouseOver] = useState(false)
 
-  const { data: session, status } = useSession()
+  const { session } = useSession()
   const { data: eventsCount = 0 } = trpc.events.getTodaysEventsCount.useQuery()
-
-  if (status === "unauthenticated") signIn("discord", { callbackUrl: "/" })
-  if (session?.user.is_recruited === false) return redirect("/auth/onboarding")
 
   return (
     <aside
@@ -139,7 +141,7 @@ const Sidebar = () => {
         </Button>
 
         <MessageOfTheDay
-          isAdmin={session?.user.role === "ADMIN"}
+          isAdmin={session?.user.publicMetadata?.role === "ADMIN"}
           isMouseOver={isMouseOver}
         />
       </div>
@@ -150,38 +152,23 @@ const Sidebar = () => {
         ))}
       </ul>
 
-      <div className="flex w-full items-start overflow-hidden px-1">
-        {status === "authenticated" ? (
-          <div
-            className="flex w-full justify-between rounded-full bg-transparent p-1 pr-2 transition-colors duration-300 data-[isover=true]:bg-black/40"
-            data-isover={isMouseOver}
-          >
-            <div className="flex items-center gap-3">
-              <Avatar
-                fallbackText={session.user.name}
-                src={session.user.image}
-              />
-              <div className="flex flex-col gap-0.5 text-neutral-100">
-                <Link
-                  className="font-semibold hover:underline focus-visible:underline"
-                  href={PATHS.MEMBRO.ID({ UUID: session.user.id })}
-                >
-                  {session.user.name}
-                </Link>
-                <p className="text-xs">{translateRole(session.user.role)}</p>
-              </div>
-            </div>
+      <div className="flex w-full flex-col items-start gap-4 overflow-hidden px-1">
+        <SignedOut>
+          <SignInButton />
+        </SignedOut>
 
-            <button
-              aria-label="log out"
-              className="p-1 text-white"
-              type="button"
-              onClick={() => signOut()}
-            >
-              <LogOut size={20} />
-            </button>
-          </div>
-        ) : null}
+        <div className="flex items-center gap-2 px-2">
+          <SignedIn>
+            <UserButton
+              appearance={{
+                elements: { userButtonTrigger: "[&>span]:flex-row-reverse" },
+              }}
+              showName
+            />
+          </SignedIn>
+        </div>
+
+        <OrganizationSwitcher />
       </div>
     </aside>
   )

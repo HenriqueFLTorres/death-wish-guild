@@ -4,7 +4,7 @@ import type { UniqueIdentifier } from "@dnd-kit/core"
 import { Check, Clock, DoorOpen, NotebookPen, Users } from "lucide-react"
 import moment from "moment"
 import Image from "next/image"
-import { useSession } from "next-auth/react"
+import { useSession } from "@clerk/nextjs"
 import { getEventTypeImagePath } from "../_components/EventCard"
 import { ALL_POSSIBLE_OPTIONS } from "../_components/SelectEvent"
 import { PerGroup } from "./_components/PerGroup"
@@ -20,7 +20,7 @@ interface EventPageProps {
 
 function EventPage(props: EventPageProps) {
   const { params } = props
-  const { data: session } = useSession()
+  const { session } = useSession()
 
   const { data: users = [] } = trpc.user.getUsers.useQuery()
 

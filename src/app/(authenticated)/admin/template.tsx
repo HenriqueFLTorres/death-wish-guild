@@ -1,8 +1,8 @@
 "use client"
 
+import { useSession } from '@clerk/nextjs'
 import Image from "next/image"
 import { redirect } from "next/navigation"
-import { useSession } from "next-auth/react"
 import type { ReactNode } from "react"
 
 interface TemplateProps {
@@ -10,10 +10,10 @@ interface TemplateProps {
 }
 
 export default function Template(props: TemplateProps) {
-  const { data: session } = useSession()
+  const { session } = useSession()
   const { children } = props
 
-  if (session?.user.role !== "ADMIN") redirect("/")
+  // if (session?.user.role !== "ADMIN") redirect("/")
 
   return (
     <section className="relative flex max-h-[75vh] w-full max-w-screen-xl gap-6 overflow-hidden rounded-lg px-7 py-10">
