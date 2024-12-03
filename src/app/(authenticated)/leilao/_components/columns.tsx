@@ -1,17 +1,23 @@
 "use client"
 
-import {} from "@/components/ui/tooltip"
 import { ColumnDef } from "@tanstack/react-table"
 import moment from "moment"
 import Image from "next/image"
 import { AuctionType } from "../page"
 import { AuctionModal, getAuctionVariant } from "./AuctionModal"
+import { ClassDisplay } from "./CreateAuction"
 import { Badge } from "@/components/ui/badge"
 
-export const columns: ColumnDef<AuctionType>[] = [
+export type statusTypes = {
+  status: "OPEN" | "PENDING" | "AWAITING" | "CANCELED" | "FINISHED"
+} & AuctionType
+
+export const columns: ColumnDef<statusTypes>[] = [
   {
     accessorKey: "item_id",
-    header: "Item",
+    header: ({ column }) => {
+      return <HeaderName column={column} name="Item" />
+    },
     enableHiding: false,
     cell: ({ row }) => (
       <li className="flex items-center gap-2 px-0.5 py-2.5 text-sm first-of-type:pt-0 last-of-type:pb-0">
@@ -40,16 +46,34 @@ export const columns: ColumnDef<AuctionType>[] = [
     ),
   },
   {
+    accessorKey: "class_type",
+    header: ({ column }) => {
+      return <HeaderName column={column} name="Classe" />
+    },
+    cell: ({ row }) =>
+      row.original.class_type !== null &&
+      row.original.class_type?.length !== 0 ? (
+        <div className="flex justify-center gap-2">
+          {row.original.class_type.map((icon, index) => (
+            <ClassDisplay key={index} onlyIcon={true} userClass={icon} />
+          ))}
+        </div>
+      ) : (
+        <div>-</div>
+      ),
+  },
+  {
     accessorKey: "current_max_bid",
-    header: "Lance Máximo",
+    header: ({ column }) => {
+      return <HeaderName column={column} name="Lance Máximo" />
+    },
     cell: ({ row }) => <p>{row.original.current_max_bid ?? "-"}</p>,
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const { variant, translation } = getAuctionVariant(row.original.status)
-
+      const { variant, translation } = getAuctionVariant(row.original)
       return <Badge variant={variant}>{translation}</Badge>
     },
   },
@@ -65,3 +89,16 @@ export const columns: ColumnDef<AuctionType>[] = [
     cell: ({ row }) => <AuctionModal auctionID={row.original.id} />,
   },
 ]
+
+function HeaderName({ name, column }: { name: string; column: any }) {
+  return (
+    <div
+      className="cursor-pointer"
+      onClick={() =>
+        column && column.toggleSorting(column.getIsSorted() === "asc")
+      }
+    >
+      {name}
+    </div>
+  )
+}

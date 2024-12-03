@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm/relations"
 import {
   account,
   auctions,
+  bid_history,
   events,
   items,
   logs,
@@ -11,7 +12,19 @@ import {
   user_logs,
 } from "./schema"
 
+export const bid_historyRelations = relations(bid_history, ({ one }) => ({
+  auction: one(auctions, {
+    fields: [bid_history.auction_id],
+    references: [auctions.id],
+  }),
+  user: one(user, {
+    fields: [bid_history.user_id],
+    references: [user.id],
+  }),
+}))
+
 export const auctionsRelations = relations(auctions, ({ one, many }) => ({
+  bid_histories: many(bid_history),
   item: one(items, {
     fields: [auctions.item_id],
     references: [items.id],
@@ -20,6 +33,23 @@ export const auctionsRelations = relations(auctions, ({ one, many }) => ({
   items: many(items, {
     relationName: "items_auction_id_auctions_id",
   }),
+}))
+
+export const userRelations = relations(user, ({ one, many }) => ({
+  bid_histories: many(bid_history),
+  items: many(items),
+  user: one(user, {
+    fields: [user.invited_by],
+    references: [user.id],
+    relationName: "user_invited_by_user_id",
+  }),
+  users: many(user, {
+    relationName: "user_invited_by_user_id",
+  }),
+  sessions: many(session),
+  user_events: many(user_events),
+  user_logs: many(user_logs),
+  accounts: many(account),
 }))
 
 export const itemsRelations = relations(items, ({ one, many }) => ({
@@ -35,22 +65,6 @@ export const itemsRelations = relations(items, ({ one, many }) => ({
     references: [auctions.id],
     relationName: "items_auction_id_auctions_id",
   }),
-}))
-
-export const userRelations = relations(user, ({ one, many }) => ({
-  items: many(items),
-  user: one(user, {
-    fields: [user.invited_by],
-    references: [user.id],
-    relationName: "user_invited_by_user_id",
-  }),
-  users: many(user, {
-    relationName: "user_invited_by_user_id",
-  }),
-  sessions: many(session),
-  user_events: many(user_events),
-  user_logs: many(user_logs),
-  accounts: many(account),
 }))
 
 export const sessionRelations = relations(session, ({ one }) => ({

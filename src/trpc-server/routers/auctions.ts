@@ -1,7 +1,13 @@
-import { eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
+import moment from "moment"
 import { z } from "zod"
 import { adminProcedure, authenticatedProcedure, router } from ".."
-import { auctions, items, user } from "../../../supabase/migrations/schema"
+import {
+  auctions,
+  bid_history,
+  items,
+  user,
+} from "../../../supabase/migrations/schema"
 import { db } from "@/db"
 import { classesEnum } from "@/types/classes"
 
@@ -68,6 +74,106 @@ export const auctionRouter = router({
 
       return { insertedID, updatedID }
     }),
+  deleteAuction: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+      const [deletedAuction] = await db
+        .delete(auctions)
+        .where(eq(auctions.id, input.auctionID))
+
+      return deletedAuction
+    }),
+  forceAuction: authenticatedProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const now = moment().toISOString()
+
+      const [auction] = await db
+        .select()
+        .from(auctions)
+        .where(eq(auctions.id, input.auctionID))
+        .limit(1)
+
+      if (auction.status !== "OPEN") throw new Error("AUCTION IS NOT AVAILABLE")
+
+      const [forceAuction] = await db
+        .update(auctions)
+        .set({ start_time: now })
+        .where(eq(auctions.id, input.auctionID))
+
+      return forceAuction
+    }),
+  reOpenAuction: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const now = moment().toISOString()
+      const tomorrow = moment().add(1, "d").toISOString()
+
+      const [auction] = await db
+        .select()
+        .from(auctions)
+        .where(eq(auctions.id, input.auctionID))
+        .limit(1)
+
+      if (auction.status !== "OPEN") throw new Error("AUCTION IS NOT AVAILABLE")
+
+      const [reOpenAuction] = await db
+        .update(auctions)
+        .set({ start_time: now, end_time: tomorrow })
+        .where(eq(auctions.id, input.auctionID))
+
+      return reOpenAuction
+    }),
+
+  cancelAuction: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const [cancelAuction] = await db
+        .update(auctions)
+        .set({ status: "CANCELED" })
+        .where(eq(auctions.id, input.auctionID))
+
+      return cancelAuction
+    }),
+  endAuction: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const [endAuction] = await db
+        .update(auctions)
+        .set({ status: "FINISHED" })
+        .where(eq(auctions.id, input.auctionID))
+
+      return endAuction
+    }),
   getBidHistory: authenticatedProcedure
     .input(
       z.object({
@@ -77,16 +183,13 @@ export const auctionRouter = router({
     .query(async (opts) => {
       const { input } = opts
 
-      const [auction] = await db
+      const bids = await db
         .select()
-        .from(auctions)
-        .where(eq(auctions.id, input.auctionID))
-        .limit(1)
-
-      const bidHistory = auction.bid_history?.bid_history ?? []
+        .from(bid_history)
+        .where(eq(bid_history.auction_id, input.auctionID))
 
       const parsedBidHistory = await Promise.all(
-        bidHistory.map(async (bid) => {
+        bids.map(async (bid) => {
           const [bidder] = await db
             .select()
             .from(user)
@@ -136,26 +239,33 @@ export const auctionRouter = router({
           : auction.current_max_bid + 5
 
       if (input.amount < minBidAmount) throw new Error("INVALID_BID_AMOUNT")
+      if (ctx.session?.user.id == undefined) return
 
-      const [{ updatedID }] = await db
-        .update(auctions)
-        .set({
-          current_max_bid: input.amount,
-          bid_history: sql`jsonb_set(
-            COALESCE(${auctions.bid_history}, '{"bid_history":[]}'::jsonb),
-            '{bid_history}',
-            (COALESCE(${auctions.bid_history}->>'bid_history', '[]')::jsonb || 
-              jsonb_build_object(
-                'amount', ${input.amount}::numeric,
-                'user_id', ${user.id}::text,
-                'bidded_at', ${new Date().toISOString()}::timestamp
-              )::jsonb
-            )
-          )`,
+      const [{ bidID }] = await db
+        .insert(bid_history)
+        .values({
+          amount: input.amount,
+          auction_id: input.auctionID,
+          user_id: ctx.session.user.id,
         })
-        .where(eq(auctions.id, input.auctionID))
-        .returning({ updatedID: auctions.id })
+        .returning({ bidID: bid_history.id })
 
-      return updatedID
+      return bidID
+    }),
+  deleteBid: adminProcedure
+    .input(
+      z.object({
+        auctionID: z.string(),
+        bidId: z.string(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+
+      const [bids] = await db
+        .delete(bid_history)
+        .where(eq(bid_history.id, input.bidId))
+
+      return bids
     }),
 })
